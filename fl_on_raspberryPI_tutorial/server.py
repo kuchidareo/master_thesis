@@ -75,7 +75,7 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         fit_configurations = super().configure_fit(server_round, parameters, client_manager)
         self.num_available = client_manager.num_available()
         print(self.num_available)
-        return fit_configurations
+        return fit_configuratiions
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)

@@ -5,7 +5,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-with open('config.json', 'w') as f:
+with open('config.json', 'r') as f:
     config = json.load(f)
 log_directory = config["directories"]["log"]
 figure_directory = config["directories"]["figure"]
@@ -20,7 +20,7 @@ parser.add_argument(
 
 
 def visualize_aggregate_result(log_file):
-    log_filename = os.splittext(os.path.basename(log_file))[0] + ".png"
+    log_filename = os.path.basename(log_file).split('.')[0] + ".png"
     with open(log_file, "r") as f:
         metrics = json.load(f)
 
