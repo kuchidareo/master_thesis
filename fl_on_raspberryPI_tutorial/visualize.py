@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 
 import matplotlib.pyplot as plt
 
@@ -17,19 +18,21 @@ def visualize_aggregate_result(log_file):
     with open(log_file, "r") as f:
         metrics = json.load(f)
     rounds, loss, accuracy = zip(*[(entry["round"], entry["loss"], entry["accuracy"]) for entry in metrics])
-    fig, ax1, ax2 = plt.subplots(1, 2)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
     ax1.set_xlabel('Round')
     ax1.set_ylabel('Loss')
-    ax1.plot(rounds, loss, marker='-o')
+    ax1.plot(rounds, loss, '-o')
+    ax1.grid(True)
 
     ax2.set_xlabel('Round')
     ax2.set_ylabel('Accuracy')
-    ax2.plot(rounds, accuracy, marker='-o')
+    ax2.plot(rounds, accuracy, '-o')
+    ax2.grid(True)
 
-    plt.title('FL on RPI Metrics per Round')
-    plt.grid(True)
-    plt.show()
+    fig.suptitle('FL on RPI Metrics per Round')
+    plt.savefig("a.png")
 
 
 def main():
@@ -37,7 +40,9 @@ def main():
 
     print(args)
 
-    visualize_aggregate_result(args.aggregated_result_log_file)
+    aggregated_result_log_file = args.aggregated_result_log_file
+    if aggregated_result_log_file:
+        visualize_aggregate_result(aggregated_result_log_file)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,14 @@
 import argparse
 from datetime import datetime
 import json
+import os
 from typing import List, Tuple
 
 import flwr as fl
 from flwr.common import Metrics
 
+
+log_directory = './log'
 
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
@@ -61,9 +64,9 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         super().__init__(*args, **kwargs)
         now = datetime.now()
         formatted_timestamp = now.strftime("%Y%m%d-%H%M%S")
-        self.log_file = f"fl_aggregate_result_{formatted_timestamp}.json"
+        self.log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
+        self.log_file = os.path.join(log_directory, self.log_filename)
         self.results = []
-        print("FedAvgWithLogging class is initialized now.")
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
@@ -71,13 +74,13 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
             return None, {}
         if not metrics_aggregated: # {} will be returned if it failed
             return None, {}
-        
-        loss = loss_aggregated["loss"]
+
+        loss = loss_aggregated
         accuracy = metrics_aggregated["accuracy"]
         self.results.append({"round": rnd, "loss": loss, "accuracy": accuracy})
 
         with open(self.log_file, "w") as f:
-            json.dump(self.accuracies, f)
+            json.dump(self.results, f)
 
         return loss_aggregated, metrics_aggregated
 
@@ -92,6 +95,7 @@ def main():
         fraction_fit=args.sample_fraction,
         fraction_evaluate=args.sample_fraction,
         min_fit_clients=args.min_num_clients,
+        min_available_clients=args.min_num_clients,
         on_fit_config_fn=fit_config,
         evaluate_metrics_aggregation_fn=weighted_average,
     )
