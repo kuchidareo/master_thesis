@@ -8,7 +8,7 @@ import flwr as fl
 from flwr.common import Metrics, Parameters
 from flwr.server.client_manager import ClientManager
 
-with open('config.json', 'w') as f:
+with open('config.json', 'r') as f:
     config = json.load(f)
 log_directory = config["directories"]["log"]
 
@@ -71,9 +71,11 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         self.results = []
         self.num_available = None
 
-    def initialize_parameters(self, client_manager: ClientManager) -> Parameters | None:
-        self.num_available = client_manager.num_available
-        return super().initialize_parameters(client_manager)
+    def configure_fit(self, server_round, parameters, client_manager):
+        fit_configurations = super().configure_fit(server_round, parameters, client_manager)
+        self.num_available = client_manager.num_available()
+        print(self.num_available)
+        return fit_configurations
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
