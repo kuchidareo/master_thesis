@@ -1,4 +1,6 @@
 import argparse
+from datetime import datetime
+import json
 from typing import List, Tuple
 
 import flwr as fl
@@ -53,6 +55,32 @@ def fit_config(server_round: int):
     }
     return config
 
+# Custom FedAvg strategy to log accuracy at each round
+class FedAvgWithLogging(fl.server.strategy.FedAvg):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        now = datetime.now()
+        formatted_timestamp = now.strftime("%Y%m%d-%H%M%S")
+        self.log_file = f"fl_aggregate_result_{formatted_timestamp}.json"
+        self.results = []
+        print("FedAvgWithLogging class is initialized now.")
+
+    def aggregate_evaluate(self, rnd: int, results, failures):
+        loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
+        if not loss_aggregated: # None will be returned if it faile
+            return None, {}
+        if not metrics_aggregated: # {} will be returned if it failed
+            return None, {}
+        
+        loss = loss_aggregated["loss"]
+        accuracy = metrics_aggregated["accuracy"]
+        self.results.append({"round": rnd, "loss": loss, "accuracy": accuracy})
+
+        with open(self.log_file, "w") as f:
+            json.dump(self.accuracies, f)
+
+        return loss_aggregated, metrics_aggregated
+
 
 def main():
     args = parser.parse_args()
@@ -60,7 +88,7 @@ def main():
     print(args)
 
     # Define strategy
-    strategy = fl.server.strategy.FedAvg(
+    strategy = FedAvgWithLogging(
         fraction_fit=args.sample_fraction,
         fraction_evaluate=args.sample_fraction,
         min_fit_clients=args.min_num_clients,
