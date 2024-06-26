@@ -2,13 +2,15 @@ import argparse
 from datetime import datetime
 import json
 import os
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import flwr as fl
-from flwr.common import Metrics
+from flwr.common import Metrics, Parameters
+from flwr.server.client_manager import ClientManager
 
-
-log_directory = './log'
+with open('config.json', 'w') as f:
+    config = json.load(f)
+log_directory = config["directories"]["log"]
 
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
@@ -67,6 +69,11 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         self.log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
         self.log_file = os.path.join(log_directory, self.log_filename)
         self.results = []
+        self.num_available = None
+
+    def initialize_parameters(self, client_manager: ClientManager) -> Parameters | None:
+        self.num_available = client_manager.num_available
+        return super().initialize_parameters(client_manager)
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
@@ -77,7 +84,7 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
 
         loss = loss_aggregated
         accuracy = metrics_aggregated["accuracy"]
-        self.results.append({"round": rnd, "loss": loss, "accuracy": accuracy})
+        self.results.append({"num_available": self.num_available, "round": rnd, "loss": loss, "accuracy": accuracy})
 
         with open(self.log_file, "w") as f:
             json.dump(self.results, f)
