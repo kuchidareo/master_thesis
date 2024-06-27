@@ -40,7 +40,6 @@ parser.add_argument(
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
-NUM_CLIENTS = 0
 
 
 class Net(nn.Module):
@@ -92,9 +91,8 @@ def test(net, testloader, device):
     return loss, accuracy
 
 
-def prepare_dataset(use_mnist: bool):
+def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int):
     """Get MNIST/CIFAR-10 and return client partitions and global testset."""
-    print(NUM_CLIENTS)
     if use_mnist:
         fds = FederatedDataset(dataset="mnist", partitioners={"train": NUM_CLIENTS})
         img_key = "image"
@@ -189,7 +187,7 @@ def main():
 
     use_mnist = args.mnist
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(use_mnist)
+    trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
