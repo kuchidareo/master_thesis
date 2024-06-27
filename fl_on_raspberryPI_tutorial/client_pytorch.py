@@ -25,7 +25,7 @@ parser.add_argument(
     type=int,
     required=True,
     help="Client id. Should be an integer between 0 and NUM_CLIENTS",
-)cid
+)
 parser.add_argument(
     "--num_clients",
     type=int,
