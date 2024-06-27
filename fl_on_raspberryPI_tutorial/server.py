@@ -72,10 +72,10 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         self.num_available = None
 
     def configure_fit(self, server_round, parameters, client_manager):
-        fit_configurations = super().configure_fit(server_round, parameters, client_manager)
+        fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         self.num_available = client_manager.num_available()
         print(self.num_available)
-        return fit_configuratiions
+        return fit_configrations
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
@@ -112,7 +112,7 @@ def main():
     # Start Flower server
     fl.server.start_server(
         server_address=args.server_address,
-        config=fl.server.ServerConfig(num_rounds=3),
+        config=fl.server.ServerConfig(args.rounds),
         strategy=strategy,
     )
 

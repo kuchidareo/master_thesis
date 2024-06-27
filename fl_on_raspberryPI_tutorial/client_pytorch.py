@@ -27,6 +27,12 @@ parser.add_argument(
     help="Client id. Should be an integer between 0 and NUM_CLIENTS",
 )
 parser.add_argument(
+    "--num_clients",
+    type=int,
+    required=True,
+    help="Number of Clients. Should be an integer.",
+)
+parser.add_argument(
     "--mnist",
     action="store_true",
     help="If you use Raspberry Pi Zero clients (which just have 512MB or RAM) use "
@@ -34,7 +40,7 @@ parser.add_argument(
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
-NUM_CLIENTS = 50
+NUM_CLIENTS = 0
 
 
 class Net(nn.Module):
@@ -177,6 +183,7 @@ def main():
     args = parser.parse_args()
     print(args)
 
+    NUM_CLIENTS = args.num_clients
     assert args.cid < NUM_CLIENTS
 
     use_mnist = args.mnist
