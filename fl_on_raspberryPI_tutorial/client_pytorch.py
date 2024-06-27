@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
     "--server_address",
     type=str,
-    default="0.0.0.0:8080",
+    default="192.168.0.110:7777",
     help=f"gRPC server address (default '0.0.0.0:8080')",
 )
 parser.add_argument(
@@ -25,7 +25,7 @@ parser.add_argument(
     type=int,
     required=True,
     help="Client id. Should be an integer between 0 and NUM_CLIENTS",
-)
+)cid
 parser.add_argument(
     "--num_clients",
     type=int,
