@@ -94,6 +94,7 @@ def test(net, testloader, device):
 
 def prepare_dataset(use_mnist: bool):
     """Get MNIST/CIFAR-10 and return client partitions and global testset."""
+    print(NUM_CLIENTS)
     if use_mnist:
         fds = FederatedDataset(dataset="mnist", partitioners={"train": NUM_CLIENTS})
         img_key = "image"
