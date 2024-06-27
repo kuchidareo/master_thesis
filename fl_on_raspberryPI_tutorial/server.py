@@ -60,6 +60,49 @@ def fit_config(server_round: int):
     }
     return config
 
+
+class EarlyStopping:
+    def __init__(self, mode, patience=5, delta=0):
+        if mode not in {'min', 'max'}:
+            raise ValueError("Argument mode must be one of 'min' or 'max'.")
+        if patience <= 0:
+            raise ValueError("Argument patience must be a postive integer.")
+        if delta < 0:
+            raise ValueError("Argument delta must not be a negative number.")
+            
+        self.mode = mode
+        self.patience = patience
+        self.delta = delta
+        self.best_score = float("inf") if mode == 'min' else -float("inf")
+        self.counter = 0
+        
+    def _is_improvement(self, val_score):
+        """Return True iff val_score is better than self.best_score."""
+        if self.mode == 'max' and val_score > self.best_score + self.delta:
+            return True
+        elif self.mode == 'min' and val_score < self.best_score - self.delta:
+            return True
+        return False
+        
+    def __call__(self, val_score):
+        """Return True iff self.counter >= self.patience.
+        """
+        
+        if self._is_improvement(val_score):
+            self.best_score = val_score
+            self.counter = 0
+            # torch.save(model.state_dict(), self.path)
+            # print('Val loss improved. Saved model.')
+            print('Val loss improved. Continue learning.')
+            return False
+        else:
+            self.counter += 1
+            print(f'Early stopping counter: {self.counter}/{self.patience}')
+            if self.counter >= self.patience:
+                print(f'Stopped early. Best val loss: {self.best_score:.4f}')
+                return True
+
+
 # Custom FedAvg strategy to log accuracy at each round
 class FedAvgWithLogging(fl.server.strategy.FedAvg):
     def __init__(self, *args, **kwargs):
@@ -69,12 +112,12 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         self.log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
         self.log_file = os.path.join(log_directory, self.log_filename)
         self.results = []
+        self.es = EarlyStopping(mode='min', patience=5)
         self.num_available = None
 
     def configure_fit(self, server_round, parameters, client_manager):
         fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         self.num_available = client_manager.num_available()
-        print(self.num_available)
         return fit_configrations
 
     def aggregate_evaluate(self, rnd: int, results, failures):
@@ -90,6 +133,8 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
 
         with open(self.log_file, "w") as f:
             json.dump(self.results, f)
+
+        self.es(loss)
 
         return loss_aggregated, metrics_aggregated
 
