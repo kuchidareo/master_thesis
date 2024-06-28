@@ -84,9 +84,12 @@ class EarlyStopping:
             return True
         return False
         
-    def __call__(self, val_score):
+    def __call__(self, val_score, accuracy):
         """Return True iff self.counter >= self.patience.
         """
+
+        if accuracy > 0.97:
+            print('Accuracy is over 97%')
         
         if self._is_improvement(val_score):
             self.best_score = val_score
@@ -107,6 +110,7 @@ class EarlyStopping:
 class FedAvgWithLogging(fl.server.strategy.FedAvg):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fraction_fit = kwargs.fraction_fit
         now = datetime.now()
         formatted_timestamp = now.strftime("%Y%m%d-%H%M%S")
         self.log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
@@ -129,12 +133,12 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
 
         loss = loss_aggregated
         accuracy = metrics_aggregated["accuracy"]
-        self.results.append({"num_available": self.num_available, "round": rnd, "loss": loss, "accuracy": accuracy})
+        self.results.append({"num_available": self.num_available, "fraction": self.fraction_fit ,"round": rnd, "loss": loss, "accuracy": accuracy})
 
         with open(self.log_file, "w") as f:
             json.dump(self.results, f)
 
-        self.es(loss)
+        self.es(loss, accuracy)
 
         return loss_aggregated, metrics_aggregated
 
