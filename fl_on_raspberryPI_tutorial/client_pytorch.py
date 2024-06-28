@@ -12,6 +12,7 @@ from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 
 from flwr_datasets import FederatedDataset
+from flwr_datasets.partitioner import ShardPartitioner
 
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
@@ -37,6 +38,11 @@ parser.add_argument(
     action="store_true",
     help="If you use Raspberry Pi Zero clients (which just have 512MB or RAM) use "
     "MNIST",
+)
+parser.add_argument(
+    "--noniid",
+    action="store_true",
+    help="make non-iid dataset by shard partitioner."
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -91,10 +97,12 @@ def test(net, testloader, device):
     return loss, accuracy
 
 
-def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int):
+def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     """Get MNIST/CIFAR-10 and return client partitions and global testset."""
     if use_mnist:
-        fds = FederatedDataset(dataset="mnist", partitioners={"train": NUM_CLIENTS})
+        noniid_partitioner = ShardPartitioner(num_partitions=10, partition_by="label", num_shards_per_partition=2, shard_size=300, shuffle=False, seed=42)
+        partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
+        fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
     else:
@@ -186,8 +194,9 @@ def main():
     assert args.cid < NUM_CLIENTS
 
     use_mnist = args.mnist
+    non_iid = args.noniid
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS)
+    trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS, non_iid)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(

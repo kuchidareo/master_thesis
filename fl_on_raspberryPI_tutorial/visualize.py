@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 with open('config.json', 'r') as f:
     config = json.load(f)
-log_directory = config["directories"]["log"]
 figure_directory = config["directories"]["figure"]
 
 parser = argparse.ArgumentParser(description="FL Result Visualization")
@@ -26,29 +25,32 @@ def visualize_aggregate_result(log_file):
 
     grouped_matrics = defaultdict(lambda: {"round": [], "loss": [], "accuracy": []})
     for entry in metrics:
-        num_available = entry["num_available"]
+        # num_available = entry["num_available"]
+        fraction = entry["fraction"]
         round = entry["round"]
         loss = entry["loss"]
         accuracy = entry["accuracy"]
 
-        grouped_matrics[num_available]["round"].append(round)
-        grouped_matrics[num_available]["loss"].append(loss)
-        grouped_matrics[num_available]["accuracy"].append(accuracy)
+        grouped_matrics[fraction]["round"].append(round)
+        grouped_matrics[fraction]["loss"].append(loss)
+        grouped_matrics[fraction]["accuracy"].append(accuracy)
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
-    for num_available, metrics in grouped_matrics.items():
-        ax1.plot(metrics["round"], metrics["loss"], '-o', label=num_available)
-        ax2.plot(metrics["round"], metrics["accuracy"], '-o', label=num_available)
+    for fraction, metrics in grouped_matrics.items():
+        ax1.plot(metrics["round"], metrics["loss"], '-', label=fraction, alpha=0.4)
+        ax2.plot(metrics["round"], metrics["accuracy"], '-', label=fraction, alpha=0.4)
 
     ax1.set_xlabel('Round')
     ax1.set_ylabel('Loss')
     ax1.grid(True)
-    ax1.legend()
+    legend1 = ax1.legend()
+    legend1.set_title("Fraction Rate")
     ax2.set_xlabel('Round')
     ax2.set_ylabel('Accuracy')
     ax2.grid(True)
-    ax2.legend()
+    legend2 = ax2.legend()
+    legend2.set_title("Fraction Rate")
 
     fig.suptitle('FL on RPI Metrics per Round')
     plt.savefig(os.path.join(figure_directory, log_filename))
