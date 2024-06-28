@@ -61,4 +61,5 @@ for (( i=0; i<${#NUM_SPLIT_VALUES[@]}; i++ )); do
             # Sleep for 600 seconds (10 minutes)
             sleep 600
         fi
+    done
 done
