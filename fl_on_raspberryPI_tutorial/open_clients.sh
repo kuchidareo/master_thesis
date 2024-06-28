@@ -19,6 +19,12 @@ SSH_USER="rasheed"
 SSH_PASSWORD="modenaottun"
 
 for HOST in "${SERVER_HOSTS[@]}"; do
-  gnome-terminal --tab -- bash -c "sshpass -p '$SSH_PASSWORD' ssh $SSH_USER@$HOST; exec bash"
+  gnome-terminal --tab -- bash -c "
+    sshpass -p '$SSH_PASSWORD' ssh $SSH_USER@$HOST << EOF
+      cd kuchida/master_thesis/fl_on_raspberryPI_tutorial
+      source venv/bin/activate
+	  git pull
+      exec bash
+	EOF
+  "
 done
-
