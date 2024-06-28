@@ -110,7 +110,7 @@ class EarlyStopping:
 class FedAvgWithLogging(fl.server.strategy.FedAvg):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fraction_fit = kwargs.fraction_fit
+        self.fraction_fit = kwargs["fraction_fit"]
         now = datetime.now()
         formatted_timestamp = now.strftime("%Y%m%d-%H%M%S")
         self.log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
