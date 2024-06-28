@@ -118,8 +118,11 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         self.results = []
         self.es = EarlyStopping(mode='min', patience=5)
         self.num_available = None
+        self.first_configure_fit_datetime = None
 
     def configure_fit(self, server_round, parameters, client_manager):
+        if not self.first_configure_fit_datetime:
+            self.first_configure_fit_datetime = datetime.now()
         fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         self.num_available = client_manager.num_available()
         return fit_configrations
@@ -133,7 +136,16 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
 
         loss = loss_aggregated
         accuracy = metrics_aggregated["accuracy"]
-        self.results.append({"num_available": self.num_available, "fraction": self.fraction_fit ,"round": rnd, "loss": loss, "accuracy": accuracy})
+        elapsed_time = datetime.now() - self.first_configure_fit_datetime
+        elapsed_minitues = elapsed_time.total_seconds() / 60
+        self.results.append({
+            "num_available": self.num_available,
+            "fraction": self.fraction_fit,
+            "round": rnd,
+            "elapsed_minitues": elapsed_minitues,
+            "loss": loss,
+            "accuracy": accuracy
+        })
 
         with open(self.log_file, "w") as f:
             json.dump(self.results, f)
