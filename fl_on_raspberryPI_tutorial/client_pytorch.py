@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
     "--server_address",
     type=str,
-    default="0.0.0.0:8080",
+    default="192.168.0.110:7777",
     help=f"gRPC server address (default '0.0.0.0:8080')",
 )
 parser.add_argument(
@@ -40,7 +40,6 @@ parser.add_argument(
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
-NUM_CLIENTS = 0
 
 
 class Net(nn.Module):
@@ -91,7 +90,7 @@ def test(net, testloader, device):
     return loss, accuracy
 
 
-def prepare_dataset(use_mnist: bool):
+def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int):
     """Get MNIST/CIFAR-10 and return client partitions and global testset."""
     if use_mnist:
         fds = FederatedDataset(dataset="mnist", partitioners={"train": NUM_CLIENTS})
@@ -187,7 +186,7 @@ def main():
 
     use_mnist = args.mnist
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(use_mnist)
+    trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(

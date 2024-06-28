@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
     "--server_address",
     type=str,
-    default="0.0.0.0:8080",
+    default="192.168.0.110:7777",
     help=f"gRPC server address (deafault '0.0.0.0:8080')",
 )
 parser.add_argument(
@@ -55,8 +55,8 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 def fit_config(server_round: int):
     """Return a configuration with static batch size and (local) epochs."""
     config = {
-        "epochs": 3,  # Number of local epochs done by clients
-        "batch_size": 16,  # Batch size to use by clients during fit()
+        "epochs": 1,  # Number of local epochs done by clients
+        "batch_size": 10,  # Batch size to use by clients during fit()
     }
     return config
 
