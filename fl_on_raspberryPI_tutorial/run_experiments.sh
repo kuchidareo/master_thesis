@@ -6,7 +6,7 @@ SAMPLE_FRACTION_VALUES=("1.0" "0.5" "0.2" "0.1")
 
 # Iterate over the arrays using index
 for (( i=0; i<${#NUM_SPLIT_VALUES[@]}; i++ )); do
-    for (( j=0; j<$(#SAMPLE_FRACTION_VALUES[@]); j++)) do
+    for (( j=0; j<${#SAMPLE_FRACTION_VALUES[@]}; j++)); do
         NUM_SPLIT_VALUE="${NUM_SPLIT_VALUES[i]}"
         SAMPLE_FRACTION_VALUE="${SAMPLE_FRACTION_VALUES[j]}"
         # Switch to the TAB_NUMBER tab and run the server command
