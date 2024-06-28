@@ -50,7 +50,7 @@ for (( i=0; i<${#NUM_SPLIT_VALUES[@]}; i++ )); do
         xdotool type --delay 1 --clearmodifiers "python3 client_pytorch.py --cid=8 --num_clients=${NUM_SPLIT_VALUE} --mnist --noniid"
         xdotool key Return
 
-        xdotool key alt+-
+        xdotool key alt+Q
         xdotool type --delay 1 --clearmodifiers "python3 client_pytorch.py --cid=9 --num_clients=${NUM_SPLIT_VALUE} --mnist --noniid"
         xdotool key Return
 
