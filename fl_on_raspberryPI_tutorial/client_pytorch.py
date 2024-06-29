@@ -127,8 +127,7 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
         validsets.append(partition["test"])
     testset = fds.load_split("test")
     testset = testset.with_transform(apply_transforms)
-    for i in range(10):
-        print(trainsets[i]["label"], validsets[i]["label"])
+    
     return trainsets, validsets, testset
 
 
