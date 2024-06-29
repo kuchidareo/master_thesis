@@ -99,19 +99,18 @@ def test(net, testloader, device):
 
 def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     """Get MNIST/CIFAR-10 and return client partitions and global testset."""
+    norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    
     if use_mnist:
-        print(NUM_CLIENTS, non_iid)
         noniid_partitioner = ShardPartitioner(num_partitions=10, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
-        print(noniid_partitioner)
         partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
-        print(fds)
         img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
     else:
         fds = FederatedDataset(dataset="cifar10", partitioners={"train": NUM_CLIENTS})
         img_key = "img"
-        norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
     pytorch_transforms = Compose([ToTensor(), norm])
 
     def apply_transforms(batch):
