@@ -100,11 +100,8 @@ def test(net, testloader, device):
 def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     """Get MNIST/CIFAR-10 and return client partitions and global testset."""
     if use_mnist:
-        if non_iid:
-            noniid_partitioner = ShardPartitioner(num_partitions=NUM_CLIENTS, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
-            partitioner = {"train": noniid_partitioner}
-        else:
-            partitioner = {"train": NUM_CLIENTS}
+        noniid_partitioner = ShardPartitioner(num_partitions=NUM_CLIENTS, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
+        partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
@@ -122,12 +119,7 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     trainsets = []
     validsets = []
     for partition_id in range(NUM_CLIENTS):
-        print(partition_id)
-        try:
-            partition = fds.load_partition(partition_id, "train")
-        except Exception as error:
-            print(error)
-        print(partition)
+        partition = fds.load_partition(partition_id, "train")
         # Divide data on each node: 90% train, 10% test
         partition = partition.train_test_split(test_size=0.1, seed=42)
         partition = partition.with_transform(apply_transforms)
@@ -205,7 +197,7 @@ def main():
     non_iid = args.noniid
     # Download dataset and partition it
     trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS, non_iid)
-    print(trainsets[0], valsets[0])
+    print(trainsets[args.cid]["label"], valsets[args.cid]["label"])
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
