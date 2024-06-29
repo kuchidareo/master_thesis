@@ -127,6 +127,8 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
         validsets.append(partition["test"])
     testset = fds.load_split("test")
     testset = testset.with_transform(apply_transforms)
+    for i in range(10):
+        print(trainsets[i]["label"], validsets[i]["label"])
     return trainsets, validsets, testset
 
 
@@ -197,7 +199,6 @@ def main():
     non_iid = args.noniid
     # Download dataset and partition it
     trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS, non_iid)
-    print(trainsets[args.cid]["label"], valsets[args.cid]["label"])
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
