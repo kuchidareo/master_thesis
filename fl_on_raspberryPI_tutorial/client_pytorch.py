@@ -197,7 +197,7 @@ def main():
     non_iid = args.noniid
     # Download dataset and partition it
     trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS, non_iid)
-    print(trainsets[args.cid], valsets[args.cid])
+    print(trainsets[args.cid]["label"], valsets[args.cid]["label"])
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
