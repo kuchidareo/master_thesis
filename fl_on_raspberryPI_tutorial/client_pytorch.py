@@ -121,6 +121,7 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     for partition_id in range(NUM_CLIENTS):
         partition = fds.load_partition(partition_id, "train")
         # Divide data on each node: 90% train, 10% test
+        print(partition)
         partition = partition.train_test_split(test_size=0.1, seed=42)
         partition = partition.with_transform(apply_transforms)
         trainsets.append(partition["train"])
