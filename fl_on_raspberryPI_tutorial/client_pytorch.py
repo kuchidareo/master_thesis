@@ -101,7 +101,7 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     """Get MNIST/CIFAR-10 and return client partitions and global testset."""
     if use_mnist:
         if non_iid:
-            noniid_partitioner = ShardPartitioner(num_partitions=10, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
+            noniid_partitioner = ShardPartitioner(num_partitions=NUM_CLIENTS, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
             partitioner = {"train": noniid_partitioner}
         else:
             partitioner = {"train": NUM_CLIENTS}
@@ -126,7 +126,6 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
         # Divide data on each node: 90% train, 10% test
         partition = partition.train_test_split(test_size=0.1, seed=42)
         partition = partition.with_transform(apply_transforms)
-        print(partition)
         trainsets.append(partition["train"])
         validsets.append(partition["test"])
     testset = fds.load_split("test")
@@ -201,7 +200,6 @@ def main():
     non_iid = args.noniid
     # Download dataset and partition it
     trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS, non_iid)
-    print(trainsets[0], valsets[0])
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
