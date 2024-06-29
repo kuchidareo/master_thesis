@@ -102,7 +102,7 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     if use_mnist:
         print(NUM_CLIENTS, non_iid)
         noniid_partitioner = ShardPartitioner(num_partitions=10, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
-        print(noniid_paritioner)
+        print(noniid_partitioner)
         partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         print(fds)
