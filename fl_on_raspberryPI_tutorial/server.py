@@ -56,10 +56,9 @@ def fit_config(server_round: int):
     """Return a configuration with static batch size and (local) epochs."""
     config = {
         "epochs": 1,  # Number of local epochs done by clients
-        "batch_size": 10,  # Batch size to use by clients during fit()
+        "batch_size": 32,  # Batch size to use by clients during fit()
     }
     return config
-
 
 class EarlyStopping:
     def __init__(self, mode, patience=5, delta=0):
@@ -88,8 +87,8 @@ class EarlyStopping:
         """Return True iff self.counter >= self.patience.
         """
 
-        if accuracy > 0.97:
-            print('Accuracy is over 97%')
+        if accuracy > 0.90:
+            print('Accuracy is over 90%')
         
         if self._is_improvement(val_score):
             self.best_score = val_score
