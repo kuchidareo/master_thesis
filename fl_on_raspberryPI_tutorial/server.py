@@ -164,6 +164,7 @@ def main():
         fraction_fit=args.sample_fraction,
         fraction_evaluate=args.sample_fraction,
         min_fit_clients=args.min_num_clients,
+        min_evaluate_clients=args.min_num_clients,
         min_available_clients=args.min_num_clients,
         on_fit_config_fn=fit_config,
         evaluate_metrics_aggregation_fn=weighted_average,
