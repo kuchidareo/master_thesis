@@ -92,6 +92,7 @@ class EcgConv1d(nn.Module):
         self.softmax = nn.Softmax(dim=1)
     
     def forward(self, x):
+        x = x.view(x.size(0), -1)
         x = self.pool(self.relu(self.conv1(x)))
         x = self.relu(self.conv2(x))
         x = self.relu(self.conv3(x))
