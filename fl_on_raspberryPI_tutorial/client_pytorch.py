@@ -1,4 +1,7 @@
 import argparse
+import h5py
+import json
+import os
 import warnings
 from collections import OrderedDict
 
@@ -6,13 +9,19 @@ import flwr as fl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms import Compose, Normalize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 
 from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import ShardPartitioner
+
+
+with open('config.json', 'r') as f:
+    config = json.load(f)
+dataset_directory = config["directories"]["dataset"]
+
 
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
@@ -34,10 +43,10 @@ parser.add_argument(
     help="Number of Clients. Should be an integer.",
 )
 parser.add_argument(
-    "--mnist",
-    action="store_true",
-    help="If you use Raspberry Pi Zero clients (which just have 512MB or RAM) use "
-    "MNIST",
+    "--dataset",
+    type=str,
+    required=True,
+    help="mnist, cifar-10, ecg(new)",
 )
 parser.add_argument(
     "--noniid",
@@ -69,6 +78,51 @@ class Net(nn.Module):
         return x
 
 
+class EcgConv1d(nn.Module):
+    def __init__(self):
+        super(EcgConv1d, self).__init__()
+        self.conv1 = nn.Conv1d(1, 16, 7)
+        self.conv2 = nn.Conv1d(16, 16, 5)
+        self.conv3 = nn.Conv1d(16, 16, 5)
+        self.conv4 = nn.Conv1d(16, 16, 5)
+        self.pool = nn.MaxPool1d(2)
+        self.relu = nn.LeakyReLU()
+        self.fc1 = nn.Linear(25 * 16, 128)
+        self.fc2 = nn.Linear(128, 5)
+        self.softmax = nn.Softmax(dim=1)
+    
+    def forward(self, x):
+        x = self.pool(self.relu(self.conv1(x)))
+        x = self.relu(self.conv2(x))
+        x = self.relu(self.conv3(x))
+        x = self.pool(self.relu(self.conv4(x)))
+        x = x.view(-1, 25 * 16)
+        x = self.relu(self.fc1(x))
+        x = self.softmax(self.fc2(x))
+        return x
+
+
+class ECG(Dataset):
+    def __init__(self, num_clients, train=True, train_test_split=0.1):
+        self.x = []
+        self.y = []
+        file_name = 'train_ecg.hdf5' if train else 'test_ecg.hdf5'
+        key_prefix = 'x_train' if train else 'x_test'
+        label_prefix = 'y_train' if train else 'y_test'
+        
+        with h5py.File(os.path.join(dataset_directory, 'ecg', file_name), 'r') as hdf:
+            dataset_size = hdf[key_prefix].shape[0]
+            shard_size = dataset_size / num_clients if train else (dataset_size / num_clients) / train_test_split
+            self.x = [hdf[key_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
+            self.y = [hdf[label_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
+    
+    def __len__(self):
+        return len(self.x)
+    
+    def __getitem__(self, idx):
+        return torch.tensor(self.x[idx], dtype=torch.float), torch.tensor(self.y[idx])
+    
+
 def train(net, trainloader, optimizer, epochs, device):
     """Train the model on the training set."""
     criterion = torch.nn.CrossEntropyLoss()
@@ -97,18 +151,18 @@ def test(net, testloader, device):
     return loss, accuracy
 
 
-def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
-    """Get MNIST/CIFAR-10 and return client partitions and global testset."""
-    if use_mnist:
+def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int, non_iid: bool):
+    if dataset == "mnist":
         noniid_partitioner = ShardPartitioner(num_partitions=NUM_CLIENTS, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
         partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
-    else:
+    elif dataset == "cifar10":
         fds = FederatedDataset(dataset="cifar10", partitioners={"train": NUM_CLIENTS})
         img_key = "img"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
     pytorch_transforms = Compose([ToTensor(), norm])
 
     def apply_transforms(batch):
@@ -131,19 +185,31 @@ def prepare_dataset(use_mnist: bool, NUM_CLIENTS: int, non_iid: bool):
     return trainsets, validsets, testset
 
 
+def prepare_dataset(dataset: str, NUM_CLIENTS: int, non_iid: bool):
+    """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
+    if dataset in ("mnist", "cifar10"):
+        return flower_federated_dataset_partition(dataset, NUM_CLIENTS, non_iid)
+    elif dataset == "ecg":
+        ecg_train_dataset = ECG(train=True, num_clients=NUM_CLIENTS)
+        ecg_val_dataset = ECG(train=False, num_clients=NUM_CLIENTS, train_test_split=0.1)
+        return ecg_train_dataset, ecg_val_dataset, None
+
+
 # Flower client, adapted from Pytorch quickstart/simulation example
 class FlowerClient(fl.client.NumPyClient):
     """A FlowerClient that trains a MobileNetV3 model for CIFAR-10 or a much smaller CNN
     for MNIST."""
 
-    def __init__(self, trainset, valset, use_mnist):
+    def __init__(self, trainset, valset, dataset):
         self.trainset = trainset
         self.valset = valset
         # Instantiate model
-        if use_mnist:
+        if dataset == "mnist":
             self.model = Net()
-        else:
+        elif dataset == "cifar10":
             self.model = mobilenet_v3_small(num_classes=10)
+        elif dataset == "ecg":
+            self.model = EcgConv1d()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
@@ -194,16 +260,16 @@ def main():
     NUM_CLIENTS = args.num_clients
     assert args.cid < NUM_CLIENTS
 
-    use_mnist = args.mnist
+    dataset = args.dataset
     non_iid = args.noniid
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(use_mnist, NUM_CLIENTS, non_iid)
+    trainsets, valsets, _ = prepare_dataset(dataset, NUM_CLIENTS, non_iid)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
         server_address=args.server_address,
         client=FlowerClient(
-            trainset=trainsets[args.cid], valset=valsets[args.cid], use_mnist=use_mnist
+            trainset=trainsets[args.cid], valset=valsets[args.cid], dataset=dataset
         ).to_client(),
     )
 
