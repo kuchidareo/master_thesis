@@ -9,10 +9,11 @@ import flwr as fl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset as TorchDataset, DataLoader
 from torchvision.transforms import Compose, Normalize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
+from datasets import Dataset as HFDataset
 
 from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import ShardPartitioner
@@ -103,7 +104,7 @@ class EcgConv1d(nn.Module):
         return x
 
 
-class ECG(Dataset):
+class ECG(TorchDataset):
     def __init__(self, num_clients, train=True, train_test_split=0.1):
         self.x = []
         self.y = []
@@ -112,7 +113,7 @@ class ECG(Dataset):
         label_prefix = 'y_train' if train else 'y_test'
         
         with h5py.File(os.path.join(dataset_directory, 'ecg', file_name), 'r') as hdf:
-            dataset_size = hdf[key_prefix].shape[0]
+            dataset_size = (hdf[key_prefix].shape[0] // 10) * 10
             shard_size = dataset_size / num_clients if train else (dataset_size / num_clients) / train_test_split
             self.x = [hdf[key_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
             self.y = [hdf[label_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
@@ -121,7 +122,10 @@ class ECG(Dataset):
         return len(self.x)
     
     def __getitem__(self, idx):
-        return torch.tensor(self.x[idx], dtype=torch.float), torch.tensor(self.y[idx])
+        return HFDataset.from_dict({
+            "data": torch.tensor(self.x[idx], dtype=torch.float),
+            "label": torch.tensor(self.y[idx])
+        })
     
 
 def train(net, trainloader, optimizer, epochs, device):
