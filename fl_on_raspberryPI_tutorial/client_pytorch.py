@@ -6,6 +6,7 @@ import warnings
 from collections import OrderedDict
 
 import flwr as fl
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -113,19 +114,18 @@ class ECG(TorchDataset):
         label_prefix = 'y_train' if train else 'y_test'
         
         with h5py.File(os.path.join(dataset_directory, 'ecg', file_name), 'r') as hdf:
-            dataset_size = (hdf[key_prefix].shape[0] // 10) * 10
-            shard_size = dataset_size / num_clients if train else (dataset_size / num_clients) / train_test_split
+            dataset_size = (hdf[key_prefix].shape[0] // num_clients) * num_clients
+            shard_size = int(dataset_size / num_clients) if train else int((dataset_size / num_clients) * train_test_split)
             self.x = [hdf[key_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
             self.y = [hdf[label_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
-    
+
     def __len__(self):
         return len(self.x)
     
     def __getitem__(self, idx):
-        return HFDataset.from_dict({
-            "data": torch.tensor(self.x[idx], dtype=torch.float),
-            "label": torch.tensor(self.y[idx])
-        })
+        hf_dataset = HFDataset.from_dict({"data": self.x[idx], "label": self.y[idx]})
+        hf_dataset.set_format(type='torch', columns=["data", "label"])
+        return hf_dataset
     
 
 def train(net, trainloader, optimizer, epochs, device):
@@ -134,9 +134,9 @@ def train(net, trainloader, optimizer, epochs, device):
     for _ in range(epochs):
         for batch in tqdm(trainloader):
             batch = list(batch.values())
-            images, labels = batch[0], batch[1]
+            data, labels = batch[0], batch[1]
             optimizer.zero_grad()
-            criterion(net(images.to(device)), labels.to(device)).backward()
+            criterion(net(data.to(device)), labels.to(device)).backward()
             optimizer.step()
 
 
@@ -147,8 +147,8 @@ def test(net, testloader, device):
     with torch.no_grad():
         for batch in tqdm(testloader):
             batch = list(batch.values())
-            images, labels = batch[0], batch[1]
-            outputs = net(images.to(device))
+            data, labels = batch[0], batch[1]
+            outputs = net(data.to(device))
             labels = labels.to(device)
             loss += criterion(outputs, labels).item()
             correct += (torch.max(outputs.data, 1)[1] == labels).sum().item()
