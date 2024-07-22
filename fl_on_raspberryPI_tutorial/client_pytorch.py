@@ -151,6 +151,8 @@ class HAR(TorchDataset):
         
         X_dataset = pd.read_csv(os.path.join(dataset_directory, 'uci_har', X_file), header=None, names=['data'])
         y_dataset = pd.read_csv(os.path.join(dataset_directory, 'uci_har', y_file), header=None, names=['label'])
+        y_dataset['label'] -= 1 # make it [0 ~ N-1]
+        
         subject_dataset = pd.read_csv(os.path.join(dataset_directory, 'uci_har', subject_annotation_file), header=None, names=['subject'])
 
         concatenated_df = pd.concat([subject_dataset, X_dataset, y_dataset], axis=1)
