@@ -88,7 +88,7 @@ def visualize_aggregate_result(log_file, mean_results, key, legend_title):
         accuracy_mean_round, accuracy_std_round = calculate_mean_std(accuracy)
         
         unique_elapsed = np.unique(elapsed_minutes, axis=1)
-        unique_first_elapsed = unique_elapsed[2]
+        unique_first_elapsed = unique_elapsed[0]
         loss_interpolated = np.array([np.interp(unique_first_elapsed, em, l) for em, l in zip(elapsed_minutes, loss)])
         accuracy_interpolated = np.array([np.interp(unique_first_elapsed, em, a) for em, a in zip(elapsed_minutes, accuracy)])
         loss_mean_elapsed, loss_std_elapsed = calculate_mean_std(loss_interpolated)
