@@ -165,7 +165,7 @@ class HAR(TorchDataset):
             shard_size = int(len(concatenated_df) / num_clients)
             for i in range(num_clients):
                 shard = concatenated_df.iloc[i * shard_size:(i + 1) * shard_size]
-                self.x.append([[float(value) for value in sensor_data.split()] for sensor_data in group['data'].values])
+                self.x.append([[float(value) for value in sensor_data.split()] for sensor_data in shard['data'].values])
                 self.y.append(shard['label'].values)
 
     def __len__(self):
