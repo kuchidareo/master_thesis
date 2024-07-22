@@ -146,7 +146,7 @@ class HAR(TorchDataset):
         self.y = []
     
         X_file = 'train/X_train.txt' if train else 'test/X_test.txt'
-        y_file = 'train_y_train.txt' if train else 'test/y_test.txt'
+        y_file = 'train/y_train.txt' if train else 'test/y_test.txt'
         subject_annotation_file = 'train/subject_train.txt' if train else 'test/subject_test.txt'
         
         X_dataset = pd.read_csv(os.path.join(dataset_directory, 'uci_har', X_file), header=None, names=['data'])
