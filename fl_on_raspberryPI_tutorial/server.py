@@ -2,11 +2,12 @@ import argparse
 from datetime import datetime
 import json
 import os
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import flwr as fl
-from flwr.common import Metrics, Parameters
+from flwr.common import EvaluateIns, FitRes, Metrics, Parameters, Scalar
 from flwr.server.client_manager import ClientManager
+from flwr.server.client_proxy import ClientProxy
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -126,6 +127,14 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         self.num_available = client_manager.num_available()
         return fit_configrations
+    
+    def configure_evaluate(self, server_round: int, parameters: Parameters, client_manager: ClientManager) -> List[Tuple[ClientProxy, EvaluateIns]]:
+        print("configure_evaluate is running now.")
+        return super().configure_evaluate(server_round, parameters, client_manager)
+    
+    def aggregate_fit(self, server_round: int, results: List[Tuple[ClientProxy, FitRes]], failures: List[Tuple[ClientProxy, FitRes] | BaseException]) -> Tuple[Parameters | None, Dict[str, Scalar]]:
+        print("aggregate_fit is running now.")
+        return super().aggregate_fit(server_round, results, failures)
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
