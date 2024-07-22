@@ -158,14 +158,14 @@ class HAR(TorchDataset):
         if train and non_iid: # train/X_train conducted by 21 subjects.
             grouped = concatenated_df.groupby('subject')
             for _, group in grouped:
-                self.x.append(group['data'].values)
+                self.x.append([[float(value) for value in sensor_data.split()] for sensor_data in group['data'].values])
                 self.y.append(group['label'].values)
         else: # test/X_test by 9 subjects. testset will be distributed iid.
             concatenated_df = concatenated_df.sample(frac=1).reset_index(drop=True) # shuffle the data row.
             shard_size = int(len(concatenated_df) / num_clients)
             for i in range(num_clients):
                 shard = concatenated_df.iloc[i * shard_size:(i + 1) * shard_size]
-                self.x.append(shard['data'].values)
+                self.x.append([[float(value) for value in sensor_data.split()] for sensor_data in group['data'].values])
                 self.y.append(shard['label'].values)
 
     def __len__(self):
@@ -248,7 +248,7 @@ def prepare_dataset(dataset: str, NUM_CLIENTS: int, non_iid: bool):
         ecg_val_dataset = ECG(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return ecg_train_dataset, ecg_val_dataset, None
     elif dataset == "har":
-        har_train_dataset = HAR(train=True, non_iid=True, num_clients=NUM_CLIENTS)
+        har_train_dataset = HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
         har_val_dataset = HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
 
