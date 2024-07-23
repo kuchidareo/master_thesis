@@ -120,21 +120,15 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         self.num_available = None
         self.first_configure_fit_datetime = None
 
+    ## TODO: The timing is not the starting point of fitting.
     def configure_fit(self, server_round, parameters, client_manager):
+        print('configure_fit is running.')
         if not self.first_configure_fit_datetime:
             self.first_configure_fit_datetime = datetime.now()
             print("time measuring start now.")
         fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         self.num_available = client_manager.num_available()
         return fit_configrations
-    
-    def configure_evaluate(self, server_round: int, parameters: Parameters, client_manager: ClientManager) -> List[Tuple[ClientProxy, EvaluateIns]]:
-        print("configure_evaluate is running now.")
-        return super().configure_evaluate(server_round, parameters, client_manager)
-    
-    def aggregate_fit(self, server_round: int, results: List[Tuple[ClientProxy, FitRes]], failures: List[Tuple[ClientProxy, FitRes] | BaseException]) -> Tuple[Parameters | None, Dict[str, Scalar]]:
-        print("aggregate_fit is running now.")
-        return super().aggregate_fit(server_round, results, failures)
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
