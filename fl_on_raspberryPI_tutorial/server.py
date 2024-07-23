@@ -122,11 +122,9 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
 
     ## TODO: The timing is not the starting point of fitting.
     def configure_fit(self, server_round, parameters, client_manager):
-        print('configure_fit is running.')
+        fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         if not self.first_configure_fit_datetime:
             self.first_configure_fit_datetime = datetime.now()
-            print("time measuring start now.")
-        fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         self.num_available = client_manager.num_available()
         return fit_configrations
 
