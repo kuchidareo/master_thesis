@@ -13,4 +13,9 @@ concatenated_df = pd.concat([subject_train, y_train], axis=1)
 activity_distribution = concatenated_df.groupby('Subject')['Activity'].value_counts().unstack().fillna(0)
 
 # Print the distribution
-print(activity_distribution)
+# print(activity_distribution)
+
+grouped = concatenated_df.groupby('Subject')
+for _, group in grouped:
+    print(group['Activity'].values)
+    # print(group['label'].values)

@@ -1,11 +1,14 @@
 import argparse
+from collections import OrderedDict
 import h5py
 import json
 import os
 import warnings
-from collections import OrderedDict
 
+from datasets import Dataset as HFDataset
 import flwr as fl
+from flwr_datasets import FederatedDataset
+from flwr_datasets.partitioner import ShardPartitioner
 import numpy as np
 import pandas as pd
 import torch
@@ -15,10 +18,8 @@ from torch.utils.data import Dataset as TorchDataset, DataLoader
 from torchvision.transforms import Compose, Normalize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
-from datasets import Dataset as HFDataset
 
-from flwr_datasets import FederatedDataset
-from flwr_datasets.partitioner import ShardPartitioner
+import models
 
 
 with open('config.json', 'r') as f:
@@ -58,64 +59,6 @@ parser.add_argument(
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
-
-
-class Net(nn.Module):
-    """Model (simple CNN adapted from 'PyTorch: A 60 Minute Blitz')."""
-
-    def __init__(self) -> None:
-        super(Net, self).__init__()
-        self.fc1 = nn.Linear(28 * 28, 200)
-        self.relu1 = nn.ReLU()
-        self.fc2 = nn.Linear(200, 200)
-        self.relu2 = nn.ReLU()
-        self.fc3 = nn.Linear(200, 10)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x.view(x.size(0), -1)
-        x = self.fc1(x)
-        x = self.relu1(x)
-        x = self.fc2(x)
-        x = self.relu2(x)
-        x = self.fc3(x)
-        return x
-
-
-class EcgConv1d(nn.Module):
-    def __init__(self):
-        super(EcgConv1d, self).__init__()
-        self.conv1 = nn.Conv1d(1, 16, 7)
-        self.conv2 = nn.Conv1d(16, 16, 5)
-        self.conv3 = nn.Conv1d(16, 16, 5)
-        self.conv4 = nn.Conv1d(16, 16, 5)
-        self.pool = nn.MaxPool1d(2)
-        self.relu = nn.LeakyReLU()
-        self.fc1 = nn.Linear(25 * 16, 128)
-        self.fc2 = nn.Linear(128, 5)
-        self.softmax = nn.Softmax(dim=1)
-    
-    def forward(self, x):
-        x = self.pool(self.relu(self.conv1(x)))
-        x = self.relu(self.conv2(x))
-        x = self.relu(self.conv3(x))
-        x = self.pool(self.relu(self.conv4(x)))
-        x = x.view(-1, 25 * 16)
-        x = self.relu(self.fc1(x))
-        x = self.softmax(self.fc2(x))
-        return x
-
-class HARNet(nn.Module):
-    def __init__(self):
-        super(HARNet, self).__init__()
-        self.fc1 = nn.Linear(561, 128)
-        self.fc2 = nn.Linear(128, 64)
-        self.fc3 = nn.Linear(64, 6)
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
 
 class ECG(TorchDataset):
     def __init__(self, num_clients, train=True, non_iid=False, train_test_split=0.1):
@@ -265,13 +208,13 @@ class FlowerClient(fl.client.NumPyClient):
         self.valset = valset
         # Instantiate model
         if dataset == "mnist":
-            self.model = Net()
+            self.model = models.mnist.MnistNet()
         elif dataset == "cifar10":
             self.model = mobilenet_v3_small(num_classes=10)
         elif dataset == "ecg":
-            self.model = EcgConv1d()
+            self.model = models.ecg.EcgConv1d()
         elif dataset == "har":
-            self.model = HARNet()
+            self.model = models.uci_har.HARNet()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
