@@ -214,7 +214,7 @@ class EnergyDataset(Dataset):
 
 
 def load_dataset(split=0.2, seed=42):
-    df = pd.read_csv('datasets/energy/energydata_complete.csv')
+    df = pd.read_csv('datasets/aep/energydata_complete.csv')
     df['date'] = pd.to_datetime(df['date'])
     df.set_index(df.date.copy(deep=True), inplace=True)
 
