@@ -252,7 +252,7 @@ def main():
     fl.client.start_client(
         server_address=args.server_address,
         client=FlowerClient(
-            trainset=trainsets[args.cid], valset=valsets[args.cid], dataset=dataset_name
+            trainset=trainsets[args.cid], valset=valsets[args.cid], dataset_name=dataset_name
         ).to_client(),
     )
 
