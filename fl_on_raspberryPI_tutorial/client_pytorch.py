@@ -21,7 +21,11 @@ from tqdm import tqdm
 
 from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader
 from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, visdrone as visdrone_model, wisdm as wisdm_model, uci_har as uci_har_model
-
+from partition.centralized import CentralizedPartition
+from partition.dirichlet import DirichletPartition
+from partition.uniform import UniformPartition
+from partition.user_index import UserPartition
+from partition.utils import compute_client_data_distribution, get_html_plots
 
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
@@ -118,18 +122,56 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int, non_iid: b
     return trainsets, validsets, testset
 
 
-def prepare_dataset(dataset: str, NUM_CLIENTS: int, non_iid: bool):
+def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, non_iid: bool):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
-    if dataset in ("mnist", "cifar10"):
-        return flower_federated_dataset_partition(dataset, NUM_CLIENTS, non_iid)
-    elif dataset == "ecg":
+    if dataset_name in ("mnist", "cifar10"):
+        return flower_federated_dataset_partition(dataset_name, NUM_CLIENTS, non_iid)
+    elif dataset_name == "ecg":
         ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=NUM_CLIENTS)
         ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return ecg_train_dataset, ecg_val_dataset, None
-    elif dataset == "har":
+    elif dataset_name == "uci_har":
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
         har_val_dataset = uci_har_loader.HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
+    elif dataset_name == "casas":
+        # Apply this partition to ecg and uci_har.
+        # Add alpha in arg
+        num_classes = 12
+        alpha = 0.1
+        casas = casas_loader.load_dataset()
+
+        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
+                                                                            dataset_name,
+                                                                            num_classes,
+                                                                            client_num_in_total,
+                                                                            NUM_CLIENTS,
+                                                                            alpha,
+                                                                            casas)
+        casas_train_dataset = partition(casas['train'])
+        casas_val_dataset = partition(casas['val'])
+        return casas_train_dataset, casas_val_dataset, None
+
+
+def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, client_num_per_round, alpha, dataset):
+    if partition_type == 'user' and dataset_name in {'wisdm', 'widar', 'visdrone'}:
+        partition = UserPartition(dataset['split']['train'])
+        client_num_in_total = len(dataset['split']['train'].keys())
+    elif partition_type == 'uniform':
+        partition = UniformPartition(num_class=num_classes, num_clients=client_num_in_total)
+    elif partition_type == 'dirichlet':
+        if alpha is None:
+            warnings.warn('alpha is not set, using default value 0.1')
+            alpha = 0.1
+        partition = DirichletPartition(num_class=num_classes, num_clients=client_num_in_total, alpha=alpha)
+    elif partition_type == 'central':
+        partition = CentralizedPartition()
+        client_num_per_round = 1
+        client_num_in_total = 1
+    else:
+        raise ValueError(f'Partition {partition_type} type not supported')
+
+    return partition, client_num_in_total, client_num_per_round
 
 
 # Flower client, adapted from Pytorch quickstart/simulation example
@@ -137,18 +179,20 @@ class FlowerClient(fl.client.NumPyClient):
     """A FlowerClient that trains a MobileNetV3 model for CIFAR-10 or a much smaller CNN
     for MNIST."""
 
-    def __init__(self, trainset, valset, dataset):
+    def __init__(self, trainset, valset, dataset_name):
         self.trainset = trainset
         self.valset = valset
         # Instantiate model
-        if dataset == "mnist":
+        if dataset_name == "mnist":
             self.model = mnist_model.MnistNet()
-        elif dataset == "cifar10":
+        elif dataset_name == "cifar10":
             self.model = mobilenet_v3_small(num_classes=10)
-        elif dataset == "ecg":
+        elif dataset_name == "ecg":
             self.model = ecg_model.EcgConv1d()
-        elif dataset == "har":
+        elif dataset_name == "uci_har":
             self.model = uci_har_model.HARNet()
+        elif dataset_name == "casas":
+            self.model = casas_model.BiLSTMModel()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
@@ -199,16 +243,16 @@ def main():
     NUM_CLIENTS = args.num_clients
     assert args.cid < NUM_CLIENTS
 
-    dataset = args.dataset
+    dataset_name = args.dataset
     non_iid = args.noniid
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(dataset, NUM_CLIENTS, non_iid)
+    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, non_iid)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
         server_address=args.server_address,
         client=FlowerClient(
-            trainset=trainsets[args.cid], valset=valsets[args.cid], dataset=dataset
+            trainset=trainsets[args.cid], valset=valsets[args.cid], dataset=dataset_name
         ).to_client(),
     )
 
