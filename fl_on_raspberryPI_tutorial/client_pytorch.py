@@ -19,7 +19,9 @@ from torchvision.transforms import Compose, Normalize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 
-from models import casas, aep, ecg, mnist, visdrone, wisdm, uci_har
+from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader
+from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, visdrone as visdrone_model, wisdm as wisdm_model, uci_har as uci_har_model
+
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -58,68 +60,6 @@ parser.add_argument(
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
-
-class ECG(TorchDataset):
-    def __init__(self, num_clients, train=True, non_iid=False, train_test_split=0.1):
-        self.x = []
-        self.y = []
-        file_name = 'train_ecg.hdf5' if train else 'test_ecg.hdf5'
-        key_prefix = 'x_train' if train else 'x_test'
-        label_prefix = 'y_train' if train else 'y_test'
-        
-        with h5py.File(os.path.join(dataset_directory, 'ecg', file_name), 'r') as hdf:
-            dataset_size = (hdf[key_prefix].shape[0] // num_clients) * num_clients
-            shard_size = int(dataset_size / num_clients) if train else int((dataset_size / num_clients) * train_test_split)
-            self.x = [hdf[key_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
-            self.y = [hdf[label_prefix][int(i * shard_size):int((i + 1) * shard_size)] for i in range(num_clients)]
-
-    def __len__(self):
-        return len(self.x)
-    
-    def __getitem__(self, idx):
-        hf_dataset = HFDataset.from_dict({"data": self.x[idx], "label": self.y[idx]})
-        hf_dataset.set_format(type='torch', columns=["data", "label"])
-        return hf_dataset
-    
-
-class HAR(TorchDataset):
-    def __init__(self, num_clients, train=True, non_iid=False, train_test_split=0.1):
-        self.x = []
-        self.y = []
-    
-        X_file = 'train/X_train.txt' if train else 'test/X_test.txt'
-        y_file = 'train/y_train.txt' if train else 'test/y_test.txt'
-        subject_annotation_file = 'train/subject_train.txt' if train else 'test/subject_test.txt'
-        
-        X_dataset = pd.read_csv(os.path.join(dataset_directory, 'uci_har', X_file), header=None, names=['data'])
-        y_dataset = pd.read_csv(os.path.join(dataset_directory, 'uci_har', y_file), header=None, names=['label'])
-        y_dataset['label'] -= 1 # make it [0 ~ N-1]
-        
-        subject_dataset = pd.read_csv(os.path.join(dataset_directory, 'uci_har', subject_annotation_file), header=None, names=['subject'])
-
-        concatenated_df = pd.concat([subject_dataset, X_dataset, y_dataset], axis=1)
-
-        if train and non_iid: # train/X_train conducted by 21 subjects.
-            grouped = concatenated_df.groupby('subject')
-            for _, group in grouped:
-                self.x.append([[float(value) for value in sensor_data.split()] for sensor_data in group['data'].values])
-                self.y.append(group['label'].values)
-        else: # test/X_test by 9 subjects. testset will be distributed iid.
-            concatenated_df = concatenated_df.sample(frac=1).reset_index(drop=True) # shuffle the data row.
-            shard_size = int(len(concatenated_df) / num_clients)
-            for i in range(num_clients):
-                shard = concatenated_df.iloc[i * shard_size:(i + 1) * shard_size]
-                self.x.append([[float(value) for value in sensor_data.split()] for sensor_data in shard['data'].values])
-                self.y.append(shard['label'].values)
-
-    def __len__(self):
-        return len(self.x)
-    
-    def __getitem__(self, idx):
-        hf_dataset = HFDataset.from_dict({"data": self.x[idx], "label": self.y[idx]})
-        hf_dataset.set_format(type='torch', columns=["data", "label"])
-        return hf_dataset
-    
 
 def train(net, trainloader, optimizer, epochs, device):
     """Train the model on the training set."""
@@ -188,12 +128,12 @@ def prepare_dataset(dataset: str, NUM_CLIENTS: int, non_iid: bool):
     if dataset in ("mnist", "cifar10"):
         return flower_federated_dataset_partition(dataset, NUM_CLIENTS, non_iid)
     elif dataset == "ecg":
-        ecg_train_dataset = ECG(train=True, num_clients=NUM_CLIENTS)
-        ecg_val_dataset = ECG(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
+        ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=NUM_CLIENTS)
+        ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return ecg_train_dataset, ecg_val_dataset, None
     elif dataset == "har":
-        har_train_dataset = HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
-        har_val_dataset = HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
+        har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
+        har_val_dataset = uci_har_loader.HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
 
 
@@ -207,13 +147,13 @@ class FlowerClient(fl.client.NumPyClient):
         self.valset = valset
         # Instantiate model
         if dataset == "mnist":
-            self.model = mnist.MnistNet()
+            self.model = mnist_model.MnistNet()
         elif dataset == "cifar10":
             self.model = mobilenet_v3_small(num_classes=10)
         elif dataset == "ecg":
-            self.model = ecg.EcgConv1d()
+            self.model = ecg_model.EcgConv1d()
         elif dataset == "har":
-            self.model = ucihar.HARNet()
+            self.model = uci_har_model.HARNet()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
