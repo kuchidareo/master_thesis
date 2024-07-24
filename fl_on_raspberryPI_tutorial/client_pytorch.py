@@ -65,7 +65,8 @@ def train(net, trainloader, optimizer, epochs, device):
     criterion = torch.nn.CrossEntropyLoss()
     for _ in range(epochs):
         for batch in tqdm(trainloader):
-            batch = list(batch.values())
+            if not isinstance(batch, list):
+                batch = list(batch.values())
             data, labels = batch[0], batch[1]
             optimizer.zero_grad()
             criterion(net(data.to(device)), labels.to(device)).backward()
