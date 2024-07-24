@@ -8,8 +8,7 @@ import os
 import re
 from collections import Counter
 from datetime import datetime
-import torch
-
+from tensorflow.keras.utils import pad_sequences
 # Define the shared Google Drive file URL
 FILE_ID = "1Ni1aJIpazW6dSn64h7P9GKtXvvH-yXqz"
 
@@ -385,9 +384,7 @@ def process():
         X = np.array(X, dtype=object)
         Y = np.array(Y, dtype=object)
 
-        # X = pad_sequences(X, maxlen=max_lenght, dtype='int32')  # Original line
-        X = torch.nn.utils.rnn.pad_sequence([torch.tensor(seq) for seq in X], batch_first=True, padding_value=0)  # PyTorch replacement
-
+        X = pad_sequences(X, maxlen=max_lenght, dtype='int32')
         if not os.path.exists('./datasets/casas/npy'):
             os.makedirs('./datasets/casas/npy')
 
