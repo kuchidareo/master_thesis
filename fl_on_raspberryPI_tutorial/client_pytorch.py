@@ -144,7 +144,7 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, non_iid: bool):
         partition, client_num_in_total, client_num_per_round = get_partition('uniform',
                                                                             dataset_name,
                                                                             num_classes,
-                                                                            client_num_in_total,
+                                                                            NUM_CLIENTS,
                                                                             NUM_CLIENTS,
                                                                             alpha,
                                                                             casas)
