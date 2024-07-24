@@ -79,7 +79,8 @@ def test(net, testloader, device):
     correct, loss = 0, 0.0
     with torch.no_grad():
         for batch in tqdm(testloader):
-            batch = list(batch.values())
+            if not isinstance(batch, list):
+                batch = list(batch.values())
             data, labels = batch[0], batch[1]
             outputs = net(data.to(device))
             labels = labels.to(device)
@@ -149,9 +150,60 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, non_iid: bool):
                                                                             NUM_CLIENTS,
                                                                             alpha,
                                                                             casas)
-        casas_train_dataset = partition(casas['train'])
-        casas_val_dataset = partition(casas['test'])
-        return casas_train_dataset, casas_val_dataset, None
+        train_dataset = partition(casas['train'])
+        val_dataset = partition(casas['test'])
+        return train_dataset, val_dataset, None
+    elif dataset_name == "aep":
+        # Apply this partition to ecg and uci_har.
+        # Add alpha in arg
+        num_classes = 10
+        alpha = 0.1
+        aep = aep_loader.load_dataset()
+
+        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
+                                                                            dataset_name,
+                                                                            num_classes,
+                                                                            NUM_CLIENTS,
+                                                                            NUM_CLIENTS,
+                                                                            alpha,
+                                                                            aep)
+        train_dataset = partition(aep['train'])
+        val_dataset = partition(aep['test'])
+        return train_dataset, val_dataset, None
+    elif dataset_name == "visdrone":
+        # Apply this partition to ecg and uci_har.
+        # Add alpha in arg
+        num_classes = 10
+        alpha = 0.1
+        visdrone = visdrone_loader.load_dataset()
+
+        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
+                                                                            dataset_name,
+                                                                            num_classes,
+                                                                            NUM_CLIENTS,
+                                                                            NUM_CLIENTS,
+                                                                            alpha,
+                                                                            visdrone)
+        train_dataset = partition(visdrone['train'])
+        val_dataset = partition(visdrone['test'])
+        return train_dataset, val_dataset, None
+    elif dataset_name == "wisdm":
+        # Apply this partition to ecg and uci_har.
+        # Add alpha in arg
+        num_classes = 10
+        alpha = 0.1
+        wisdm = wisdm_loader.load_dataset()
+
+        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
+                                                                            dataset_name,
+                                                                            num_classes,
+                                                                            NUM_CLIENTS,
+                                                                            NUM_CLIENTS,
+                                                                            alpha,
+                                                                            wisdm)
+        train_dataset = partition(wisdm['train'])
+        val_dataset = partition(wisdm['test'])
+        return train_dataset, val_dataset, None
 
 
 def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, client_num_per_round, alpha, dataset):
@@ -194,6 +246,12 @@ class FlowerClient(fl.client.NumPyClient):
             self.model = uci_har_model.HARNet()
         elif dataset_name == "casas":
             self.model = casas_model.BiLSTMModel()
+        elif dataset_name == "aep":
+            self.model = aep_model.MLP()
+        # elif dataset_name == "visdrone":
+        #     self.model = visdrone_model.
+        elif dataset_name == "wisdm":
+            self.model = wisdm_model.LSTM_NET()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
