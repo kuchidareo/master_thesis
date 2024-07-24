@@ -19,7 +19,7 @@ from torchvision.transforms import Compose, Normalize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 
-from models import casas, aep, ecg, mnist, visdrone, wisdm, ucihar
+from models import casas, aep, ecg, mnist, visdrone, wisdm, uci_har
 
 with open('config.json', 'r') as f:
     config = json.load(f)
