@@ -23,11 +23,6 @@ from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader,
 from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, visdrone as visdrone_model, wisdm as wisdm_model, uci_har as uci_har_model
 
 
-with open('config.json', 'r') as f:
-    config = json.load(f)
-dataset_directory = config["directories"]["dataset"]
-
-
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
     "--server_address",
