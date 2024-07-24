@@ -19,7 +19,7 @@ from torchvision.transforms import Compose, Normalize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 
-import models as MyModels
+from .models import Casas, UciHar, Aep, Ecg, Mnist, Visdrone, Wisdm
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -207,13 +207,13 @@ class FlowerClient(fl.client.NumPyClient):
         self.valset = valset
         # Instantiate model
         if dataset == "mnist":
-            self.model = MyModels.mnist.MnistNet()
+            self.model = Mnist.MnistNet()
         elif dataset == "cifar10":
             self.model = mobilenet_v3_small(num_classes=10)
         elif dataset == "ecg":
-            self.model = MyModels.ecg.EcgConv1d()
+            self.model = Ecg.EcgConv1d()
         elif dataset == "har":
-            self.model = MyModels.uci_har.HARNet()
+            self.model = UciHar.HARNet()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
