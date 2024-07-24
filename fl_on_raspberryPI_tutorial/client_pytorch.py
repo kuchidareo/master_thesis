@@ -149,7 +149,7 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, non_iid: bool):
                                                                             alpha,
                                                                             casas)
         casas_train_dataset = partition(casas['train'])
-        casas_val_dataset = partition(casas['val'])
+        casas_val_dataset = partition(casas['test'])
         return casas_train_dataset, casas_val_dataset, None
 
 
