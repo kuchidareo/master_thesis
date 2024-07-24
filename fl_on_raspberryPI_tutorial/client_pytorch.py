@@ -60,9 +60,8 @@ parser.add_argument(
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
-def train(net, trainloader, optimizer, epochs, device):
+def train(net, trainloader, optimizer, criterion, epochs, device):
     """Train the model on the training set."""
-    criterion = torch.nn.CrossEntropyLoss()
     for _ in range(epochs):
         for batch in tqdm(trainloader):
             if not isinstance(batch, list):
@@ -73,9 +72,8 @@ def train(net, trainloader, optimizer, epochs, device):
             optimizer.step()
 
 
-def test(net, testloader, device):
+def test(net, testloader, criterion, device):
     """Validate the model on the test set."""
-    criterion = torch.nn.CrossEntropyLoss()
     correct, loss = 0, 0.0
     with torch.no_grad():
         for batch in tqdm(testloader):
@@ -235,6 +233,7 @@ class FlowerClient(fl.client.NumPyClient):
     def __init__(self, trainset, valset, dataset_name):
         self.trainset = trainset
         self.valset = valset
+        self.criterion = nn.CrossEntropyLoss()
         # Instantiate model
         if dataset_name == "mnist":
             self.model = mnist_model.MnistNet()
@@ -248,6 +247,7 @@ class FlowerClient(fl.client.NumPyClient):
             self.model = casas_model.BiLSTMModel()
         elif dataset_name == "aep":
             self.model = aep_model.MLP()
+            self.criterion = nn.MSELoss()
         # elif dataset_name == "visdrone":
         #     self.model = visdrone_model.
         elif dataset_name == "wisdm":
@@ -280,7 +280,7 @@ class FlowerClient(fl.client.NumPyClient):
         # Define optimizer
         optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01, momentum=0.9)
         # Train
-        train(self.model, trainloader, optimizer, epochs=epochs, device=self.device)
+        train(self.model, trainloader, optimizer, self.criterion, epochs=epochs, device=self.device)
         # Return local model and statistics
         return self.get_parameters({}), len(trainloader.dataset), {}
 
@@ -290,7 +290,7 @@ class FlowerClient(fl.client.NumPyClient):
         # Construct dataloader
         valloader = DataLoader(self.valset, batch_size=64)
         # Evaluate
-        loss, accuracy = test(self.model, valloader, device=self.device)
+        loss, accuracy = test(self.model, valloader, self.criterion, device=self.device)
         # Return statistics
         return float(loss), len(valloader.dataset), {"accuracy": float(accuracy)}
 
