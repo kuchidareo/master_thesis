@@ -169,7 +169,8 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
                                                                             alpha,
                                                                             dataset)
         train_dataset = partition(dataset['train'])
-        val_dataset = partition(dataset['test'])
+        val_partition = UniformPartition(num_class=num_classes, num_clients=NUM_CLIENTS)
+        val_dataset = val_partition(dataset['test'])
         return train_dataset, val_dataset, None
 
 
