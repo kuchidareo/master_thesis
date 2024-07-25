@@ -175,7 +175,7 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
 
 ## TODO: look around client_num_in_total, client_num_per_round.
 def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, client_num_per_round, alpha, dataset):
-    if partition_type == 'user' and dataset_name in {'wisdm', 'widar', 'visdrone'}:
+    if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
         partition = UserPartition(dataset['split']['train'])
         client_num_in_total = len(dataset['split']['train'].keys())
     elif partition_type == 'uniform':
@@ -220,7 +220,7 @@ class FlowerClient(fl.client.NumPyClient):
             self.criterion = nn.MSELoss()
         # elif dataset_name == "visdrone":
         #     self.model = visdrone_model.
-        elif dataset_name == "wisdm":
+        elif dataset_name in ("wisdm_phone", "wisdm_watch"):
             self.model = wisdm_model.LSTM_NET()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
