@@ -50,12 +50,19 @@ parser.add_argument(
     "--dataset",
     type=str,
     required=True,
-    help="mnist, cifar-10, ecg(new)",
+    help="mnist, cifar-10, ecg, uci_har, ....",
 )
 parser.add_argument(
-    "--noniid",
-    action="store_true",
-    help="make non-iid dataset by shard partitioner."
+    "--partition_type",
+    type=str,
+    required=True,
+    help="[user({'wisdm', 'widar', 'visdrone'}), uniform, dirichlet, central]",
+)
+parser.add_argument(
+    "--dirichlet_alpha",
+    type=str,
+    default=0.1,
+    help="alpha value in dirichlet partition_type.",
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -122,88 +129,51 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int, non_iid: b
     return trainsets, validsets, testset
 
 
-def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, non_iid: bool):
+## TODO: get train, val dataset in a different function.
+def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
     if dataset_name in ("mnist", "cifar10"):
-        return flower_federated_dataset_partition(dataset_name, NUM_CLIENTS, non_iid)
+        return flower_federated_dataset_partition(dataset_name, NUM_CLIENTS)
     elif dataset_name == "ecg":
         ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=NUM_CLIENTS)
         ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return ecg_train_dataset, ecg_val_dataset, None
     elif dataset_name == "uci_har":
+        non_iid = True if partition_type == "user" else False
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
         har_val_dataset = uci_har_loader.HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
-    elif dataset_name == "casas":
-        # Apply this partition to ecg and uci_har.
-        # Add alpha in arg
-        num_classes = 12
-        alpha = 0.1
-        casas = casas_loader.load_dataset()
-
-        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
+    else:
+        if dataset_name == "casas":
+            # Apply this partition to ecg and uci_har.
+            num_classes = 12
+            dataset = casas_loader.load_dataset()
+        elif dataset_name == "aep":
+            num_classes = 10
+            dataset = aep_loader.load_dataset()
+        elif dataset_name == "visdrone":
+            num_classes = 12
+            dataset = visdrone_loader.load_dataset()
+        elif dataset_name == "wisdm_watch":
+            num_classes = 12
+            dataset = wisdm_loader.load_dataset(reprocess=False, modality='watch')
+        elif dataset_name == 'wisdm_phone':
+            num_classes = 12
+            dataset = wisdm_loader.load_dataset(reprocess=False, modality='phone')
+        
+        partition, client_num_in_total, client_num_per_round = get_partition(partition_type,
                                                                             dataset_name,
                                                                             num_classes,
                                                                             NUM_CLIENTS,
                                                                             NUM_CLIENTS,
                                                                             alpha,
-                                                                            casas)
-        train_dataset = partition(casas['train'])
-        val_dataset = partition(casas['test'])
-        return train_dataset, val_dataset, None
-    elif dataset_name == "aep":
-        # Apply this partition to ecg and uci_har.
-        # Add alpha in arg
-        num_classes = 10
-        alpha = 0.1
-        aep = aep_loader.load_dataset()
-
-        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
-                                                                            dataset_name,
-                                                                            num_classes,
-                                                                            NUM_CLIENTS,
-                                                                            NUM_CLIENTS,
-                                                                            alpha,
-                                                                            aep)
-        train_dataset = partition(aep['train'])
-        val_dataset = partition(aep['test'])
-        return train_dataset, val_dataset, None
-    elif dataset_name == "visdrone":
-        # Apply this partition to ecg and uci_har.
-        # Add alpha in arg
-        num_classes = 10
-        alpha = 0.1
-        visdrone = visdrone_loader.load_dataset()
-
-        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
-                                                                            dataset_name,
-                                                                            num_classes,
-                                                                            NUM_CLIENTS,
-                                                                            NUM_CLIENTS,
-                                                                            alpha,
-                                                                            visdrone)
-        train_dataset = partition(visdrone['train'])
-        val_dataset = partition(visdrone['test'])
-        return train_dataset, val_dataset, None
-    elif dataset_name == "wisdm":
-        # Apply this partition to ecg and uci_har.
-        # Add alpha in arg
-        num_classes = 10
-        alpha = 0.1
-        wisdm = wisdm_loader.load_dataset()
-
-        partition, client_num_in_total, client_num_per_round = get_partition('uniform',
-                                                                            dataset_name,
-                                                                            num_classes,
-                                                                            NUM_CLIENTS,
-                                                                            NUM_CLIENTS,
-                                                                            alpha,
-                                                                            wisdm)
-        train_dataset = partition(wisdm['train'])
-        val_dataset = partition(wisdm['test'])
+                                                                            dataset)
+        train_dataset = partition(dataset['train'])
+        val_dataset = partition(dataset['test'])
         return train_dataset, val_dataset, None
 
 
+## TODO: look around client_num_in_total, client_num_per_round.
 def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, client_num_per_round, alpha, dataset):
     if partition_type == 'user' and dataset_name in {'wisdm', 'widar', 'visdrone'}:
         partition = UserPartition(dataset['split']['train'])
@@ -303,9 +273,11 @@ def main():
     assert args.cid < NUM_CLIENTS
 
     dataset_name = args.dataset
-    non_iid = args.noniid
+    partition_type = args.partition_type
+    dirichlet_alpha = args.dirichlet_alpha
+
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, non_iid)
+    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
