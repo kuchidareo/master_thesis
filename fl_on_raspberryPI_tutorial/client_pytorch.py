@@ -161,21 +161,14 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
             num_classes = 12
             dataset = wisdm_loader.load_dataset(reprocess=False, modality='phone')
         
-        partition, client_num_in_total, client_num_per_round = get_partition(partition_type,
-                                                                            dataset_name,
-                                                                            num_classes,
-                                                                            NUM_CLIENTS,
-                                                                            NUM_CLIENTS,
-                                                                            alpha,
-                                                                            dataset)
-        train_dataset = partition(dataset['train'])
+        train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, dataset)
+        train_dataset = train_partition(dataset['train'])
         val_partition = UniformPartition(num_class=num_classes, num_clients=NUM_CLIENTS)
         val_dataset = val_partition(dataset['test'])
         return train_dataset, val_dataset, None
 
 
-## TODO: look around client_num_in_total, client_num_per_round.
-def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, client_num_per_round, alpha, dataset):
+def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, alpha, dataset):
     if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
         partition = UserPartition(dataset['split']['train'])
         client_num_in_total = len(dataset['split']['train'].keys())
@@ -193,7 +186,7 @@ def get_partition(partition_type, dataset_name, num_classes, client_num_in_total
     else:
         raise ValueError(f'Partition {partition_type} type not supported')
 
-    return partition, client_num_in_total, client_num_per_round
+    return partition
 
 
 # Flower client, adapted from Pytorch quickstart/simulation example
