@@ -164,6 +164,7 @@ def get_partition(partition_type, dataset_name, num_classes, client_num_in_total
     if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
         partition = UserPartition(dataset['split']['train'])
         client_num_in_total = len(dataset['split']['train'].keys())
+        print(f"This dataset has {client_num_in_total} clients data. The first {client_num_in_total} clients data is allocated to the devices.")
     elif partition_type == 'uniform':
         partition = UniformPartition(num_class=num_classes, num_clients=client_num_in_total)
     elif partition_type == 'dirichlet':
