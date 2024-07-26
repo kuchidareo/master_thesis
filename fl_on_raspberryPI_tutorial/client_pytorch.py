@@ -1,31 +1,25 @@
 import argparse
 from collections import OrderedDict
-import h5py
-import json
-import os
 import warnings
 
-from datasets import Dataset as HFDataset
 import flwr as fl
 from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import ShardPartitioner
-import numpy as np
-import pandas as pd
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset as TorchDataset, DataLoader
+from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, Normalize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
+from ultralytics.nn.tasks import DetectionModel
 
 from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader
-from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, visdrone as visdrone_model, wisdm as wisdm_model, uci_har as uci_har_model
+from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model
 from partition.centralized import CentralizedPartition
 from partition.dirichlet import DirichletPartition
 from partition.uniform import UniformPartition
 from partition.user_index import UserPartition
-from partition.utils import compute_client_data_distribution, get_html_plots
+
 
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
@@ -129,7 +123,6 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int, non_iid: b
     return trainsets, validsets, testset
 
 
-## TODO: get train, val dataset in a different function.
 def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
     if dataset_name in ("mnist", "cifar10"):
@@ -143,9 +136,8 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
         har_val_dataset = uci_har_loader.HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
-    else:
+    else: # Imported from FedAIoT source code.
         if dataset_name == "casas":
-            # Apply this partition to ecg and uci_har.
             num_classes = 12
             dataset = casas_loader.load_dataset()
         elif dataset_name == "aep":
@@ -212,8 +204,8 @@ class FlowerClient(fl.client.NumPyClient):
         elif dataset_name == "aep":
             self.model = aep_model.MLP()
             self.criterion = nn.MSELoss()
-        # elif dataset_name == "visdrone":
-        #     self.model = visdrone_model.
+        elif dataset_name == "visdrone":
+            self.model = DetectionModel(cfg="yolov8.yaml")
         elif dataset_name in ("wisdm_phone", "wisdm_watch"):
             self.model = wisdm_model.LSTM_NET()
         # Determine device
