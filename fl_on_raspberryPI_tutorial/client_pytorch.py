@@ -18,6 +18,7 @@ from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mni
 from partition.centralized import CentralizedPartition
 from partition.dirichlet import DirichletPartition
 from partition.uniform import UniformPartition
+from partition.uneven_amount import UnEvenAmountPartition
 from partition.user_index import UserPartition
 
 
@@ -160,13 +161,15 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
         return train_dataset, val_dataset, None
 
 
-def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, alpha, dataset):
+def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, alpha, allocation, dataset):
     if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
         partition = UserPartition(dataset['split']['train'])
         client_num_in_total = len(dataset['split']['train'].keys())
         print(f"This dataset has {client_num_in_total} clients data. The first {client_num_in_total} clients data is allocated to the devices.")
     elif partition_type == 'uniform':
         partition = UniformPartition(num_class=num_classes, num_clients=client_num_in_total)
+    elif partition_type == 'eneven_amount':
+        partition = UnEvenAmountPartition(num_classes=num_classes, num_clients=client_num_in_total, allocation=allocation)
     elif partition_type == 'dirichlet':
         if alpha is None:
             warnings.warn('alpha is not set, using default value 0.1')
