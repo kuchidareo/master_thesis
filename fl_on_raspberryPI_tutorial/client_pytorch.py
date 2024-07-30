@@ -60,8 +60,9 @@ parser.add_argument(
     help="alpha value in dirichlet partition_type.",
 )
 parser.add_argument(
-    "--data_amount_allocation",
-    type=list,
+    "--allocation",
+    type=int,
+    nargs='+',
     help="For UnEvenAmountPartition.",
 )
 
@@ -173,7 +174,7 @@ def get_partition(partition_type, dataset_name, num_classes, client_num_in_total
         print(f"This dataset has {client_num_in_total} clients data. The first {client_num_in_total} clients data is allocated to the devices.")
     elif partition_type == 'uniform':
         partition = UniformPartition(num_class=num_classes, num_clients=client_num_in_total)
-    elif partition_type == 'eneven_amount':
+    elif partition_type == 'uneven_amount':
         partition = UnEvenAmountPartition(num_classes=num_classes, num_clients=client_num_in_total, allocation=allocation)
     elif partition_type == 'dirichlet':
         if alpha is None:
@@ -270,7 +271,7 @@ def main():
     dataset_name = args.dataset
     partition_type = args.partition_type
     dirichlet_alpha = args.dirichlet_alpha
-    data_amount_allocation = args.data_amount_allocation
+    data_amount_allocation = args.allocation
 
     # Download dataset and partition it
     trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha, data_amount_allocation)
