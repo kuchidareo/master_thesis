@@ -18,14 +18,16 @@ class UnEvenAmountPartition:
         self.num_class = num_class
 
     def __call__(self, dataset) -> List[Dataset]:
+        # Ensure allocation sums to total_num
+        assert self.num_clients == len(self.allocation), "Allocation must be same length as the number of clients."
+
         total_num = len(dataset)
         # Convert allocation values to ratios
         total_allocation = sum(self.allocation)
         allocation_ratios = [value / total_allocation for value in self.allocation]
         # Convert ratios to actual counts
         allocation_counts = [int(ratio * total_num) for ratio in allocation_ratios]
-        # Ensure allocation sums to total_num
-        assert sum(allocation_counts) == total_num, "Allocation must sum to total number of data points."
+        
         
         # Create indices for each client based on allocation
         idxs = np.arange(total_num)
