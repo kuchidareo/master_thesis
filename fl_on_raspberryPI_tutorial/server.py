@@ -87,9 +87,7 @@ class EarlyStopping:
     def __call__(self, val_score, accuracy):
         """Return True iff self.counter >= self.patience.
         """
-
-        if accuracy > 0.90:
-            print('Accuracy is over 90%')
+        print(f'val_score: {val_score}\taccuracy: {accuracy}')
         
         if self._is_improvement(val_score):
             self.best_score = val_score
