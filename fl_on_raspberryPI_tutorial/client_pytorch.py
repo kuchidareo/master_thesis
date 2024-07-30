@@ -59,6 +59,11 @@ parser.add_argument(
     default=0.1,
     help="alpha value in dirichlet partition_type.",
 )
+parser.add_argument(
+    "--data_amount_allocation",
+    type=list,
+    help="For UnEvenAmountPartition.",
+)
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -124,7 +129,7 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int, non_iid: b
     return trainsets, validsets, testset
 
 
-def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float):
+def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float, allocation: list):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
     if dataset_name in ("mnist", "cifar10"):
         return flower_federated_dataset_partition(dataset_name, NUM_CLIENTS)
@@ -154,7 +159,7 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
             num_classes = 12
             dataset = wisdm_loader.load_dataset(reprocess=False, modality='phone')
         
-        train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, dataset)
+        train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, allocation, dataset)
         train_dataset = train_partition(dataset['train'])
         val_partition = UniformPartition(num_class=num_classes, num_clients=NUM_CLIENTS)
         val_dataset = val_partition(dataset['test'])
@@ -265,9 +270,10 @@ def main():
     dataset_name = args.dataset
     partition_type = args.partition_type
     dirichlet_alpha = args.dirichlet_alpha
+    data_amount_allocation = args.data_amount_allocation
 
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha)
+    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha, data_amount_allocation)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
