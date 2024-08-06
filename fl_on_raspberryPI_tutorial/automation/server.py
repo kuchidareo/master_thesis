@@ -12,8 +12,13 @@ def run_command(command):
 
 # Commands to run
 commands = [
-    ['python', 'server.py', '--rounds=2', '--sample_fraction=0.5', '--min_num_clients=40'],
-    ['python', 'server.py', '--rounds=2', '--sample_fraction=0.75', '--min_num_clients=40']
+    ['python', 'server.py', '--rounds=100', '--sample_fraction=0.5', '--min_num_clients=40'],
+    ['python', 'server.py', '--rounds=100', '--sample_fraction=0.75', '--min_num_clients=40'],
+    ['python', 'server.py', '--rounds=100', '--sample_fraction=1.0', '--min_num_clients=40'],
+    ['python', 'server.py', '--rounds=100', '--sample_fraction=0.25', '--min_num_clients=40'],
+    ['python', 'server.py', '--rounds=100', '--sample_fraction=0.5', '--min_num_clients=40'],
+    ['python', 'server.py', '--rounds=100', '--sample_fraction=0.75', '--min_num_clients=40'],
+    ['python', 'server.py', '--rounds=100', '--sample_fraction=1.0', '--min_num_clients=40'],
 ]
 
 for command in commands:

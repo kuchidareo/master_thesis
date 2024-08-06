@@ -13,7 +13,12 @@ def run_command(command):
 # Commands to run
 commands = [
     'bash experiment_script/wisdm_phone/baseline_3.sh',
-    'bash experiment_script/wisdm_phone/baseline_3.sh'
+    'bash experiment_script/wisdm_phone/baseline_3.sh',
+    'bash experiment_script/wisdm_phone/baseline_3.sh',
+    'bash experiment_script/wisdm_watch/baseline_3.sh',
+    'bash experiment_script/wisdm_watch/baseline_3.sh',
+    'bash experiment_script/wisdm_watch/baseline_3.sh',
+    'bash experiment_script/wisdm_watch/baseline_3.sh',
 ]
 
 for command in commands:
