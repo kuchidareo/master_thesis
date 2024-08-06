@@ -8,6 +8,7 @@ import flwr as fl
 from flwr.common import EvaluateIns, FitRes, Metrics, Parameters, Scalar
 from flwr.server.client_manager import ClientManager
 from flwr.server.client_proxy import ClientProxy
+import numpy as np
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -38,7 +39,12 @@ parser.add_argument(
     default=2,
     help="Minimum number of available clients required for sampling (default: 2)",
 )
-
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=1234,
+    help="Numpy random seed",
+)
 
 # Define metric aggregation function
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
@@ -57,7 +63,9 @@ def fit_config(server_round: int):
     """Return a configuration with static batch size and (local) epochs."""
     config = {
         "epochs": 1,  # Number of local epochs done by clients
-        "batch_size": 10,  # Batch size to use by clients during fit()
+        "batch_size": 32,  # Batch size to use by clients during fit()
+        "lr": 0.01, # Learning rate by clients during fit(), using SGD optimizer.
+        "optimizer_momentum": 0.9 # Use SGD optimizer. Set the momentum.
     }
     return config
 
@@ -118,7 +126,6 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         self.num_available = None
         self.first_configure_fit_datetime = None
 
-    ## TODO: The timing is not the starting point of fitting.
     def configure_fit(self, server_round, parameters, client_manager):
         fit_configrations = super().configure_fit(server_round, parameters, client_manager)
         if not self.first_configure_fit_datetime:
@@ -158,6 +165,8 @@ def main():
     args = parser.parse_args()
 
     print(args)
+
+    np.random.seed(args.seed)
 
     # Define strategy
     strategy = FedAvgWithLogging(

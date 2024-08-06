@@ -5,6 +5,7 @@ import warnings
 import flwr as fl
 from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import ShardPartitioner
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -64,6 +65,12 @@ parser.add_argument(
     type=int,
     nargs='+',
     help="For UnEvenAmountPartition.",
+)
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=1234,
+    help="Numpy random seed",
 )
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -240,11 +247,11 @@ class FlowerClient(fl.client.NumPyClient):
         print("Client sampled for fit()")
         self.set_parameters(parameters)
         # Read hyperparameters from config set by the server
-        batch, epochs = config["batch_size"], config["epochs"]
+        batch, epochs, lr, momentum = config["batch_size"], config["epochs"], config["lr"], config["optimizer_momentum"]
         # Construct dataloader
         trainloader = DataLoader(self.trainset, batch_size=batch, shuffle=True)
         # Define optimizer
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01, momentum=0.9)
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
         # Train
         train(self.model, trainloader, optimizer, self.criterion, epochs=epochs, device=self.device)
         # Return local model and statistics
@@ -272,6 +279,8 @@ def main():
     partition_type = args.partition_type
     dirichlet_alpha = args.dirichlet_alpha
     data_amount_allocation = args.allocation
+
+    np.random.seed(args.seed)
 
     # Download dataset and partition it
     trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha, data_amount_allocation)
