@@ -22,6 +22,7 @@ from partition.uniform import UniformPartition
 from partition.uneven_amount import UnEvenAmountPartition
 from partition.user_index import UserPartition
 
+from partition.utils import get_html_plots, compute_client_data_distribution
 
 parser = argparse.ArgumentParser(description="Flower Embedded devices")
 parser.add_argument(
@@ -169,6 +170,9 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
         
         train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, allocation, dataset)
         train_dataset = train_partition(dataset['train'])
+        # data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
+        # get_html_plots(data_distribution, class_distribution)
+        # print("Finish making plots")
         val_partition = UniformPartition(num_class=num_classes, num_clients=NUM_CLIENTS)
         val_dataset = val_partition(dataset['test'])
         return train_dataset, val_dataset, None
