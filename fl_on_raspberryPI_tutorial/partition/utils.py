@@ -10,7 +10,8 @@ from torch.utils.data import Dataset
 
 
 class IndexedSubset(Dataset):
-    def __init__(self, dataset, indices):
+    def __init__(self, dataset, indices, user_id):
+        self.user_id = user_id
         self.indices = indices
         self.dataset = dataset
         self.targets = [dataset.targets[i] for i in indices]
@@ -62,6 +63,7 @@ def compute_client_data_distribution(datasets: List[Sized | Dataset], num_classe
     data_distribution = []
 
     for i in range(len(datasets)):
+        print(f"dataset[i] user_id id{i}: {datasets[i].user_id}")
         class_counts = torch.zeros(num_classes)
         for j in range(len(datasets[i])):
             class_counts[int(datasets[i].targets[j])] += 1
@@ -69,6 +71,7 @@ def compute_client_data_distribution(datasets: List[Sized | Dataset], num_classe
         data_distribution.append(np.sum(class_counts))
         class_counts = class_counts / np.sum(class_counts)
         class_distribution.append(class_counts)
+        print(f"dataset[i] class_count: {class_counts}")
     return data_distribution, class_distribution
 
 

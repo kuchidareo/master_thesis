@@ -20,6 +20,7 @@ class UserPartition:
             IndexedSubset(
                 dataset_ref,
                 indices=v,
+                user_id=id
             )
-            for _, v in self.user_idx.items()
+            for id, v in self.user_idx.items()
         ]

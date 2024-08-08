@@ -176,8 +176,8 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
         
         train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, amount_allocation, user_selection, dataset)
         train_dataset = train_partition(dataset['train'])
-        # data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
-        # get_html_plots(data_distribution, class_distribution)
+        data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
+        get_html_plots(data_distribution, class_distribution)
         # print("Finish making plots")
         val_partition = UniformPartition(num_class=num_classes, num_clients=NUM_CLIENTS)
         val_dataset = val_partition(dataset['test'])
@@ -186,8 +186,6 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
 
 def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, alpha, amount_allocation, user_selection, dataset):
     if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
-        print(dataset["split"]["train"])
-        print(user_selection)
         partition = UserPartition(dataset['split']['train'])
         client_num_in_total = len(dataset['split']['train'].keys())
         print(f"This dataset has {client_num_in_total} clients data. The first {client_num_in_total} clients data is allocated to the devices.")
