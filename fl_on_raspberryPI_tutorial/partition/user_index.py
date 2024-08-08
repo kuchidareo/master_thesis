@@ -8,18 +8,18 @@ from partition.utils import IndexedSubset
 
 class UserPartition:
     def __init__(
-            self, user_idxs
+            self, user_idxs, user_selection=None
     ):
         self.user_idx = user_idxs
         self.cid_to_user_id = {idx: user_id for idx, user_id in enumerate(user_idxs)}
-        print(self.cid_to_user_id)
+        self.user_selection = user_selection
 
-    def __call__(self, dataset, user_selection=None) -> List[Dataset]:
+    def __call__(self, dataset) -> List[Dataset]:
         dataset_ref = dataset
-        if user_selection:
+        if self.user_selection:
             subsets = []
             for id, v in self.user_idx.items():
-                candidate_user_id = [self.cid_to_user_id[cid] for cid in user_selection]
+                candidate_user_id = [self.cid_to_user_id[cid] for cid in self.user_selection]
                 if id in candidate_user_id:
                     subsets.append(IndexedSubset(
                         dataset_ref,

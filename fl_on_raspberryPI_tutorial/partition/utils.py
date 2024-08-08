@@ -10,7 +10,7 @@ from torch.utils.data import Dataset
 
 
 class IndexedSubset(Dataset):
-    def __init__(self, dataset, indices, user_id):
+    def __init__(self, dataset, indices, user_id=None):
         self.user_id = user_id
         self.indices = indices
         self.dataset = dataset
