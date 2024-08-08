@@ -175,10 +175,10 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
             dataset = wisdm_loader.load_dataset(reprocess=False, modality='phone')
         
         train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, amount_allocation, user_selection, dataset)
-        train_dataset = train_partition(dataset['train'], [0, 1, 2, 3, 4])
+        train_dataset = train_partition(dataset['train'])
         data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
-        # get_html_plots(data_distribution, class_distribution)
-        # print("Finish making plots")
+        get_html_plots(data_distribution, class_distribution)
+        print("Finish making plots")
         val_partition = UniformPartition(num_class=num_classes, num_clients=NUM_CLIENTS)
         val_dataset = val_partition(dataset['test'])
         return train_dataset, val_dataset, None
