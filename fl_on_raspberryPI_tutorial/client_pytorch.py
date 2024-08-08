@@ -62,10 +62,16 @@ parser.add_argument(
     help="alpha value in dirichlet partition_type.",
 )
 parser.add_argument(
-    "--allocation",
+    "--amount_allocation",
     type=int,
     nargs='+',
     help="For UnEvenAmountPartition.",
+)
+parser.add_argument(
+    "--user_selection",
+    type=int,
+    nargs='+',
+    help="For UserPartition.",
 )
 parser.add_argument(
     "--seed",
@@ -138,7 +144,7 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int, non_iid: b
     return trainsets, validsets, testset
 
 
-def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float, allocation: list):
+def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float, amount_allocation: list, user_selection: list):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
     if dataset_name in ("mnist", "cifar10"):
         return flower_federated_dataset_partition(dataset_name, NUM_CLIENTS)
@@ -168,7 +174,7 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
             num_classes = 12
             dataset = wisdm_loader.load_dataset(reprocess=False, modality='phone')
         
-        train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, allocation, dataset)
+        train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, amount_allocation, user_selection, dataset)
         train_dataset = train_partition(dataset['train'])
         # data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
         # get_html_plots(data_distribution, class_distribution)
@@ -178,15 +184,17 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
         return train_dataset, val_dataset, None
 
 
-def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, alpha, allocation, dataset):
+def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, alpha, amount_allocation, user_selection, dataset):
     if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
+        print(dataset["split"]["train"])
+        print(user_selection)
         partition = UserPartition(dataset['split']['train'])
         client_num_in_total = len(dataset['split']['train'].keys())
         print(f"This dataset has {client_num_in_total} clients data. The first {client_num_in_total} clients data is allocated to the devices.")
     elif partition_type == 'uniform':
         partition = UniformPartition(num_class=num_classes, num_clients=client_num_in_total)
     elif partition_type == 'uneven_amount':
-        partition = UnEvenAmountPartition(num_class=num_classes, num_clients=client_num_in_total, allocation=allocation)
+        partition = UnEvenAmountPartition(num_class=num_classes, num_clients=client_num_in_total, allocation=amount_allocation)
     elif partition_type == 'dirichlet':
         if alpha is None:
             warnings.warn('alpha is not set, using default value 0.1')
@@ -282,12 +290,13 @@ def main():
     dataset_name = args.dataset
     partition_type = args.partition_type
     dirichlet_alpha = args.dirichlet_alpha
-    data_amount_allocation = args.allocation
+    data_amount_allocation = args.amount_allocation
+    user_selection = args.user_selection
 
     np.random.seed(args.seed)
 
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha, data_amount_allocation)
+    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha, data_amount_allocation, user_selection)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
