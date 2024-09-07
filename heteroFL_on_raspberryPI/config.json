@@ -1,0 +1,8 @@
+{
+    "directories": {
+        "log": "./log",
+        "figure": "./figure",
+        "datasets": "./datasets",
+        "loaders": "./loaders"
+    }
+}

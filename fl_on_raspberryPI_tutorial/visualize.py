@@ -58,6 +58,8 @@ def calculate_mean_std(values):
     return mean_values, std_values
 
 def plot_metrics(ax, x, y_mean, y_std, label, xlabel, ylabel, legend_title):
+    if label == -1:
+        label = 'Uniform Distribution'
     ax.plot(x, y_mean, '-', label=label, alpha=0.4)
     ax.fill_between(x, np.array(y_mean) - np.array(y_std), np.array(y_mean) + np.array(y_std), alpha=0.2)
     ax.set_xlabel(xlabel)
@@ -119,8 +121,8 @@ def visualize_aggregate_result_on_fraction(log_file):
 def visualize_aggregate_result_on_numdevice(log_file):
     mean_results = []
     visualize_aggregate_result(log_file, mean_results, "num_available", "Number of devices")
-    with open(f"{os.path.basename(log_file).split('.')[0]}_mean.json", "w") as f:
-        json.dump(mean_results, f)
+    # with open(f"{os.path.basename(log_file).split('.')[0]}_mean.json", "w") as f:
+    #     json.dump(mean_results, f)
 
 def main():
     args = parser.parse_args()
