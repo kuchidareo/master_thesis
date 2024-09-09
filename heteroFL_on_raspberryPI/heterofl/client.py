@@ -1,5 +1,4 @@
 """Defines the MNIST Flower Client and a function to instantiate it."""
-import argparse
 from typing import Callable, Dict, List, Optional, Tuple
 
 import flwr as fl
@@ -15,17 +14,6 @@ from heterofl.models import create_model, get_parameters, set_parameters, test, 
 from heterofl.utils import preprocess_input
 
 # from torch.utils.data import DataLoader
-
-
-parser = argparse.ArgumentParser(description="Flower Embedded devices")
-
-parser.add_argument(
-    "--cid",
-    type=int,
-    required=True,
-    help="Client id. Should be an integer between 0 and NUM_CLIENTS",
-)
-
 
 class FlowerNumPyClient(fl.client.NumPyClient):
     """Standard Flower client for training."""
@@ -158,7 +146,7 @@ def main(cfg: DictConfig) -> None:
     model_config = preprocess_input(cfg.model, cfg.dataset)
 
     client_to_model_rate_mapping = None
-    cid = parser.cid
+    cid = cfg.cid
 
     data_loaders = {}
 

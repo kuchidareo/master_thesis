@@ -6,6 +6,8 @@ client_resources:
     num_cpus: 1
     num_gpus: 0.08
 
+cid: 0 # Set
+
 control:
   model_split_mode: 'dynamic'
   model_mode: 'a1-b1-c1-d1-e1'
