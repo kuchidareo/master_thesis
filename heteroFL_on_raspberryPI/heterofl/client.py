@@ -22,13 +22,13 @@ class FlowerNumPyClient(fl.client.NumPyClient):
 
     def __init__(
         self,
-        # cid: str,
+        cid: str,
         net: torch.nn.Module,
         dataloader,
         model_rate: Optional[float],
         client_train_settings: Dict,
     ):
-        # self.cid = cid
+        self.cid = cid
         self.net = net
         self.trainloader = dataloader["trainloader"]
         self.label_split = dataloader["label_split"]
@@ -38,20 +38,20 @@ class FlowerNumPyClient(fl.client.NumPyClient):
         self.client_train_settings["device"] = torch.device(
             "cuda:0" if torch.cuda.is_available() else "cpu"
         )
-        # print(
-        #     "Client_with model rate = {} , cid of client = {}".format(
-        #         self.model_rate, self.cid
-        #     )
-        # )
+        print(
+            "Client_with model rate = {} , cid of client = {}".format(
+                self.model_rate, self.cid
+            )
+        )
 
     def get_parameters(self, config) -> NDArrays:
         """Return the parameters of the current net."""
-        # print(f"[Client {self.cid}] get_parameters")
+        print(f"[Client {self.cid}] get_parameters")
         return get_parameters(self.net)
 
     def fit(self, parameters, config) -> Tuple[NDArrays, int, Dict]:
         """Implement distributed fit function for a given client."""
-        # print(f"cid = {self.cid}")
+        print(f"cid = {self.cid}")
         set_parameters(self.net, parameters)
         if "lr" in config:
             self.client_train_settings["lr"] = config["lr"]
@@ -118,14 +118,14 @@ def gen_client_fn(
             "valloader": data_loaders["valloaders"][int(cid)],
             "label_split": data_loaders["label_split"][int(cid)],
         }
-        # trainloader = data_loaders["trainloaders"][int(cid)]
-        # valloader = data_loaders["valloaders"][int(cid)]
+        trainloader = data_loaders["trainloaders"][int(cid)]
+        valloader = data_loaders["valloaders"][int(cid)]
         model_rate = None
         if client_to_model_rate_mapping is not None:
             model_rate = client_to_model_rate_mapping[int(cid)]
 
         return FlowerNumPyClient(
-            # cid=cid,
+            cid=cid,
             net=create_model(
                 model_config,
                 model_rate=model_rate,
