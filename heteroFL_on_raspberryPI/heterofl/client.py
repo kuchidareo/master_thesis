@@ -106,6 +106,7 @@ def gen_client_fn(
     """
 
     def client_fn(cid: str) -> FlowerNumPyClient:
+        print(f"cid is {cid}")
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client
         # will train and evaluate on their own unique data
@@ -186,7 +187,7 @@ def main(cfg: DictConfig) -> None:
 
     fl.client.start_client(
         server_address="192.168.0.110:5555",
-        client_fn=lambda context: client_fn(context, cid),
+        client_fn=lambda context: client_fn(cid),
     )
 
 
