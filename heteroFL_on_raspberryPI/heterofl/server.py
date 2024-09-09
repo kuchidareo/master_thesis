@@ -246,10 +246,9 @@ def main(cfg: DictConfig) -> None:
             min_available_clients=cfg.num_clients,
         )
 
-        history = fl.start_server(
-            num_clients=cfg.num_clients,
+        history = fl.server.start_server(
+            server_address="192.168.0.110:5555",
             config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
-            client_resources=client_resources,
             client_manager=ClientManagerHeteroFL(
                 model_rate_manager,
                 client_to_model_rate_mapping,
@@ -268,7 +267,7 @@ def main(cfg: DictConfig) -> None:
             min_available_clients=cfg.num_clients,
         )
 
-        history = fl.start_server(
+        history = fl.server.start_server(
             num_clients=cfg.num_clients,
             config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
             client_resources=client_resources,

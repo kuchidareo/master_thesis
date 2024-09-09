@@ -186,7 +186,8 @@ def main(cfg: DictConfig) -> None:
     )
 
     fl.client.start_client(
-        client_fn,
+        server_address="192.168.0.110:5555",
+        client_fn=client_fn,
     )
 
 
