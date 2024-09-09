@@ -584,7 +584,7 @@ def test(model, test_loader, label_split=None, device="cpu"):
             input_dict["img"] = images.to(device)
             input_dict["label"] = labels.to(device)
             if label_split is not None:
-                input_dict["label_split"] = label_split.type(torch.int).to(device)
+                input_dict["label_split"] = label_split.type(torch.long).to(device)
             output = model(input_dict)
             test_loss += output["loss"].item()
             correct += (
