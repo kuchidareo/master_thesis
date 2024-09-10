@@ -119,10 +119,11 @@ def gen_client_fn(
         }
         trainloader = data_loaders["trainloaders"][int(cid)]
         valloader = data_loaders["valloaders"][int(cid)]
+
         # model_rate = None
         # if client_to_model_rate_mapping is not None:
         #     model_rate = client_to_model_rate_mapping[int(cid)]
-
+        
         return FlowerNumPyClient(
             cid=cid,
             net=create_model(
