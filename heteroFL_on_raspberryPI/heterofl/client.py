@@ -11,7 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from heterofl.dataset import load_datasets
 from heterofl.models import create_model, get_parameters, set_parameters, test, train
-from heterofl.utils import preprocess_input, get_global_model_rate
+from heterofl.utils import ModelRateManager, preprocess_input, get_global_model_rate
 
 # from torch.utils.data import DataLoader
 
@@ -105,7 +105,7 @@ def gen_client_fn(
         A tuple containing the client function that creates Flower Clients
     """
 
-    def client_fn(cid: str, model_rate: float) -> FlowerNumPyClient:
+    def client_fn(cid: str) -> FlowerNumPyClient:
         print(f"cid is {cid}")
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client
@@ -120,9 +120,9 @@ def gen_client_fn(
         trainloader = data_loaders["trainloaders"][int(cid)]
         valloader = data_loaders["valloaders"][int(cid)]
 
-        # model_rate = None
-        # if client_to_model_rate_mapping is not None:
-        #     model_rate = client_to_model_rate_mapping[int(cid)]
+        model_rate = None
+        if client_to_model_rate_mapping is not None:
+            model_rate = client_to_model_rate_mapping[int(cid)]
 
         return FlowerNumPyClient(
             cid=cid,
@@ -168,6 +168,10 @@ def main(cfg: DictConfig) -> None:
 
     if "HeteroFL" in cfg.strategy._target_:
         client_to_model_rate_mapping = [float(0) for _ in range(cfg.num_clients)]
+        model_rate_manager = ModelRateManager(
+            cfg.control.model_split_mode, model_split_rate, model_mode
+        )
+        client_to_model_rate_mapping = model_rate_manager.create_model_rate(len(client_to_model_rate_mapping))
 
     # prepare function that will be used to spawn each client
     client_train_settings = {
@@ -195,7 +199,7 @@ def main(cfg: DictConfig) -> None:
 
     fl.client.start_client(
         server_address="192.168.0.110:5555",
-        client_fn=client_fn(cid, model_rate),
+        client_fn=client_fn(cid),
     )
 
 

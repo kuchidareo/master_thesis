@@ -45,6 +45,9 @@ class ClientManagerHeteroFL(fl.server.ClientManager):
         # shall handle in case of not_simulation...
         self.client_label_split = client_label_split
 
+        # For synchronizing client cids.
+        self.cid_idx = 0
+
         self._cv = threading.Condition()
 
     def __len__(self) -> int:
@@ -105,7 +108,11 @@ class ClientManagerHeteroFL(fl.server.ClientManager):
         if client.cid in self.clients:
             return False
 
-        self.clients[client.cid] = client
+        # client.cid is not 'cid' from the clients.
+        # self.clients[client.cid] = client
+
+        self.clients[self.cid_idx] = client 
+        self.cid_idx += 1
 
         # in case of not a simulation, this type of method can be used
         # if self.is_simulation is False:

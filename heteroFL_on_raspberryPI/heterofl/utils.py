@@ -121,11 +121,12 @@ def get_global_model_rate(model_mode):
 class ModelRateManager:
     """Control the model rate of clients in case of simulation."""
 
-    def __init__(self, model_split_mode, model_split_rate, model_mode):
+    def __init__(self, model_split_mode, model_split_rate, model_mode, manual_model_rate):
         self.model_split_mode = model_split_mode
         self.model_split_rate = model_split_rate
         self.model_mode = model_mode
         self.model_mode = self.model_mode.split("-")
+        self.manual_model_rate = manual_model_rate
 
     def create_model_rate_mapping(self, num_users):
         """Change the client to model rate mapping accordingly."""
@@ -161,6 +162,9 @@ class ModelRateManager:
             client_model_rate = np.array(mode_rate)[rate_idx]
 
             # return client_model_rate
+
+        elif self.model_split_mode == "manual":
+            client_model_rate = np.array(self.manual_model_rate)
 
         else:
             raise ValueError("Not valid model split mode")
