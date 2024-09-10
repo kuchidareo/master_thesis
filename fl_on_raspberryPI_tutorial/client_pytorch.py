@@ -14,8 +14,8 @@ from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 from ultralytics.nn.tasks import DetectionModel
 
-from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader
-from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model
+from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader, german_traffic as german_traffic_loader
+from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model, german_traffic as german_traffic_model, trashnet as trashnet_model
 from partition.centralized import CentralizedPartition
 from partition.dirichlet import DirichletPartition
 from partition.uniform import UniformPartition
@@ -122,6 +122,10 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
         fds = FederatedDataset(dataset="cifar10", partitioners={"train": NUM_CLIENTS})
         img_key = "img"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    elif dataset == "trashnet":
+        fds = FederatedDataset(dataset="garythung/trashnet", partitioners={"train": NUM_CLIENTS})
+        img_key = "image"
+        norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     pytorch_transforms = Compose([ToTensor(), norm])
 
@@ -147,7 +151,7 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
 
 def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float, amount_allocation: list, user_selection: list):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
-    if dataset_name in ("mnist", "cifar10"):
+    if dataset_name in ("mnist", "cifar10", "trashnet"):
         return flower_federated_dataset_partition(dataset_name, NUM_CLIENTS)
     elif dataset_name == "ecg":
         ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=NUM_CLIENTS)
@@ -158,6 +162,8 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
         har_val_dataset = uci_har_loader.HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
+    elif dataset_name == "german_traffic":
+        german_traffic_dataset = german_traffic_loader.load_dataset()
     else: # Imported from FedAIoT source code.
         if dataset_name == "casas":
             num_classes = 12
@@ -223,6 +229,8 @@ class FlowerClient(fl.client.NumPyClient):
             self.model = mnist_model.MnistNet()
         elif dataset_name == "cifar10":
             self.model = mobilenet_v3_small(num_classes=10)
+        elif dataset_name == "trashnet":
+            self.model = trashnet_model.SimpleCNN()
         elif dataset_name == "ecg":
             self.model = ecg_model.EcgConv1d()
         elif dataset_name == "uci_har":
