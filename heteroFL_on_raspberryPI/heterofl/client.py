@@ -149,7 +149,6 @@ def main(cfg: DictConfig) -> None:
 
     client_to_model_rate_mapping = None
     cid = cfg.client_server.cid
-    model_rate = cfg.client_server.model_rate
 
     data_loaders = {}
 
