@@ -190,8 +190,6 @@ def main(cfg: DictConfig) -> None:
         "milestones": cfg.optim_scheduler.milestones,
     }
 
-
-
     client_fn = gen_client_fn(
         model_config=model_config,
         client_to_model_rate_mapping=client_to_model_rate_mapping,
@@ -199,11 +197,11 @@ def main(cfg: DictConfig) -> None:
         data_loaders=data_loaders,
     )
 
+
     fl.client.start_client(
         server_address="192.168.0.110:5555",
-        client_fn=client_fn(cid),
+        client_fn=client_fn,
     )
-
 
 if __name__ == "__main__":
     main()
