@@ -9,12 +9,12 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torchvision.transforms import Compose, Normalize, ToTensor
+from torchvision.transforms import Compose, Normalize, Resize, ToTensor
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 from ultralytics.nn.tasks import DetectionModel
 
-from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader, german_traffic as german_traffic_loader
+from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader, german_traffic as german_traffic_loader, trashnet as trashnet_loader
 from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model, german_traffic as germann_traffic_model, trashnet as trashnet_model
 from partition.centralized import CentralizedPartition
 from partition.dirichlet import DirichletPartition
@@ -118,16 +118,19 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
+        pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset == "cifar10":
         fds = FederatedDataset(dataset="cifar10", partitioners={"train": NUM_CLIENTS})
         img_key = "img"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset == "trashnet":
         fds = FederatedDataset(dataset="garythung/trashnet", partitioners={"train": NUM_CLIENTS})
         img_key = "image"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        resize = Resize((224, 224))
+        pytorch_transforms = Compose([ToTensor(), norm, resize])
 
-    pytorch_transforms = Compose([ToTensor(), norm])
 
     def apply_transforms(batch):
         """Apply transforms to the partition from FederatedDataset."""
@@ -162,6 +165,8 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
         har_val_dataset = uci_har_loader.HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
+    # elif dataset_name == "trashnet":
+    #     return trashnet_loader.load_dataset(num_clients=NUM_CLIENTS)
     elif dataset_name == "german_traffic":
         german_traffic_dataset = german_traffic_loader.load_dataset()
     else: # Imported from FedAIoT source code.
