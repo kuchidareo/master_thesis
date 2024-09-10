@@ -15,7 +15,7 @@ from tqdm import tqdm
 from ultralytics.nn.tasks import DetectionModel
 
 from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader, german_traffic as german_traffic_loader
-from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model, german_traffic as german_traffic_model, trashnet as trashnet_model
+from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model, trashnet as trashnet_model
 from partition.centralized import CentralizedPartition
 from partition.dirichlet import DirichletPartition
 from partition.uniform import UniformPartition
