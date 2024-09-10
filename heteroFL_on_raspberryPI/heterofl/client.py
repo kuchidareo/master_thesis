@@ -167,6 +167,7 @@ def main(cfg: DictConfig) -> None:
 
     model_split_rate = {"a": 1, "b": 0.5, "c": 0.25, "d": 0.125, "e": 0.0625}
     model_mode = cfg.control.model_mode
+    manual_model_rate = cfg.control.manual_model_rate
     model_config["global_model_rate"] = model_split_rate[
         get_global_model_rate(model_mode)
     ]
@@ -174,7 +175,7 @@ def main(cfg: DictConfig) -> None:
     if "HeteroFL" in cfg.strategy._target_:
         client_to_model_rate_mapping = [float(0) for _ in range(cfg.num_clients)]
         model_rate_manager = ModelRateManager(
-            cfg.control.model_split_mode, model_split_rate, model_mode
+            cfg.control.model_split_mode, model_split_rate, model_mode, manual_model_rate
         )
         client_to_model_rate_mapping = model_rate_manager.create_model_rate(len(client_to_model_rate_mapping))
 
