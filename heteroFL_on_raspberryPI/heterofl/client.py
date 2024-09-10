@@ -177,7 +177,7 @@ def main(cfg: DictConfig) -> None:
         model_rate_manager = ModelRateManager(
             cfg.control.model_split_mode, model_split_rate, model_mode, manual_model_rate
         )
-        client_to_model_rate_mapping = model_rate_manager.create_model_rate(len(client_to_model_rate_mapping))
+        client_to_model_rate_mapping = model_rate_manager.create_model_rate_mapping(len(client_to_model_rate_mapping))
 
     # prepare function that will be used to spawn each client
     client_train_settings = {
