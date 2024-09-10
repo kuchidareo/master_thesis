@@ -110,10 +110,11 @@ def test(net, testloader, criterion, device):
     return loss, accuracy
 
 
-def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int, non_iid: bool):
+def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
     if dataset == "mnist":
-        noniid_partitioner = ShardPartitioner(num_partitions=NUM_CLIENTS, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
-        partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
+        # noniid_partitioner = ShardPartitioner(num_partitions=NUM_CLIENTS, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
+        # partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
+        partitioner = {"train": NUM_CLIENTS}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
