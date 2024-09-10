@@ -120,6 +120,7 @@ def gen_client_fn(
         trainloader = data_loaders["trainloaders"][int(cid)]
         valloader = data_loaders["valloaders"][int(cid)]
         model_rate = None
+        import pdb; pdb.set_trace()
         if client_to_model_rate_mapping is not None:
             model_rate = client_to_model_rate_mapping[int(cid)]
 
