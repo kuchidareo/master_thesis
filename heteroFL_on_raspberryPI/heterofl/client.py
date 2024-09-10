@@ -2,7 +2,6 @@
 from typing import Callable, Dict, List, Optional, Tuple
 
 import flwr as fl
-from flwr.client import Client
 import torch
 from flwr.common.typing import NDArrays
 import hydra
@@ -76,7 +75,7 @@ def gen_client_fn(
     client_to_model_rate_mapping: Optional[List[float]],
     client_train_settings: Dict,
     data_loaders,
-) -> Callable[[str], Client]:  # pylint: disable=too-many-arguments
+) -> Callable[[str], FlowerNumPyClient]:  # pylint: disable=too-many-arguments
     """Generate the client function that creates the Flower Clients.
 
     Parameters
@@ -106,7 +105,7 @@ def gen_client_fn(
         A tuple containing the client function that creates Flower Clients
     """
 
-    def client_fn(cid: str) -> Client:
+    def client_fn(cid: str) -> FlowerNumPyClient:
         print(f"cid is {cid}")
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client
@@ -135,7 +134,7 @@ def gen_client_fn(
             dataloader=client_dataloader,
             model_rate=model_rate,
             client_train_settings=client_train_settings,
-        ).to_client()
+        )
 
     return client_fn
 
