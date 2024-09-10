@@ -87,7 +87,7 @@ def gen_evaluate_fn(
         local_metrics = {}
         local_metrics["loss"] = 0
         local_metrics["accuracy"] = 0
-        for i, clnt_tstldr in enumerate(data_loaders["valloaders"]):
+        for i, clnt_tstldr in tqdm(enumerate(data_loaders["valloaders"])):
             client_test_res = test(
                 net,
                 clnt_tstldr,
