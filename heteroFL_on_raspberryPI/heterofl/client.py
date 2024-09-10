@@ -11,7 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from heterofl.dataset import load_datasets
 from heterofl.models import create_model, get_parameters, set_parameters, test, train
-from heterofl.utils import preprocess_input
+from heterofl.utils import preprocess_input, get_global_model_rate
 
 # from torch.utils.data import DataLoader
 
@@ -123,7 +123,7 @@ def gen_client_fn(
         # model_rate = None
         # if client_to_model_rate_mapping is not None:
         #     model_rate = client_to_model_rate_mapping[int(cid)]
-        
+
         return FlowerNumPyClient(
             cid=cid,
             net=create_model(
@@ -179,6 +179,12 @@ def main(cfg: DictConfig) -> None:
         "scheduler": cfg.optim_scheduler.scheduler,
         "milestones": cfg.optim_scheduler.milestones,
     }
+
+    model_split_rate = {"a": 1, "b": 0.5, "c": 0.25, "d": 0.125, "e": 0.0625}
+    model_mode = cfg.control.model_mode
+    model_config["global_model_rate"] = model_split_rate[
+        get_global_model_rate(model_mode)
+    ]
 
     client_fn = gen_client_fn(
         model_config=model_config,
