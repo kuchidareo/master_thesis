@@ -16,7 +16,7 @@ control:
 
 dataset:
   dataset_name: 'CIFAR10'
-  iid: True
+  iid: false
   shard_per_user : 2 # only used in case of non-iid (i.e. iid = false)
   balance: false
   batch_size:
