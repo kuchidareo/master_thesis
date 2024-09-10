@@ -165,6 +165,12 @@ def main(cfg: DictConfig) -> None:
         seed=cfg.seed,
     )
 
+    model_split_rate = {"a": 1, "b": 0.5, "c": 0.25, "d": 0.125, "e": 0.0625}
+    model_mode = cfg.control.model_mode
+    model_config["global_model_rate"] = model_split_rate[
+        get_global_model_rate(model_mode)
+    ]
+
     if "HeteroFL" in cfg.strategy._target_:
         client_to_model_rate_mapping = [float(0) for _ in range(cfg.num_clients)]
         model_rate_manager = ModelRateManager(
@@ -183,11 +189,7 @@ def main(cfg: DictConfig) -> None:
         "milestones": cfg.optim_scheduler.milestones,
     }
 
-    model_split_rate = {"a": 1, "b": 0.5, "c": 0.25, "d": 0.125, "e": 0.0625}
-    model_mode = cfg.control.model_mode
-    model_config["global_model_rate"] = model_split_rate[
-        get_global_model_rate(model_mode)
-    ]
+
 
     client_fn = gen_client_fn(
         model_config=model_config,

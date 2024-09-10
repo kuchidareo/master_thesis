@@ -112,6 +112,7 @@ class ClientManagerHeteroFL(fl.server.ClientManager):
         # self.clients[client.cid] = client
 
         self.clients[self.cid_idx] = client 
+        print(f"Registered: cid={self.cid_idx}")
         self.cid_idx += 1
 
         # in case of not a simulation, this type of method can be used
