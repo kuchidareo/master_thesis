@@ -105,7 +105,7 @@ def gen_client_fn(
         A tuple containing the client function that creates Flower Clients
     """
 
-    def client_fn(cid: str) -> FlowerNumPyClient:
+    def client_fn(cid: str, model_rate: float) -> FlowerNumPyClient:
         print(f"cid is {cid}")
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client
@@ -119,9 +119,9 @@ def gen_client_fn(
         }
         trainloader = data_loaders["trainloaders"][int(cid)]
         valloader = data_loaders["valloaders"][int(cid)]
-        model_rate = None
-        if client_to_model_rate_mapping is not None:
-            model_rate = client_to_model_rate_mapping[int(cid)]
+        # model_rate = None
+        # if client_to_model_rate_mapping is not None:
+        #     model_rate = client_to_model_rate_mapping[int(cid)]
 
         return FlowerNumPyClient(
             cid=cid,
@@ -147,7 +147,8 @@ def main(cfg: DictConfig) -> None:
     model_config = preprocess_input(cfg.model, cfg.dataset)
 
     client_to_model_rate_mapping = None
-    cid = cfg.cid
+    cid = cfg.client_server.cid
+    model_rate = cfg.client_server.model_rate
 
     data_loaders = {}
 
@@ -187,7 +188,7 @@ def main(cfg: DictConfig) -> None:
 
     fl.client.start_client(
         server_address="192.168.0.110:5555",
-        client_fn=client_fn(cid),
+        client_fn=client_fn(cid, model_rate),
     )
 
 

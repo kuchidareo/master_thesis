@@ -6,7 +6,9 @@ client_resources:
     num_cpus: 1
     num_gpus: 0.08
 
-cid: 0 # Set
+client_server:
+  cid: 0
+  model_rate: 1.0
 
 control:
   model_split_mode: 'dynamic'
