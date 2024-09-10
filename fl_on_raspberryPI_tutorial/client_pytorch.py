@@ -143,10 +143,10 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
         partition = partition.with_transform(apply_transforms)
         trainsets.append(partition["train"])
         validsets.append(partition["test"])
-    testset = fds.load_split("test")
-    testset = testset.with_transform(apply_transforms)
+    # testset = fds.load_split("test")
+    # testset = testset.with_transform(apply_transforms)
     
-    return trainsets, validsets, testset
+    return trainsets, validsets, None
 
 
 def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float, amount_allocation: list, user_selection: list):
