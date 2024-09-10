@@ -47,6 +47,7 @@ class ClientManagerHeteroFL(fl.server.ClientManager):
 
         # For synchronizing client cids.
         self.cid_idx = 0
+        self.proxy_cid_to_cid_idx = {}
 
         self._cv = threading.Condition()
 
@@ -111,7 +112,9 @@ class ClientManagerHeteroFL(fl.server.ClientManager):
         # client.cid is not 'cid' from the clients.
         # self.clients[client.cid] = client
 
+        self.proxy_cid_to_cid_idx[client.cid] = self.cid_idx
         self.clients[self.cid_idx] = client 
+    
         print(f"Registered: cid={self.cid_idx}")
         self.cid_idx += 1
 

@@ -155,12 +155,13 @@ class HeteroFL(fl.server.strategy.Strategy):
         learning_rate = self.optimizer.param_groups[0]["lr"]
         print(f"lr = {learning_rate}")
         for client in clients:
-            model_rate = clnt_mngr_heterofl.get_client_to_model_mapping(client.cid)
+            proxy_cid_to_cid_idx = client_manager.proxy_cid_to_cid_idx
+            model_rate = clnt_mngr_heterofl.get_client_to_model_mapping(proxy_cid_to_cid_idx[client.cid])
             client_param_idx = self.local_param_model_rate[model_rate]
             local_param = param_idx_to_local_params(
                 global_parameters=global_parameters, client_param_idx=client_param_idx
             )
-            self.active_cl_mr[client.cid] = model_rate
+            self.active_cl_mr[proxy_cid_to_cid_idx[client.cid]] = model_rate
             # local param are in the form of state_dict,
             #  so converting them only to values of tensors
             local_param_fitres = [val.cpu() for val in local_param.values()]
