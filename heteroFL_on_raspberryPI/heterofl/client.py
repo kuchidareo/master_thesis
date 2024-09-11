@@ -192,7 +192,7 @@ def main(cfg: DictConfig) -> None:
     }
 
     client_fn = gen_client_fn(
-        cid=cid
+        cid=cid,
         model_config=model_config,
         client_to_model_rate_mapping=client_to_model_rate_mapping,
         client_train_settings=client_train_settings,
