@@ -200,7 +200,7 @@ def main(cfg: DictConfig) -> None:
 
     fl.client.start_client(
         server_address="192.168.0.110:5555",
-        client_fn=client_fn,
+        client_fn=lambda cid=cid: client_fn(cid)
     )
 
 if __name__ == "__main__":
