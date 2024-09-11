@@ -111,6 +111,10 @@ class HeteroFL(fl.server.strategy.Strategy):
             self.global_model_rate,
         )
 
+        all_clients = clnt_mngr_heterofl.all()
+        for client in all_clients:
+            client.cid = clnt_mngr_heterofl.proxy_cid_to_cid_idx[client.cid] # Changing cid
+
         if clnt_mngr_heterofl.client_label_split is not None:
             self.active_cl_labels = clnt_mngr_heterofl.client_label_split.copy()
 
@@ -156,8 +160,6 @@ class HeteroFL(fl.server.strategy.Strategy):
         print(f"lr = {learning_rate}")
 
         for client in clients:
-            # Changing cid
-            client.cid = client_manager.proxy_cid_to_cid_idx[client.cid]
             model_rate = clnt_mngr_heterofl.get_client_to_model_mapping(client.cid)
             client_param_idx = self.local_param_model_rate[model_rate]
             local_param = param_idx_to_local_params(
