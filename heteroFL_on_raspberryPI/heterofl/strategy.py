@@ -173,6 +173,7 @@ class HeteroFL(fl.server.strategy.Strategy):
                     FitIns(
                         ndarrays_to_parameters(local_param_fitres),
                         {"lr": learning_rate},
+                        {"cid": client.cid}
                     ),
                 )
             )

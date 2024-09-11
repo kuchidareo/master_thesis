@@ -21,27 +21,52 @@ class FlowerNumPyClient(fl.client.NumPyClient):
 
     def __init__(
         self,
-        cid: str,
-        net: torch.nn.Module,
+        # cid: str,
+        # net: torch.nn.Module,
         dataloader,
-        model_rate: Optional[float],
+        model_config,
+        client_to_model_rate_mapping,
+        # model_rate: Optional[float],
         client_train_settings: Dict,
     ):
-        self.cid = cid
-        self.net = net
+        self.cid = None
+        self.net = None
+        self.model_config = model_config
         self.trainloader = dataloader["trainloader"]
         self.label_split = dataloader["label_split"]
         self.valloader = dataloader["valloader"]
-        self.model_rate = model_rate
+        self.client_to_model_rate_mapping = client_to_model_rate_mapping
+        self.model_rate = None
         self.client_train_settings = client_train_settings
         self.client_train_settings["device"] = torch.device(
             "cuda:0" if torch.cuda.is_available() else "cpu"
         )
+
+        self.is_first_fitting = True
+
+    
+    def initialization_at_first_fitting(self, config):
+        if "lr" in config:
+            self.client_train_settings["lr"] = config["lr"]
+        if "cid" in config:
+            self.cid = config["cid"] # Get cid from server.
+
         print(
             "Client_with model rate = {} , cid of client = {}".format(
                 self.model_rate, self.cid
             )
         )
+
+        if self.client_to_model_rate_mapping is not None:
+            self.model_rate = self.client_to_model_rate_mapping[int(self.cid)]
+
+        self.net = create_model(
+            self.model_config,
+            model_rate=self.model_rate,
+            device=self.client_train_settings["device"],
+        )
+
+        self.is_first_fitting = False
 
     def get_parameters(self, config) -> NDArrays:
         """Return the parameters of the current net."""
@@ -50,29 +75,29 @@ class FlowerNumPyClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config) -> Tuple[NDArrays, int, Dict]:
         """Implement distributed fit function for a given client."""
-        print(f"cid = {self.cid}")
+        if self.is_first_fitting:
+            self.initialization_at_first_fitting(config)
+
         set_parameters(self.net, parameters)
-        if "lr" in config:
-            self.client_train_settings["lr"] = config["lr"]
+
         train(
             self.net,
-            self.trainloader,
-            self.label_split,
+            self.trainloader[int(self.cid)],
+            self.label_split[int(self.cid)],
             self.client_train_settings,
         )
-        return get_parameters(self.net), len(self.trainloader), {}
+        return get_parameters(self.net), len(self.trainloader[int(self.cid)]), {}
 
     def evaluate(self, parameters, config) -> Tuple[float, int, Dict]:
         """Implement distributed evaluation for a given client."""
         set_parameters(self.net, parameters)
         loss, accuracy = test(
-            self.net, self.valloader, device=self.client_train_settings["device"]
+            self.net, self.valloader[int(self.cid)], device=self.client_train_settings["device"]
         )
-        return float(loss), len(self.valloader), {"accuracy": float(accuracy)}
+        return float(loss), len(self.valloader[int(self.cid)]), {"accuracy": float(accuracy)}
 
 
 def gen_client_fn(
-    cid: str,
     model_config: Dict,
     client_to_model_rate_mapping: Optional[List[float]],
     client_train_settings: Dict,
@@ -108,33 +133,28 @@ def gen_client_fn(
     """
 
     def client_fn(context: Context) -> FlowerNumPyClient:
-        print(f"cid is {cid}")
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client
         # will train and evaluate on their own unique data
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         client_dataloader = {
-            "trainloader": data_loaders["trainloaders"][int(cid)],
-            "valloader": data_loaders["valloaders"][int(cid)],
-            "label_split": data_loaders["label_split"][int(cid)],
+            "trainloader": data_loaders["trainloaders"],
+            "valloader": data_loaders["valloaders"],
+            "label_split": data_loaders["label_split"],
         }
-        trainloader = data_loaders["trainloaders"][int(cid)]
-        valloader = data_loaders["valloaders"][int(cid)]
-
-        model_rate = None
-        if client_to_model_rate_mapping is not None:
-            model_rate = client_to_model_rate_mapping[int(cid)]
 
         return FlowerNumPyClient(
-            cid=cid,
-            net=create_model(
-                model_config,
-                model_rate=model_rate,
-                device=device,
-            ),
+            # cid=cid,
+            # net=create_model(
+            #     model_config,
+            #     model_rate=model_rate,
+            #     device=device,
+            # ),
             dataloader=client_dataloader,
-            model_rate=model_rate,
+            model_config=model_config,
+            # model_rate=model_rate,
+            client_to_model_rate_mapping=client_to_model_rate_mapping,
             client_train_settings=client_train_settings,
         ).to_client()
 
@@ -150,7 +170,6 @@ def main(cfg: DictConfig) -> None:
     model_config = preprocess_input(cfg.model, cfg.dataset)
 
     client_to_model_rate_mapping = None
-    cid = cfg.client_server.cid
 
     data_loaders = {}
 
@@ -193,7 +212,6 @@ def main(cfg: DictConfig) -> None:
     }
 
     client_fn = gen_client_fn(
-        cid=cid,
         model_config=model_config,
         client_to_model_rate_mapping=client_to_model_rate_mapping,
         client_train_settings=client_train_settings,
