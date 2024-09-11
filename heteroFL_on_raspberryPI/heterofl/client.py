@@ -4,6 +4,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 import flwr as fl
 import torch
 from flwr.common.typing import NDArrays
+from flwr.common import Context
 import hydra
 from hydra.core.hydra_config import HydraConfig
 from hydra.utils import instantiate
@@ -106,7 +107,8 @@ def gen_client_fn(
         A tuple containing the client function that creates Flower Clients
     """
 
-    def client_fn() -> FlowerNumPyClient:
+    def client_fn(context: Context) -> FlowerNumPyClient:
+        print(context)
         print(f"cid is {cid}")
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client
