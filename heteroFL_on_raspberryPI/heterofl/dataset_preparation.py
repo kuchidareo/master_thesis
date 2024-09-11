@@ -14,24 +14,22 @@ import heterofl.datasets as dt
 def _download_data(dataset_name: str, strategy_name: str) -> Tuple[Dataset, Dataset]:
     root = "./data/{}".format(dataset_name)
     if dataset_name == "MNIST":
-    #     trainset = dt.MNIST(
-    #         root=root,
-    #         split="train",
-    #         subset="label",
-    #         transform=dt.Compose(
-    #             [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
-    #         ),
-    #     )
-    #     testset = dt.MNIST(
-    #         root=root,
-    #         split="test",
-    #         subset="label",
-    #         transform=dt.Compose(
-    #             [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
-    #         ),
-    #     )
-        trainset = load_dataset("mnist", split="train")  
-        testset = load_dataset("mnist", split="test")  
+        trainset = dt.MNIST(
+            root=root,
+            split="train",
+            subset="label",
+            transform=dt.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+            ),
+        )
+        testset = dt.MNIST(
+            root=root,
+            split="test",
+            subset="label",
+            transform=dt.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+            ),
+        )
     elif dataset_name == "CIFAR10":
         normalize = transforms.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
