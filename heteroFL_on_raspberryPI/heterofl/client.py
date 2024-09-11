@@ -108,7 +108,6 @@ def gen_client_fn(
     """
 
     def client_fn(context: Context) -> FlowerNumPyClient:
-        print(context)
         print(f"cid is {cid}")
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client

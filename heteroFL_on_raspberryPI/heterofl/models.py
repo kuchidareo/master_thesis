@@ -542,7 +542,7 @@ def train(model, train_loader, label_split, settings):
             input_dict = {}
             input_dict["img"] = images.to(settings["device"])
             input_dict["label"] = labels.to(settings["device"])
-            input_dict["label_split"] = label_split.type(torch.int).to(
+            input_dict["label_split"] = label_split.type(torch.long).to(
                 settings["device"]
             )
             optimizer.zero_grad()
