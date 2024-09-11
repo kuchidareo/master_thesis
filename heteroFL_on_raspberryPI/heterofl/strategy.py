@@ -87,6 +87,8 @@ class HeteroFL(fl.server.strategy.Strategy):
             milestones=optim_scheduler_settings["milestones"],
         )
 
+        self.proxy_cid_to_cid_idx = {}
+
     def __repr__(self) -> str:
         """Return a string representation of the HeteroFL object."""
         return "HeteroFL"
@@ -110,10 +112,6 @@ class HeteroFL(fl.server.strategy.Strategy):
             clnt_mngr_heterofl.get_all_clients_to_model_mapping(),
             self.global_model_rate,
         )
-
-        all_clients = clnt_mngr_heterofl.all()
-        for client in all_clients:
-            client.cid = clnt_mngr_heterofl.proxy_cid_to_cid_idx[client.cid] # Changing cid
 
         if clnt_mngr_heterofl.client_label_split is not None:
             self.active_cl_labels = clnt_mngr_heterofl.client_label_split.copy()
@@ -160,12 +158,13 @@ class HeteroFL(fl.server.strategy.Strategy):
         print(f"lr = {learning_rate}")
 
         for client in clients:
-            model_rate = clnt_mngr_heterofl.get_client_to_model_mapping(client.cid)
+            self.proxy_cid_to_cid_idx = client_manager.proxy_cid_to_cid_idx
+            model_rate = clnt_mngr_heterofl.get_client_to_model_mapping(self.proxy_cid_to_cid_idx[client.cid])
             client_param_idx = self.local_param_model_rate[model_rate]
             local_param = param_idx_to_local_params(
                 global_parameters=global_parameters, client_param_idx=client_param_idx
             )
-            self.active_cl_mr[client.cid] = model_rate
+            self.active_cl_mr[self.proxy_cid_to_cid_idx[client.cid]] = model_rate
             # local param are in the form of state_dict,
             #  so converting them only to values of tensors
             local_param_fitres = [val.cpu() for val in local_param.values()]
@@ -174,7 +173,7 @@ class HeteroFL(fl.server.strategy.Strategy):
                     client,
                     FitIns(
                         ndarrays_to_parameters(local_param_fitres),
-                        {"lr": learning_rate, "cid": client.cid},
+                        {"lr": learning_rate, "cid": self.proxy_cid_to_cid_idx[client.cid]},
                     ),
                 )
             )
@@ -199,7 +198,7 @@ class HeteroFL(fl.server.strategy.Strategy):
         for res in results:
             param_idx.append(
                 copy.deepcopy(
-                    self.local_param_model_rate[self.active_cl_mr[res[0].cid]]
+                    self.local_param_model_rate[self.active_cl_mr[self.proxy_cid_to_cid_idx[res[0].cid]]]
                 )
             )
 
@@ -240,7 +239,7 @@ class HeteroFL(fl.server.strategy.Strategy):
                 if "weight" in parameter_type or "bias" in parameter_type:
                     self._agg_layer_conv(
                         {
-                            "cid": int(results[clnt][0].cid),
+                            "cid": int(self.proxy_cid_to_cid_idx[results[clnt][0].cid]),
                             "param_idx": param_idx,
                             "local_parameters": local_parameters,
                         },
@@ -322,7 +321,7 @@ class HeteroFL(fl.server.strategy.Strategy):
                 if "weight" in parameter_type or "bias" in parameter_type:
                     self._agg_layer_resnet18(
                         {
-                            "cid": int(results[clnt][0].cid),
+                            "cid": int(self.proxy_cid_to_cid_idx[results[clnt][0].cid]),
                             "param_idx": param_idx,
                             "local_parameters": local_parameters,
                         },
