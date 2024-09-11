@@ -280,7 +280,7 @@ class HeteroFL(fl.server.strategy.Strategy):
             if param_info["val"].dim() > 1:
                 if k == output_names["output_weight_name"]:
                     label_split = self.active_cl_labels[clnt_params["cid"]]
-                    label_split = label_split.type(torch.int)
+                    label_split = label_split.type(torch.long)
                     param_idx[clnt][k] = list(param_idx[clnt][k])
                     param_idx[clnt][k][0] = param_idx[clnt][k][0][label_split]
                     tmp_v[torch.meshgrid(param_idx[clnt][k])] += clnt_params[
@@ -298,7 +298,7 @@ class HeteroFL(fl.server.strategy.Strategy):
         else:
             if k == output_names["output_bias_name"]:
                 label_split = self.active_cl_labels[clnt_params["cid"]]
-                label_split = label_split.type(torch.int)
+                label_split = label_split.type(torch.long)
                 param_idx[clnt][k] = param_idx[clnt][k][label_split]
                 tmp_v[param_idx[clnt][k]] += clnt_params["local_parameters"][clnt][k][
                     label_split
@@ -347,7 +347,7 @@ class HeteroFL(fl.server.strategy.Strategy):
             if param_info["val"].dim() > 1:
                 if "linear" in k:
                     label_split = self.active_cl_labels[clnt_params["cid"]]
-                    label_split = label_split.type(torch.int)
+                    label_split = label_split.type(torch.long)
                     param_idx[clnt][k] = list(param_idx[clnt][k])
                     param_idx[clnt][k][0] = param_idx[clnt][k][0][label_split]
                     tmp_v[torch.meshgrid(param_idx[clnt][k])] += clnt_params[
@@ -365,7 +365,7 @@ class HeteroFL(fl.server.strategy.Strategy):
         else:
             if "linear" in k:
                 label_split = self.active_cl_labels[clnt_params["cid"]]
-                label_split = label_split.type(torch.int)
+                label_split = label_split.type(torch.long)
                 param_idx[clnt][k] = param_idx[clnt][k][label_split]
                 tmp_v[param_idx[clnt][k]] += clnt_params["local_parameters"][clnt][k][
                     label_split
