@@ -9,6 +9,7 @@ from typing import List, OrderedDict
 import numpy as np
 import torch
 import torch.nn.functional as F
+from tqdm import tqdm
 from flwr.common import parameters_to_ndarrays
 from torch import nn
 
@@ -538,7 +539,7 @@ def train(model, train_loader, label_split, settings):
 
     model.train()
     for _ in range(settings["epochs"]):
-        for images, labels in train_loader:
+        for images, labels in tqdm(train_loader):
             input_dict = {}
             input_dict["img"] = images.to(settings["device"])
             input_dict["label"] = labels.to(settings["device"])
@@ -579,7 +580,7 @@ def test(model, test_loader, label_split=None, device="cpu"):
 
     with torch.no_grad():
         model.train(False)
-        for images, labels in test_loader:
+        for images, labels in tqdm(test_loader):
             input_dict = {}
             input_dict["img"] = images.to(device)
             input_dict["label"] = labels.to(device)
