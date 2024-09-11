@@ -1,6 +1,6 @@
 num_clients: 10
-num_epochs: 1
-num_rounds: 100
+num_epochs: 5
+num_rounds: 400
 seed: 0
 client_resources:
     num_cpus: 1
@@ -9,11 +9,11 @@ client_resources:
 control:
   model_split_mode: 'manual'
   model_mode: 'a1-b1-c1-d1-e1'
-  manual_model_rate: [1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 0.5, 0.5, 0.5, 0.5]
+  manual_model_rate: [1.0, 1.0, 0.5, 0.5, 0.25, 0.25, 0.125, 0.125, 0.0625, 0.0625]
 
 dataset:
-  dataset_name: 'MNIST'
-  iid: false
+  dataset_name: 'CIFAR10'
+  iid: true
   shard_per_user : 2 # only used in case of non-iid (i.e. iid = false)
   balance: false
   batch_size:
@@ -25,7 +25,7 @@ dataset:
 
 
 model:
-  model_name: conv  # use 'conv' for MNIST
+  model_name: resnet18  # use 'conv' for MNIST
   hidden_layers: [64 , 128 , 256 , 512]
   norm: bn
   scale: 1
@@ -38,7 +38,7 @@ optim_scheduler:
   momentum: 0.9
   weight_decay: 5.00e-04
   scheduler: MultiStepLR
-  milestones: [300, 500]
+  milestones: [150, 250]
 
 strategy:
   _target_: heterofl.strategy.HeteroFL

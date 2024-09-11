@@ -11,6 +11,7 @@ from flwr.common.typing import NDArrays, Scalar
 import hydra
 from hydra.core.hydra_config import HydraConfig
 from hydra.utils import instantiate
+import mlflow
 from omegaconf import DictConfig, OmegaConf
 from tqdm import tqdm
 import torch
@@ -63,53 +64,59 @@ def gen_evaluate_fn(
         # if server_round % 5 != 0 and server_round < 395:
         #     return 1, {}
 
-        net = model
-        params_dict = zip(intermediate_keys, parameters_ndarrays)
-        state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
-        net.load_state_dict(state_dict, strict=False)
-        net.to(device)
+        with mlflow.start_run():
+            net = model
+            params_dict = zip(intermediate_keys, parameters_ndarrays)
+            state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
+            net.load_state_dict(state_dict, strict=False)
+            net.to(device)
 
-        if server_round % 100 == 0:
-            save_model(net, f"model_after_round_{server_round}.pth")
+            if server_round % 100 == 0:
+                save_model(net, f"model_after_round_{server_round}.pth")
 
-        if enable_train_on_train_data is True:
-            print("start of testing")
-            start_time = time.time()
-            with torch.no_grad():
-                net.train(True)
-                for images, labels in tqdm(data_loaders["entire_trainloader"]):
-                    input_dict = {}
-                    input_dict["img"] = images.to(device)
-                    input_dict["label"] = labels.to(device)
-                    net(input_dict)
-            print(f"end of stat, time taken = {time.time() - start_time}")
-        
-        local_metrics = {}
-        local_metrics["loss"] = 0
-        local_metrics["accuracy"] = 0
-        for i, clnt_tstldr in enumerate(data_loaders["valloaders"]):
-            client_test_res = test(
-                net,
-                clnt_tstldr,
-                data_loaders["label_split"][i].type(torch.int),
-                device=device,
+            if enable_train_on_train_data is True:
+                print("start of testing")
+                start_time = time.time()
+                with torch.no_grad():
+                    net.train(True)
+                    for images, labels in tqdm(data_loaders["entire_trainloader"]):
+                        input_dict = {}
+                        input_dict["img"] = images.to(device)
+                        input_dict["label"] = labels.to(device)
+                        net(input_dict)
+                print(f"end of stat, time taken = {time.time() - start_time}")
+            
+            local_metrics = {}
+            local_metrics["loss"] = 0
+            local_metrics["accuracy"] = 0
+            for i, clnt_tstldr in enumerate(data_loaders["valloaders"]):
+                client_test_res = test(
+                    net,
+                    clnt_tstldr,
+                    data_loaders["label_split"][i].type(torch.int),
+                    device=device,
+                )
+                local_metrics["loss"] += client_test_res[0]
+                local_metrics["accuracy"] += client_test_res[1]
+
+            global_metrics = {}
+            global_metrics["loss"], global_metrics["accuracy"] = test(
+                net, data_loaders["testloader"], device=device
             )
-            local_metrics["loss"] += client_test_res[0]
-            local_metrics["accuracy"] += client_test_res[1]
 
-        global_metrics = {}
-        global_metrics["loss"], global_metrics["accuracy"] = test(
-            net, data_loaders["testloader"], device=device
-        )
+            mlflow.log_metric("global_loss", global_metrics["loss"])
+            mlflow.log_metric("global_accuracy", global_metrics["accuracy"])
+            mlflow.log_metric("local_loss", local_metrics["loss"])
+            mlflow.log_metric("local_accuracy", local_metrics["accuracy"])
 
-        # return statistics
-        print(f"global accuracy = {global_metrics['accuracy']}")
-        print(f"local_accuracy = {local_metrics['accuracy']}")
-        return global_metrics["loss"], {
-            "global_accuracy": global_metrics["accuracy"],
-            "local_loss": local_metrics["loss"],
-            "local_accuracy": local_metrics["accuracy"],
-        }
+            # return statistics
+            print(f"global accuracy = {global_metrics['accuracy']}")
+            print(f"local_accuracy = {local_metrics['accuracy']}")
+            return global_metrics["loss"], {
+                "global_accuracy": global_metrics["accuracy"],
+                "local_loss": local_metrics["loss"],
+                "local_accuracy": local_metrics["accuracy"],
+            }
 
     return evaluate
 
