@@ -154,8 +154,8 @@ def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     torch.manual_seed(cfg.seed)
 
+    mlflow.set_experiment(cfg.mlflow.exname)
     with mlflow.start_run():
-        mlflow.set_experiment(cfg.mlflow.exname)
         log_params_from_omegaconf_dict(cfg)
 
         model_config = preprocess_input(cfg.model, cfg.dataset)
