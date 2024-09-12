@@ -97,35 +97,23 @@ def gen_evaluate_fn(
             )
             local_metrics["loss"] += client_test_res[0] / len(data_loaders["valloaders"])
             local_metrics["accuracy"] += client_test_res[1] / len(data_loaders["valloaders"])
-
-        print(f"elapsed_time: {time.time() - config['first_configure_fit_datetime']}")
         
-        elapsed_time = (
-            time.time() - config["first_configure_fit_datetime"]
-            if config["first_configure_fit_datetime"] is not None
-            else 0
-        )
         mlflow.log_metrics(
             {
                 "local_loss": local_metrics["loss"],
                 "local_accuracy": local_metrics["accuracy"]
-            }, step=server_round, timestamp=int(elapsed_time)
+            }, step=server_round
         )
 
         global_metrics = {}
         global_metrics["loss"], global_metrics["accuracy"] = test(
             net, data_loaders["testloader"], device=device
         )
-        elapsed_time = (
-            time.time() - config["first_configure_fit_datetime"]
-            if config["first_configure_fit_datetime"] is not None
-            else 0
-        )
         mlflow.log_metrics(
             {
                 "global_loss": global_metrics["loss"],
                 "global_accuracy": global_metrics["accuracy"]
-            }, step=server_round, timestamp=int(elapsed_time)
+            }, step=server_round
         )
 
         # return statistics
