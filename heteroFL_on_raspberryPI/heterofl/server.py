@@ -2,6 +2,7 @@
 
 import time
 from collections import OrderedDict
+from datetime import datetime
 import pickle
 from pathlib import Path
 from typing import Callable, Dict, Optional, Tuple
@@ -63,7 +64,6 @@ def gen_evaluate_fn(
         """Use the entire test set for evaluation."""
         # if server_round % 5 != 0 and server_round < 395:
         #     return 1, {}
-
     
         net = model
         params_dict = zip(intermediate_keys, parameters_ndarrays)
@@ -96,18 +96,20 @@ def gen_evaluate_fn(
                 data_loaders["label_split"][i].type(torch.int),
                 device=device,
             )
-            local_metrics["loss"] += client_test_res[0]
-            local_metrics["accuracy"] += client_test_res[1]
+            local_metrics["loss"] += client_test_res[0] / len(data_loaders["valloaders"])
+            local_metrics["accuracy"] += client_test_res[1] / len(data_loaders["valloaders"])
+        
+        elapsed_time = datetime.now() - config["first_configure_fit_datetime"]
+        mlflow.log_metric("local_loss", local_metrics["loss"], round=server_round, elapsed_time=elapsed_time)
+        mlflow.log_metric("local_accuracy", local_metrics["accuracy"], round=server_round, elapsed_time=elapsed_time)
 
         global_metrics = {}
         global_metrics["loss"], global_metrics["accuracy"] = test(
             net, data_loaders["testloader"], device=device
         )
-
-        mlflow.log_metric("global_loss", global_metrics["loss"], step=server_round)
-        mlflow.log_metric("global_accuracy", global_metrics["accuracy"], step=server_round)
-        mlflow.log_metric("local_loss", local_metrics["loss"], step=server_round)
-        mlflow.log_metric("local_accuracy", local_metrics["accuracy"], step=server_round)
+        elapsed_time = datetime.now() - config["first_configure_fit_datetime"]
+        mlflow.log_metric("global_loss", global_metrics["loss"], round=server_round, elapsed_time=elapsed_time)
+        mlflow.log_metric("global_accuracy", global_metrics["accuracy"], round=server_round, elapsed_time=elapsed_time)
 
         # return statistics
         print(f"global accuracy = {global_metrics['accuracy']}")
@@ -120,6 +122,10 @@ def gen_evaluate_fn(
 
     return evaluate
 
+def log_params_from_omegaconf_dict(cfg):
+    flatten_conf = dict(OmegaConf.to_container(cfg))
+    mlflow.log_param(flatten_conf)
+
 
 # pylint: disable=too-many-locals,protected-access
 @hydra.main(config_path="conf", config_name="base.yaml", version_base=None)
@@ -129,132 +135,136 @@ def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     torch.manual_seed(cfg.seed)
 
-    model_config = preprocess_input(cfg.model, cfg.dataset)
+    with mlflow.start_run():
+        mlflow.set_experiment(cfg.mlflow.exname)
+        log_params_from_omegaconf_dict(cfg)
 
-    model_split_rate = None
-    model_mode = None
-    client_to_model_rate_mapping = None
-    model_rate_manager = None
-    history = None
+        model_config = preprocess_input(cfg.model, cfg.dataset)
+
+        model_split_rate = None
+        model_mode = None
+        client_to_model_rate_mapping = None
+        model_rate_manager = None
+        history = None
 
 
-    data_loaders = {}
+        data_loaders = {}
 
-    (
-        data_loaders["entire_trainloader"],
-        data_loaders["trainloaders"],
-        data_loaders["label_split"],
-        data_loaders["valloaders"],
-        data_loaders["testloader"],
-    ) = load_datasets(
-        "heterofl" if "heterofl" in cfg.strategy._target_ else "fedavg",
-        config=cfg.dataset,
-        num_clients=cfg.num_clients,
-        seed=cfg.seed,
-    )
-
-    if "HeteroFL" in cfg.strategy._target_:
-        # send this array(client_model_rate_mapping) as
-        # an argument to client_manager and client
-        model_split_rate = {"a": 1, "b": 0.5, "c": 0.25, "d": 0.125, "e": 0.0625}
-        # model_split_mode = cfg.control.model_split_mode
-        model_mode = cfg.control.model_mode
-        manual_model_rate = cfg.control.manual_model_rate
-
-        client_to_model_rate_mapping = [float(0) for _ in range(cfg.num_clients)]
-        model_rate_manager = ModelRateManager(
-            cfg.control.model_split_mode, model_split_rate, model_mode, manual_model_rate
+        (
+            data_loaders["entire_trainloader"],
+            data_loaders["trainloaders"],
+            data_loaders["label_split"],
+            data_loaders["valloaders"],
+            data_loaders["testloader"],
+        ) = load_datasets(
+            "heterofl" if "heterofl" in cfg.strategy._target_ else "fedavg",
+            config=cfg.dataset,
+            num_clients=cfg.num_clients,
+            seed=cfg.seed,
         )
 
-        model_config["global_model_rate"] = model_split_rate[
-            get_global_model_rate(model_mode)
-        ]
+        if "HeteroFL" in cfg.strategy._target_:
+            # send this array(client_model_rate_mapping) as
+            # an argument to client_manager and client
+            model_split_rate = {"a": 1, "b": 0.5, "c": 0.25, "d": 0.125, "e": 0.0625}
+            # model_split_mode = cfg.control.model_split_mode
+            model_mode = cfg.control.model_mode
+            manual_model_rate = cfg.control.manual_model_rate
 
-    test_model = models.create_model(
-        model_config,
-        model_rate=(
-            model_split_rate[get_global_model_rate(model_mode)]
-            if model_split_rate is not None
-            else None
-        ),
-        track=True,
-        device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
-    )
+            client_to_model_rate_mapping = [float(0) for _ in range(cfg.num_clients)]
+            model_rate_manager = ModelRateManager(
+                cfg.control.model_split_mode, model_split_rate, model_mode, manual_model_rate
+            )
 
-    # prepare function that will be used to spawn each client
-    client_train_settings = {
-        "epochs": cfg.num_epochs,
-        "optimizer": cfg.optim_scheduler.optimizer,
-        "lr": cfg.optim_scheduler.lr,
-        "momentum": cfg.optim_scheduler.momentum,
-        "weight_decay": cfg.optim_scheduler.weight_decay,
-        "scheduler": cfg.optim_scheduler.scheduler,
-        "milestones": cfg.optim_scheduler.milestones,
-    }
+            model_config["global_model_rate"] = model_split_rate[
+                get_global_model_rate(model_mode)
+            ]
 
-    if "clip" in cfg:
-        client_train_settings["clip"] = cfg.clip
-
-    optim_scheduler_settings = {
-        "optimizer": cfg.optim_scheduler.optimizer,
-        "lr": cfg.optim_scheduler.lr,
-        "momentum": cfg.optim_scheduler.momentum,
-        "weight_decay": cfg.optim_scheduler.weight_decay,
-        "scheduler": cfg.optim_scheduler.scheduler,
-        "milestones": cfg.optim_scheduler.milestones,
-    }
-
-    evaluate_fn = gen_evaluate_fn(
-        data_loaders,
-        torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
-        test_model,
-        models.create_model(
+        test_model = models.create_model(
             model_config,
             model_rate=(
                 model_split_rate[get_global_model_rate(model_mode)]
                 if model_split_rate is not None
                 else None
             ),
-            track=False,
+            track=True,
             device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
         )
-        .state_dict()
-        .keys(),
-        enable_train_on_train_data=(
-            cfg.enable_train_on_train_data_while_testing
-            if "enable_train_on_train_data_while_testing" in cfg
-            else True
-        ),
-    )
 
-    client_resources = {
-        "num_cpus": cfg.client_resources.num_cpus,
-        "num_gpus": cfg.client_resources.num_gpus if torch.cuda.is_available() else 0,
-    }
+        # prepare function that will be used to spawn each client
+        client_train_settings = {
+            "epochs": cfg.num_epochs,
+            "optimizer": cfg.optim_scheduler.optimizer,
+            "lr": cfg.optim_scheduler.lr,
+            "momentum": cfg.optim_scheduler.momentum,
+            "weight_decay": cfg.optim_scheduler.weight_decay,
+            "scheduler": cfg.optim_scheduler.scheduler,
+            "milestones": cfg.optim_scheduler.milestones,
+        }
 
-    if "HeteroFL" in cfg.strategy._target_:
-        strategy_heterofl = instantiate(
-            cfg.strategy,
-            model_name=cfg.model.model_name,
-            net=models.create_model(
+        if "clip" in cfg:
+            client_train_settings["clip"] = cfg.clip
+
+        optim_scheduler_settings = {
+            "optimizer": cfg.optim_scheduler.optimizer,
+            "lr": cfg.optim_scheduler.lr,
+            "momentum": cfg.optim_scheduler.momentum,
+            "weight_decay": cfg.optim_scheduler.weight_decay,
+            "scheduler": cfg.optim_scheduler.scheduler,
+            "milestones": cfg.optim_scheduler.milestones,
+        }
+
+        evaluate_fn = gen_evaluate_fn(
+            data_loaders,
+            torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
+            test_model,
+            models.create_model(
                 model_config,
                 model_rate=(
                     model_split_rate[get_global_model_rate(model_mode)]
                     if model_split_rate is not None
                     else None
                 ),
-                device="cpu",
+                track=False,
+                device=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),
+            )
+            .state_dict()
+            .keys(),
+            enable_train_on_train_data=(
+                cfg.enable_train_on_train_data_while_testing
+                if "enable_train_on_train_data_while_testing" in cfg
+                else False # Maybe False is the default.
             ),
-            optim_scheduler_settings=optim_scheduler_settings,
-            global_model_rate=(
-                model_split_rate[get_global_model_rate(model_mode)]
-                if model_split_rate is not None
-                else 1.0
-            ),
-            evaluate_fn=evaluate_fn,
-            min_available_clients=cfg.num_clients,
         )
-        with mlflow.start_run():
+
+        client_resources = {
+            "num_cpus": cfg.client_resources.num_cpus,
+            "num_gpus": cfg.client_resources.num_gpus if torch.cuda.is_available() else 0,
+        }
+
+        if "HeteroFL" in cfg.strategy._target_:
+            strategy_heterofl = instantiate(
+                cfg.strategy,
+                model_name=cfg.model.model_name,
+                net=models.create_model(
+                    model_config,
+                    model_rate=(
+                        model_split_rate[get_global_model_rate(model_mode)]
+                        if model_split_rate is not None
+                        else None
+                    ),
+                    device="cpu",
+                ),
+                optim_scheduler_settings=optim_scheduler_settings,
+                global_model_rate=(
+                    model_split_rate[get_global_model_rate(model_mode)]
+                    if model_split_rate is not None
+                    else 1.0
+                ),
+                evaluate_fn=evaluate_fn,
+                min_available_clients=cfg.num_clients,
+            )
+
             history = fl.server.start_server(
                 server_address="192.168.0.110:5555",
                 config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
@@ -265,41 +275,41 @@ def main(cfg: DictConfig) -> None:
                 ),
                 strategy=strategy_heterofl,
             )
-    else:
-        strategy_fedavg = instantiate(
-            cfg.strategy,
-            # on_fit_config_fn=lambda server_round: {
-            #     "lr": cfg.optim_scheduler.lr
-            #     * pow(cfg.optim_scheduler.lr_decay_rate, server_round)
-            # },
-            evaluate_fn=evaluate_fn,
-            min_available_clients=cfg.num_clients,
-        )
+        else:
+            strategy_fedavg = instantiate(
+                cfg.strategy,
+                # on_fit_config_fn=lambda server_round: {
+                #     "lr": cfg.optim_scheduler.lr
+                #     * pow(cfg.optim_scheduler.lr_decay_rate, server_round)
+                # },
+                evaluate_fn=evaluate_fn,
+                min_available_clients=cfg.num_clients,
+            )
 
-        history = fl.server.start_server(
-            num_clients=cfg.num_clients,
-            config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
-            client_resources=client_resources,
-            strategy=strategy_fedavg,
-        )
+            history = fl.server.start_server(
+                num_clients=cfg.num_clients,
+                config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
+                client_resources=client_resources,
+                strategy=strategy_fedavg,
+            )
 
-    print(get_model_properties(
-        model_config,
-        model_split_rate,
-        model_mode + "" if model_mode is not None else None,
-        data_loaders["entire_trainloader"],
-        cfg.dataset.batch_size.train,
-    ))
+        print(get_model_properties(
+            model_config,
+            model_split_rate,
+            model_mode + "" if model_mode is not None else None,
+            data_loaders["entire_trainloader"],
+            cfg.dataset.batch_size.train,
+        ))
 
-    # save the results
-    save_path = HydraConfig.get().runtime.output_dir
+        # save the results
+        save_path = HydraConfig.get().runtime.output_dir
 
-    # save the results as a python pickle
-    with open(str(Path(save_path) / "results.pkl"), "wb") as file_handle:
-        pickle.dump({"history": history}, file_handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # save the results as a python pickle
+        with open(str(Path(save_path) / "results.pkl"), "wb") as file_handle:
+            pickle.dump({"history": history}, file_handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    # save the model
-    torch.save(test_model.state_dict(), str(Path(save_path) / "model.pth"))
+        # save the model
+        torch.save(test_model.state_dict(), str(Path(save_path) / "model.pth"))
 
 
 if __name__ == "__main__":

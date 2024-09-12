@@ -2,6 +2,7 @@
 
 import copy
 from collections import OrderedDict
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
 import flwr as fl
@@ -88,6 +89,7 @@ class HeteroFL(fl.server.strategy.Strategy):
         )
 
         self.proxy_cid_to_cid_idx = {}
+        self.first_configure_fit_datetime = None
 
     def __repr__(self) -> str:
         """Return a string representation of the HeteroFL object."""
@@ -179,6 +181,11 @@ class HeteroFL(fl.server.strategy.Strategy):
             )
 
         self.scheduler.step()
+
+        if not self.first_configure_fit_datetime:
+            print("First configure fit!!")
+            self.first_configure_fit_datetime = datetime.now()
+        
         return fit_configurations
 
     def aggregate_fit(
@@ -455,7 +462,7 @@ class HeteroFL(fl.server.strategy.Strategy):
             # No evaluation function provided
             return None
         parameters_ndarrays = parameters_to_ndarrays(parameters)
-        eval_res = self.evaluate_fn(server_round, parameters_ndarrays, {})
+        eval_res = self.evaluate_fn(server_round, parameters_ndarrays, {"first_configure_fit_datetime": self.first_configure_fit_datetime})
         if eval_res is None:
             return None
         loss, metrics = eval_res
