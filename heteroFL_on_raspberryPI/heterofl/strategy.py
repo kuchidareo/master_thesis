@@ -2,7 +2,7 @@
 
 import copy
 from collections import OrderedDict
-from datetime import datetime
+import time
 from typing import Dict, List, Optional, Tuple, Union
 
 import flwr as fl
@@ -184,7 +184,7 @@ class HeteroFL(fl.server.strategy.Strategy):
 
         if not self.first_configure_fit_datetime:
             print("First configure fit!!")
-            self.first_configure_fit_datetime = datetime.now()
+            self.first_configure_fit_datetime = time.time()
         
         return fit_configurations
 

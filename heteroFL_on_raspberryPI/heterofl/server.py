@@ -2,7 +2,6 @@
 
 import time
 from collections import OrderedDict
-from datetime import datetime
 import pickle
 from pathlib import Path
 from typing import Callable, Dict, Optional, Tuple
@@ -100,24 +99,32 @@ def gen_evaluate_fn(
             local_metrics["accuracy"] += client_test_res[1] / len(data_loaders["valloaders"])
         
         elapsed_time = (
-            datetime.now() - config["first_configure_fit_datetime"]
+            time.time() - config["first_configure_fit_datetime"]
             if config["first_configure_fit_datetime"] is not None
             else 0
         )
-        mlflow.log_metric("local_loss", local_metrics["loss"], round=server_round, elapsed_time=elapsed_time)
-        mlflow.log_metric("local_accuracy", local_metrics["accuracy"], round=server_round, elapsed_time=elapsed_time)
+        mlflow.log_metrics(
+            {
+                "local_loss": local_metrics["loss"],
+                "local_accuracy": local_metrics["accuracy"]
+            }, step=server_round, timestamp=int(elapsed_time)
+        )
 
         global_metrics = {}
         global_metrics["loss"], global_metrics["accuracy"] = test(
             net, data_loaders["testloader"], device=device
         )
         elapsed_time = (
-            datetime.now() - config["first_configure_fit_datetime"]
+            time.time() - config["first_configure_fit_datetime"]
             if config["first_configure_fit_datetime"] is not None
             else 0
         )
-        mlflow.log_metric("global_loss", global_metrics["loss"], round=server_round, elapsed_time=elapsed_time)
-        mlflow.log_metric("global_accuracy", global_metrics["accuracy"], round=server_round, elapsed_time=elapsed_time)
+        mlflow.log_metrics(
+            {
+                "global_loss": global_metrics["loss"],
+                "global_accuracy": global_metrics["accuracy"]
+            }, step=server_round, timestamp=int(elapsed_time)
+        )
 
         # return statistics
         print(f"global accuracy = {global_metrics['accuracy']}")
