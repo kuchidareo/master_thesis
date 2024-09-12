@@ -93,13 +93,17 @@ def gen_evaluate_fn(
             client_test_res = test(
                 net,
                 clnt_tstldr,
-                data_loaders["label_split"][i].type(torch.int),
+                data_loaders["label_split"][i].type(torch.long),
                 device=device,
             )
             local_metrics["loss"] += client_test_res[0] / len(data_loaders["valloaders"])
             local_metrics["accuracy"] += client_test_res[1] / len(data_loaders["valloaders"])
         
-        elapsed_time = datetime.now() - config["first_configure_fit_datetime"]
+        elapsed_time = (
+            datetime.now() - config["first_configure_fit_datetime"]
+            if config["first_configure_fit_datetime"] is not None
+            else 0
+        )
         mlflow.log_metric("local_loss", local_metrics["loss"], round=server_round, elapsed_time=elapsed_time)
         mlflow.log_metric("local_accuracy", local_metrics["accuracy"], round=server_round, elapsed_time=elapsed_time)
 
@@ -107,7 +111,11 @@ def gen_evaluate_fn(
         global_metrics["loss"], global_metrics["accuracy"] = test(
             net, data_loaders["testloader"], device=device
         )
-        elapsed_time = datetime.now() - config["first_configure_fit_datetime"]
+        elapsed_time = (
+            datetime.now() - config["first_configure_fit_datetime"]
+            if config["first_configure_fit_datetime"] is not None
+            else 0
+        )
         mlflow.log_metric("global_loss", global_metrics["loss"], round=server_round, elapsed_time=elapsed_time)
         mlflow.log_metric("global_accuracy", global_metrics["accuracy"], round=server_round, elapsed_time=elapsed_time)
 
@@ -121,6 +129,9 @@ def gen_evaluate_fn(
         }
 
     return evaluate
+
+    
+
 
 def log_params_from_omegaconf_dict(cfg):
     flatten_conf = dict(OmegaConf.to_container(cfg))
