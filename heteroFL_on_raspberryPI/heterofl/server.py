@@ -124,7 +124,8 @@ def gen_evaluate_fn(
 
 def log_params_from_omegaconf_dict(cfg):
     flatten_conf = dict(OmegaConf.to_container(cfg))
-    mlflow.log_param(flatten_conf)
+    for key, value in flatten_conf.items():
+        mlflow.log_param(key, value)
 
 
 # pylint: disable=too-many-locals,protected-access
