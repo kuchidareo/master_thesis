@@ -98,7 +98,7 @@ def gen_evaluate_fn(
             local_metrics["loss"] += client_test_res[0] / len(data_loaders["valloaders"])
             local_metrics["accuracy"] += client_test_res[1] / len(data_loaders["valloaders"])
 
-        print(f"elapsed_time: {time.time() - config["first_configure_fit_datetime"]}")
+        print(f"elapsed_time: {time.time() - config['first_configure_fit_datetime']}")
         
         elapsed_time = (
             time.time() - config["first_configure_fit_datetime"]
