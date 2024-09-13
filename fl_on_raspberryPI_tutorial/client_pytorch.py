@@ -269,6 +269,8 @@ def main(cfg: DictConfig):
     np.random.seed(cfg.seed)
     torch.manual_seed(cfg.seed)
 
+    # TODO: Make a dict to get [num_class, model, ...] from dataset_name
+
     # Download dataset and partition it
     trainsets, valsets = prepare_dataset(num_clients, dataset_conf, dataset_name)
 

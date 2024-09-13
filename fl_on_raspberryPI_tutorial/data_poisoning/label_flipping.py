@@ -4,18 +4,19 @@ import numpy as np
 def flipping(trainsets, dataset_name, rate, target_cids):
     poisoned_trainsets = copy.deepcopy(trainsets)
 
+    match dataset_name:
+        case "trashnet": # label  0~5
+            num_classes = 6
+            X_train, y_train = trainsets[cid]["image"], trainsets[cid]["label"]
+        case "german_traffic":
+            num_classes = 43
+
+
     for cid in target_cids:
         import pdb; pdb.set_trace()
-        X_train, y_train = trainsets[cid]
 
         poisoned_count = int(len(X_train) * rate)
         random_index = np.random.choice(len(X_train), poisoned_count, replace=False)
-
-        match dataset_name:
-            case "trashnet": # label  0~5
-                num_classes = 6
-            case "german_traffic":
-                num_classes = 43
 
         for index in random_index:
             label = y_train[index]
