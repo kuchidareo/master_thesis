@@ -1,6 +1,6 @@
 num_clients: 10
-num_epochs: 1
-num_rounds: 100
+num_epochs: 3
+num_rounds: 20
 seed: 0
 client_resources:
     num_cpus: 1
