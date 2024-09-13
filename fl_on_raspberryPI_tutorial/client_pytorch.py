@@ -280,7 +280,7 @@ def main(cfg: DictConfig):
     fl.client.start_client(
         server_address=cfg.server_address,
         client=FlowerClient(
-            trainset=trainsets[cfg.client.cid], valset=valsets[cfg.client.cid], dataset_name=dataset_name, cid=cfg.client.cid
+            trainset=trainsets[cfg.client.cid], valset=valsets[cfg.client.cid], dataset_name=dataset_name, poisoning_conf=poisoning_conf, cid=cfg.client.cid
         ).to_client(),
     )
 
