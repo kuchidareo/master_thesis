@@ -15,6 +15,7 @@ from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 from ultralytics.nn.tasks import DetectionModel
 
+from data_poisoning import label_flipping, blurring, steganography, occlusion
 from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader, german_traffic as german_traffic_loader, trashnet as trashnet_loader
 from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model, german_traffic as germann_traffic_model, trashnet as trashnet_model
 from partition.centralized import CentralizedPartition
@@ -94,7 +95,7 @@ def flower_federated_dataset_partition(dataset:str, num_clients: int):
     # testset = fds.load_split("test")
     # testset = testset.with_transform(apply_transforms)
     
-    return trainsets, validsets, None
+    return trainsets, validsets
 
 
 def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: str):
@@ -106,12 +107,12 @@ def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: st
     elif dataset_name == "ecg":
         ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=num_clients)
         ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=num_clients, train_test_split=0.2)
-        return ecg_train_dataset, ecg_val_dataset, None
+        return ecg_train_dataset, ecg_val_dataset
     elif dataset_name == "uci_har":
         non_iid = True if partition_type == "user" else False
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=num_clients)
         har_val_dataset = uci_har_loader.HAR(train=False, num_clients=num_clients, train_test_split=0.2)
-        return har_train_dataset, har_val_dataset, None
+        return har_train_dataset, har_val_dataset
     # elif dataset_name == "german_traffic":
     #     german_traffic_dataset = german_traffic_loader.load_dataset()
     else: # Imported from FedAIoT source code.
@@ -138,7 +139,7 @@ def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: st
         # print("Finish making plots")
         val_partition = UniformPartition(num_class=num_classes, num_clients=num_clients)
         val_dataset = val_partition(dataset['test'])
-        return train_dataset, val_dataset, None
+        return train_dataset, val_dataset
 
 
 def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, client_num_in_total):
@@ -164,6 +165,22 @@ def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_class
 
     return partition
 
+def datapoisoning_to_target_cids(trainsets, dataset_name, poisoning):
+    if not poisoning.is_enabled:
+        return trainsets
+
+    match poisoning.method:
+        case "label_flipping":
+            poisoned_trainsets = label_flipping.flipping(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+        case "blurring":
+            poisoned_trainsets = blurring(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+        case "occlusion":
+            poisoned_trainsets = occlusion(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+        case "steganography":
+            poisoned_trainsets = steganography(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+        case _:
+            print(f"Poisoning method {poisoning.method} is not supported.")
+    return poisoned_trainsets
 
 # Flower client, adapted from Pytorch quickstart/simulation example
 class FlowerClient(fl.client.NumPyClient):
@@ -247,11 +264,15 @@ def main(cfg: DictConfig):
     dataset_conf = cfg.dataset
     dataset_name = cfg.dataset.dataset_name
 
+    poisoning_conf = cfg.poisoning
+
     np.random.seed(cfg.seed)
     torch.manual_seed(cfg.seed)
 
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(num_clients, dataset_conf, dataset_name)
+    trainsets, valsets = prepare_dataset(num_clients, dataset_conf, dataset_name)
+
+    trainsets, valsets = datapoisoning_to_target_cids(trainsets, dataset_name, poisoning_conf)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
