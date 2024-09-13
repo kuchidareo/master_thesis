@@ -37,3 +37,6 @@ directory:
   figure: "./figure"
   datasets: "./datasets"
   loaders: "./loaders"
+
+mlflow:
+  exname: "tutorial"
