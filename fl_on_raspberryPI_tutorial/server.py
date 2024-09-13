@@ -126,7 +126,7 @@ def main(cfg: DictConfig):
     # Define strategy
     strategy = FedAvgWithLogging(
         fraction_fit=cfg.strategy.fraction_fit,
-        fraction_evaluate=cfg.fraction_evaluate,
+        fraction_evaluate=cfg.strategy.fraction_evaluate,
         min_fit_clients=cfg.strategy.min_fit_clients,
         min_evaluate_clients=cfg.strategy.min_evaluate_clients,
         min_available_clients=cfg.strategy.min_available_clients,
