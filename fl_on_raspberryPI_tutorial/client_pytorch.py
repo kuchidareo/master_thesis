@@ -1,11 +1,12 @@
-import argparse
 from collections import OrderedDict
 import warnings
 
 import flwr as fl
 from flwr_datasets import FederatedDataset
 from flwr_datasets.partitioner import ShardPartitioner
+import hydra
 import numpy as np
+from omegaconf import DictConfig, OmegaConf
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -23,62 +24,6 @@ from partition.uneven_amount import UnEvenAmountPartition
 from partition.user_index import UserPartition
 
 from partition.utils import get_html_plots, compute_client_data_distribution
-
-parser = argparse.ArgumentParser(description="Flower Embedded devices")
-parser.add_argument(
-    "--server_address",
-    type=str,
-    default="192.168.0.110:5555",
-    help=f"gRPC server address (default '0.0.0.0:8080')",
-)
-parser.add_argument(
-    "--cid",
-    type=int,
-    required=True,
-    help="Client id. Should be an integer between 0 and NUM_CLIENTS",
-)
-parser.add_argument(
-    "--num_clients",
-    type=int,
-    required=True,
-    help="Number of Clients. Should be an integer.",
-)
-parser.add_argument(
-    "--dataset",
-    type=str,
-    required=True,
-    help="mnist, cifar-10, ecg, uci_har, ....",
-)
-parser.add_argument(
-    "--partition_type",
-    type=str,
-    required=True,
-    help="[user({'wisdm', 'widar', 'visdrone'}), uniform, dirichlet, central]",
-)
-parser.add_argument(
-    "--dirichlet_alpha",
-    type=str,
-    default=0.1,
-    help="alpha value in dirichlet partition_type.",
-)
-parser.add_argument(
-    "--amount_allocation",
-    type=int,
-    nargs='+',
-    help="For UnEvenAmountPartition.",
-)
-parser.add_argument(
-    "--user_selection",
-    type=int,
-    nargs='+',
-    help="For UserPartition.",
-)
-parser.add_argument(
-    "--seed",
-    type=int,
-    default=1234,
-    help="Numpy random seed",
-)
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -110,22 +55,22 @@ def test(net, testloader, criterion, device):
     return loss, accuracy
 
 
-def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
+def flower_federated_dataset_partition(dataset:str, num_clients: int):
     if dataset == "mnist":
-        # noniid_partitioner = ShardPartitioner(num_partitions=NUM_CLIENTS, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/NUM_CLIENTS), shuffle=False, seed=42)
-        # partitioner = {"train": noniid_partitioner} if non_iid else {"train": NUM_CLIENTS}
-        partitioner = {"train": NUM_CLIENTS}
+        # noniid_partitioner = ShardPartitioner(num_partitions=num_clients, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/num_clients), shuffle=False, seed=42)
+        # partitioner = {"train": noniid_partitioner} if non_iid else {"train": num_clients}
+        partitioner = {"train": num_clients}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
         pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset == "cifar10":
-        fds = FederatedDataset(dataset="cifar10", partitioners={"train": NUM_CLIENTS})
+        fds = FederatedDataset(dataset="cifar10", partitioners={"train": num_clients})
         img_key = "img"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset == "trashnet":
-        fds = FederatedDataset(dataset="garythung/trashnet", partitioners={"train": NUM_CLIENTS})
+        fds = FederatedDataset(dataset="garythung/trashnet", partitioners={"train": num_clients})
         img_key = "image"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         resize = Resize((224, 224))
@@ -139,7 +84,7 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
 
     trainsets = []
     validsets = []
-    for partition_id in range(NUM_CLIENTS):
+    for partition_id in range(num_clients):
         partition = fds.load_partition(partition_id, "train")
         # Divide data on each node: 90% train, 10% test
         partition = partition.train_test_split(test_size=0.1, seed=42)
@@ -152,23 +97,23 @@ def flower_federated_dataset_partition(dataset:str, NUM_CLIENTS: int):
     return trainsets, validsets, None
 
 
-def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, alpha: float, amount_allocation: list, user_selection: list):
+def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: str):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
+    partition_type = dataset_conf.partition_type
+
     if dataset_name in ("mnist", "cifar10", "trashnet"):
-        return flower_federated_dataset_partition(dataset_name, NUM_CLIENTS)
+        return flower_federated_dataset_partition(dataset_name, num_clients)
     elif dataset_name == "ecg":
-        ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=NUM_CLIENTS)
-        ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
+        ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=num_clients)
+        ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=num_clients, train_test_split=0.2)
         return ecg_train_dataset, ecg_val_dataset, None
     elif dataset_name == "uci_har":
         non_iid = True if partition_type == "user" else False
-        har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=NUM_CLIENTS)
-        har_val_dataset = uci_har_loader.HAR(train=False, num_clients=NUM_CLIENTS, train_test_split=0.2)
+        har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=num_clients)
+        har_val_dataset = uci_har_loader.HAR(train=False, num_clients=num_clients, train_test_split=0.2)
         return har_train_dataset, har_val_dataset, None
-    # elif dataset_name == "trashnet":
-    #     return trashnet_loader.load_dataset(num_clients=NUM_CLIENTS)
-    elif dataset_name == "german_traffic":
-        german_traffic_dataset = german_traffic_loader.load_dataset()
+    # elif dataset_name == "german_traffic":
+    #     german_traffic_dataset = german_traffic_loader.load_dataset()
     else: # Imported from FedAIoT source code.
         if dataset_name == "casas":
             num_classes = 12
@@ -186,25 +131,25 @@ def prepare_dataset(dataset_name: str, NUM_CLIENTS: int, partition_type: str, al
             num_classes = 12
             dataset = wisdm_loader.load_dataset(reprocess=False, modality='phone')
         
-        train_partition = get_partition(partition_type, dataset_name, num_classes, NUM_CLIENTS, alpha, amount_allocation, user_selection, dataset)
+        train_partition = get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, num_clients)
         train_dataset = train_partition(dataset['train'])
-        data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
+        # data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
         # get_html_plots(data_distribution, class_distribution)
         # print("Finish making plots")
-        val_partition = UniformPartition(num_class=num_classes, num_clients=NUM_CLIENTS)
+        val_partition = UniformPartition(num_class=num_classes, num_clients=num_clients)
         val_dataset = val_partition(dataset['test'])
         return train_dataset, val_dataset, None
 
 
-def get_partition(partition_type, dataset_name, num_classes, client_num_in_total, alpha, amount_allocation, user_selection, dataset):
+def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, client_num_in_total):
     if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
-        partition = UserPartition(dataset['split']['train'], user_selection)
+        partition = UserPartition(dataset['split']['train'], dataset_conf.user_selection)
         client_num_in_total = len(dataset['split']['train'].keys())
         print(f"This dataset has {client_num_in_total} clients data. The first {client_num_in_total} clients data is allocated to the devices.")
     elif partition_type == 'uniform':
         partition = UniformPartition(num_class=num_classes, num_clients=client_num_in_total)
     elif partition_type == 'uneven_amount':
-        partition = UnEvenAmountPartition(num_class=num_classes, num_clients=client_num_in_total, allocation=amount_allocation)
+        partition = UnEvenAmountPartition(num_class=num_classes, num_clients=client_num_in_total, allocation=dataset_conf.amount_allocation)
     elif partition_type == 'dirichlet':
         if alpha is None:
             warnings.warn('alpha is not set, using default value 0.1')
@@ -291,30 +236,28 @@ class FlowerClient(fl.client.NumPyClient):
         # Return statistics
         return float(loss), len(valloader.dataset), {"accuracy": float(accuracy)}
 
+@hydra.main(config_path="conf", config_name="base.yaml", version_base=None)
+def main(cfg: DictConfig):
 
-def main():
-    args = parser.parse_args()
-    print(args)
+    print(OmegaConf.to_yaml(cfg))
 
-    NUM_CLIENTS = args.num_clients
-    assert args.cid < NUM_CLIENTS
+    num_clients = cfg.num_clients
+    assert cfg.client.cid < num_clients
 
-    dataset_name = args.dataset
-    partition_type = args.partition_type
-    dirichlet_alpha = args.dirichlet_alpha
-    data_amount_allocation = args.amount_allocation
-    user_selection = args.user_selection
+    dataset_conf = cfg.dataset
+    dataset_name = cfg.dataset.dataset_name
 
-    np.random.seed(args.seed)
+    np.random.seed(cfg.seed)
+    torch.manual_seed(cfg.seed)
 
     # Download dataset and partition it
-    trainsets, valsets, _ = prepare_dataset(dataset_name, NUM_CLIENTS, partition_type, dirichlet_alpha, data_amount_allocation, user_selection)
+    trainsets, valsets, _ = prepare_dataset(num_clients, dataset_conf, dataset_name)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
-        server_address=args.server_address,
+        server_address=cfg.server_address,
         client=FlowerClient(
-            trainset=trainsets[args.cid], valset=valsets[args.cid], dataset_name=dataset_name
+            trainset=trainsets[cfg.client.cid], valset=valsets[cfg.client.cid], dataset_name=dataset_name
         ).to_client(),
     )
 

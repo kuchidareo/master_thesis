@@ -1,50 +1,14 @@
-import argparse
 from datetime import datetime
 import json
 import os
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Tuple
 
 import flwr as fl
-from flwr.common import EvaluateIns, FitRes, Metrics, Parameters, Scalar
-from flwr.server.client_manager import ClientManager
-from flwr.server.client_proxy import ClientProxy
+from flwr.common import Metrics
+import hydra
 import numpy as np
-
-with open('config.json', 'r') as f:
-    config = json.load(f)
-log_directory = config["directories"]["log"]
-
-parser = argparse.ArgumentParser(description="Flower Embedded devices")
-parser.add_argument(
-    "--server_address",
-    type=str,
-    default="192.168.0.110:5555",
-    help=f"gRPC server address (deafault '0.0.0.0:8080')",
-)
-parser.add_argument(
-    "--rounds",
-    type=int,
-    default=5,
-    help="Number of rounds of federated learning (default: 5)",
-)
-parser.add_argument(
-    "--sample_fraction",
-    type=float,
-    default=1.0,
-    help="Fraction of available clients used for fit/evaluate (default: 1.0)",
-)
-parser.add_argument(
-    "--min_num_clients",
-    type=int,
-    default=2,
-    help="Minimum number of available clients required for sampling (default: 2)",
-)
-parser.add_argument(
-    "--seed",
-    type=int,
-    default=1234,
-    help="Numpy random seed",
-)
+import mlflow
+from omegaconf import DictConfig, OmegaConf
 
 # Define metric aggregation function
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
@@ -117,21 +81,8 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fraction_fit = kwargs["fraction_fit"]
-        now = datetime.now()
-        formatted_timestamp = now.strftime("%Y%m%d-%H%M%S")
-        self.log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
-        self.log_file = os.path.join(log_directory, self.log_filename)
         self.results = []
         self.es = EarlyStopping(mode='min', patience=5)
-        self.num_available = None
-        self.first_configure_fit_datetime = None
-
-    def configure_fit(self, server_round, parameters, client_manager):
-        fit_configrations = super().configure_fit(server_round, parameters, client_manager)
-        if not self.first_configure_fit_datetime:
-            self.first_configure_fit_datetime = datetime.now()
-        self.num_available = client_manager.num_available()
-        return fit_configrations
 
     def aggregate_evaluate(self, rnd: int, results, failures):
         loss_aggregated, metrics_aggregated = super().aggregate_evaluate(rnd, results, failures)
@@ -140,51 +91,59 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
         if not metrics_aggregated: # {} will be returned if it failed
             return None, {}
 
-        loss = loss_aggregated
         accuracy = metrics_aggregated["accuracy"]
-        elapsed_time = datetime.now() - self.first_configure_fit_datetime
-        elapsed_minitues = elapsed_time.total_seconds() / 60
-        self.results.append({
-            "num_available": self.num_available,
-            "fraction": self.fraction_fit,
-            "round": rnd,
-            "elapsed_minitues": elapsed_minitues,
-            "loss": loss,
-            "accuracy": accuracy
-        })
 
-        with open(self.log_file, "w") as f:
-            json.dump(self.results, f)
+        mlflow.log_metrics(
+            {
+                "local_loss": loss_aggregated,
+                "local_accuracy": accuracy
+            }, step=rnd
+        )
 
-        self.es(loss, accuracy)
+        self.es(loss_aggregated, accuracy)
 
         return loss_aggregated, metrics_aggregated
+    
+
+def log_params_from_omegaconf_dict(cfg):
+    flatten_conf = dict(OmegaConf.to_container(cfg))
+    for key, value in flatten_conf.items():
+        mlflow.log_param(key, value)
 
 
-def main():
-    args = parser.parse_args()
+@hydra.main(config_path="conf", config_name="base.yaml", version_base=None)
+def main(cfg: DictConfig):
 
-    print(args)
+    print(OmegaConf.to_yaml(cfg))
+    np.random.seed(cfg.seed)
 
-    np.random.seed(args.seed)
-
+    log_directory = cfg.directory.log
+    now = datetime.now()
+    formatted_timestamp = now.strftime("%Y%m%d-%H%M%S")
+    log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
+    log_file = os.path.join(log_directory, log_filename)
+   
     # Define strategy
     strategy = FedAvgWithLogging(
-        fraction_fit=args.sample_fraction,
-        fraction_evaluate=args.sample_fraction,
-        min_fit_clients=args.min_num_clients,
-        min_evaluate_clients=args.min_num_clients,
-        min_available_clients=args.min_num_clients,
+        fraction_fit=cfg.strategy.fraction_fit,
+        fraction_evaluate=cfg.fraction_evaluate,
+        min_fit_clients=cfg.strategy.min_fit_clients,
+        min_evaluate_clients=cfg.strategy.min_evaluate_clients,
+        min_available_clients=cfg.strategy.min_available_clients,
         on_fit_config_fn=fit_config,
         evaluate_metrics_aggregation_fn=weighted_average,
+        log_file=log_file
     )
 
-    # Start Flower server
-    fl.server.start_server(
-        server_address=args.server_address,
-        config=fl.server.ServerConfig(args.rounds),
-        strategy=strategy,
-    )
+    mlflow.set_experiment(cfg.mlflow.exname)
+    with mlflow.start_run():
+        log_params_from_omegaconf_dict(cfg)
+        # Start Flower server
+        fl.server.start_server(
+            server_address=cfg.server_address,
+            config=fl.server.ServerConfig(cfg.num_rounds),
+            strategy=strategy,
+        )
 
 
 if __name__ == "__main__":
