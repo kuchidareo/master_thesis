@@ -9,7 +9,6 @@ def flipping(trainsets, dataset_name, rate, target_cids):
             num_classes = 6
             for cid in target_cids:
                 X_train, y_train = trainsets[cid]["image"], trainsets[cid]["label"]
-                import pdb; pdb.set_trace()
                 poisoned_count = int(len(X_train) * rate)
                 random_index = np.random.choice(len(X_train), poisoned_count, replace=False)
 
