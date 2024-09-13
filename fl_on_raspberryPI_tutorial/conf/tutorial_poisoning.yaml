@@ -8,7 +8,7 @@ client:
   cid: 0
 
 dataset:
-  dataset_name: 'mnist'
+  dataset_name: 'trashnet'
   partition_type: uniform
   dirichlet_alpha: 0.1 # only used in case of dirichlet partition_type
   batch_size:
@@ -19,7 +19,7 @@ dataset:
     test: false
 
 poisoning:
-  is_enabled: false # only for trashnet, german_traffic.
+  is_enabled: true # only for trashnet, german_traffic.
   method: "label_flipping" # blurring, occlusion, steganography, label_flipping
   rate: 0.05
   target_cids: [0, 1, 2, 3, 4]
