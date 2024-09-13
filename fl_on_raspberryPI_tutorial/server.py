@@ -132,7 +132,6 @@ def main(cfg: DictConfig):
         min_available_clients=cfg.strategy.min_available_clients,
         on_fit_config_fn=fit_config,
         evaluate_metrics_aggregation_fn=weighted_average,
-        log_file=log_file
     )
 
     mlflow.set_experiment(cfg.mlflow.exname)
