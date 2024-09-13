@@ -165,32 +165,33 @@ def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_class
 
     return partition
 
-def datapoisoning_to_target_cids(trainsets, dataset_name, poisoning):
+def datapoisoning_to_target_cids(trainset, dataset_name, poisoning, cid):
     if not poisoning.is_enabled:
-        return trainsets
+        return trainset
 
     match poisoning.method:
         case "label_flipping":
-            poisoned_trainsets = label_flipping.flipping(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+            poisoned_trainset = label_flipping.flipping(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
         case "blurring":
-            poisoned_trainsets = blurring(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+            poisoned_trainset = blurring(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
         case "occlusion":
-            poisoned_trainsets = occlusion(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+            poisoned_trainset = occlusion(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
         case "steganography":
-            poisoned_trainsets = steganography(trainsets, dataset_name, poisoning.rate, poisoning.target_cids)
+            poisoned_trainset = steganography(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
         case _:
             print(f"Poisoning method {poisoning.method} is not supported.")
-    return poisoned_trainsets
+    return poisoned_trainset
 
 # Flower client, adapted from Pytorch quickstart/simulation example
 class FlowerClient(fl.client.NumPyClient):
     """A FlowerClient that trains a MobileNetV3 model for CIFAR-10 or a much smaller CNN
     for MNIST."""
 
-    def __init__(self, trainset, valset, dataset_name):
-        self.trainset = trainset
+    def __init__(self, trainset, valset, dataset_name, poisoning_conf, cid):
+        self.trainset = datapoisoning_to_target_cids(trainset, dataset_name, poisoning_conf, cid)
         self.valset = valset
         self.criterion = nn.CrossEntropyLoss()
+        self.cid = cid
         # Instantiate model
         if dataset_name == "mnist":
             self.model = mnist_model.MnistNet()
@@ -214,6 +215,7 @@ class FlowerClient(fl.client.NumPyClient):
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
+        
 
     def set_parameters(self, params):
         """Set model weights from a list of NumPy ndarrays."""
@@ -274,13 +276,11 @@ def main(cfg: DictConfig):
     # Download dataset and partition it
     trainsets, valsets = prepare_dataset(num_clients, dataset_conf, dataset_name)
 
-    trainsets, valsets = datapoisoning_to_target_cids(trainsets, dataset_name, poisoning_conf)
-
     # Start Flower client setting its associated data partition
     fl.client.start_client(
         server_address=cfg.server_address,
         client=FlowerClient(
-            trainset=trainsets[cfg.client.cid], valset=valsets[cfg.client.cid], dataset_name=dataset_name
+            trainset=trainsets[cfg.client.cid], valset=valsets[cfg.client.cid], dataset_name=dataset_name, cid=cfg.client.cid
         ).to_client(),
     )
 
