@@ -6,13 +6,8 @@ from torch.utils.data import Dataset
 import pandas as pd
 
 
-with open('config.json', 'r') as config_file:
-    config = json.load(config_file)
-datasets_directory = config['directories']['datasets']
-
-
 class HAR(Dataset):
-    def __init__(self, num_clients, train=True, non_iid=False, train_test_split=0.1):
+    def __init__(self, num_clients, dataset_conf, train=True, non_iid=False, train_test_split=0.1):
         self.x = []
         self.y = []
     
@@ -20,11 +15,11 @@ class HAR(Dataset):
         y_file = 'train/y_train.txt' if train else 'test/y_test.txt'
         subject_annotation_file = 'train/subject_train.txt' if train else 'test/subject_test.txt'
         
-        X_dataset = pd.read_csv(os.path.join(datasets_directory, 'uci_har', X_file), header=None, names=['data'])
-        y_dataset = pd.read_csv(os.path.join(datasets_directory, 'uci_har', y_file), header=None, names=['label'])
+        X_dataset = pd.read_csv(os.path.join(dataset_conf.directory, 'uci_har', X_file), header=None, names=['data'])
+        y_dataset = pd.read_csv(os.path.join(dataset_conf.directory, 'uci_har', y_file), header=None, names=['label'])
         y_dataset['label'] -= 1 # make it [0 ~ N-1]
         
-        subject_dataset = pd.read_csv(os.path.join(datasets_directory, 'uci_har', subject_annotation_file), header=None, names=['subject'])
+        subject_dataset = pd.read_csv(os.path.join(dataset_conf.directory, 'uci_har', subject_annotation_file), header=None, names=['subject'])
 
         concatenated_df = pd.concat([subject_dataset, X_dataset, y_dataset], axis=1)
 

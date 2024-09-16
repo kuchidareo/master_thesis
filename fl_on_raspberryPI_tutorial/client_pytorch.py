@@ -16,8 +16,8 @@ from tqdm import tqdm
 from ultralytics.nn.tasks import DetectionModel
 
 from data_poisoning import label_flipping, blurring, steganography, occlusion
-from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader, german_traffic as german_traffic_loader, trashnet as trashnet_loader
-from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model, german_traffic as germann_traffic_model, trashnet as trashnet_model
+from dataset_info import get_dataset_info
+from loaders import ecg as ecg_loader, uci_har as uci_har_loader
 from partition.centralized import CentralizedPartition
 from partition.dirichlet import DirichletPartition
 from partition.uniform import UniformPartition
@@ -58,7 +58,7 @@ def test(net, testloader, criterion, device):
     return loss, accuracy
 
 
-def flower_federated_dataset_partition(dataset:str, num_clients: int):
+def huggingface_federated_dataset_partition(dataset:str, num_clients: int):
     if dataset == "mnist":
         # noniid_partitioner = ShardPartitioner(num_partitions=num_clients, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/num_clients), shuffle=False, seed=42)
         # partitioner = {"train": noniid_partitioner} if non_iid else {"train": num_clients}
@@ -102,13 +102,8 @@ def flower_federated_dataset_partition(dataset:str, num_clients: int):
     return trainsets, validsets
 
 
-def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: str):
-    """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
-    partition_type = dataset_conf.partition_type
-
-    if dataset_name in ("mnist", "cifar10", "trashnet"):
-        return flower_federated_dataset_partition(dataset_name, num_clients)
-    elif dataset_name == "ecg":
+def custom_federated_dataset_partition(dataset_name, partition_type, num_clients):
+    if dataset_name == "ecg":
         ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=num_clients)
         ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=num_clients, train_test_split=0.2)
         return ecg_train_dataset, ecg_val_dataset
@@ -117,33 +112,17 @@ def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: st
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=num_clients)
         har_val_dataset = uci_har_loader.HAR(train=False, num_clients=num_clients, train_test_split=0.2)
         return har_train_dataset, har_val_dataset
-    # elif dataset_name == "german_traffic":
-    #     german_traffic_dataset = german_traffic_loader.load_dataset()
-    else: # Imported from FedAIoT source code.
-        if dataset_name == "casas":
-            num_classes = 12
-            dataset = casas_loader.load_dataset()
-        elif dataset_name == "aep":
-            num_classes = 10
-            dataset = aep_loader.load_dataset()
-        elif dataset_name == "visdrone":
-            num_classes = 12
-            dataset = visdrone_loader.load_dataset()
-        elif dataset_name == "wisdm_watch":
-            num_classes = 12
-            dataset = wisdm_loader.load_dataset(reprocess=False, modality='watch')
-        elif dataset_name == 'wisdm_phone':
-            num_classes = 12
-            dataset = wisdm_loader.load_dataset(reprocess=False, modality='phone')
-        
-        train_partition = get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, num_clients)
-        train_dataset = train_partition(dataset['train'])
-        # data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
-        # get_html_plots(data_distribution, class_distribution)
-        # print("Finish making plots")
-        val_partition = UniformPartition(num_class=num_classes, num_clients=num_clients)
-        val_dataset = val_partition(dataset['test'])
-        return train_dataset, val_dataset
+    
+
+def fedaiot_federated_dataset_partition(dataset_name, partition_type, dataset_conf, num_classes, num_clients, dataset):
+    train_partition = get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, num_clients)
+    train_dataset = train_partition(dataset['train'])
+    # data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
+    # get_html_plots(data_distribution, class_distribution)
+    # print("Finish making plots")
+    val_partition = UniformPartition(num_class=num_classes, num_clients=num_clients)
+    val_dataset = val_partition(dataset['test'])
+    return train_dataset, val_dataset
 
 
 def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, client_num_in_total):
@@ -169,6 +148,19 @@ def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_class
 
     return partition
 
+
+def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: str, num_classes, category, dataset):
+    """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
+    partition_type = dataset_conf.partition_type
+
+    if category == "huggingface":
+        return huggingface_federated_dataset_partition(dataset_name, num_clients)
+    elif category == "custom":
+        return custom_federated_dataset_partition(dataset_name, partition_type, num_clients)
+    elif category == "fedaiot": # Imported from FedAIoT source code.
+        return fedaiot_federated_dataset_partition(dataset_name, partition_type, dataset_conf, num_classes, num_clients, dataset)
+
+
 def datapoisoning_to_target_cids(trainset, dataset_name, poisoning, cid):
     if not poisoning.is_enabled:
         return trainset
@@ -191,35 +183,15 @@ class FlowerClient(fl.client.NumPyClient):
     """A FlowerClient that trains a MobileNetV3 model for CIFAR-10 or a much smaller CNN
     for MNIST."""
 
-    def __init__(self, trainset, valset, dataset_name, poisoning_conf, cid):
+    def __init__(self, model, trainset, valset, dataset_name, poisoning_conf, cid):
+        self.model = model
         self.trainset = datapoisoning_to_target_cids(trainset, dataset_name, poisoning_conf, cid)
         self.valset = valset
         self.criterion = nn.CrossEntropyLoss()
         self.cid = cid
-        # Instantiate model
-        if dataset_name == "mnist":
-            self.model = mnist_model.MnistNet()
-        elif dataset_name == "cifar10":
-            self.model = mobilenet_v3_small(num_classes=10)
-        elif dataset_name == "trashnet":
-            self.model = trashnet_model.SimpleCNN()
-        elif dataset_name == "ecg":
-            self.model = ecg_model.EcgConv1d()
-        elif dataset_name == "uci_har":
-            self.model = uci_har_model.HARNet()
-        elif dataset_name == "casas":
-            self.model = casas_model.BiLSTMModel()
-        elif dataset_name == "aep":
-            self.model = aep_model.MLP()
-            self.criterion = nn.MSELoss()
-        elif dataset_name == "visdrone":
-            self.model = DetectionModel(cfg="yolov8.yaml")
-        elif dataset_name in ("wisdm_phone", "wisdm_watch"):
-            self.model = wisdm_model.LSTM_NET()
         # Determine device
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)  # send model to device
-        
 
     def set_parameters(self, params):
         """Set model weights from a list of NumPy ndarrays."""
@@ -275,16 +247,21 @@ def main(cfg: DictConfig):
     np.random.seed(cfg.seed)
     torch.manual_seed(cfg.seed)
 
-    # TODO: Make a dict to get [num_class, model, ...] from dataset_name
+    model, num_classes, category, dataset = get_dataset_info(dataset_name)
 
     # Download dataset and partition it
-    trainsets, valsets = prepare_dataset(num_clients, dataset_conf, dataset_name)
+    trainsets, valsets = prepare_dataset(num_clients, dataset_conf, dataset_name, num_classes, category)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
         server_address=cfg.server_address,
         client=FlowerClient(
-            trainset=trainsets[cfg.client.cid], valset=valsets[cfg.client.cid], dataset_name=dataset_name, poisoning_conf=poisoning_conf, cid=cfg.client.cid
+            model = model,
+            trainset=trainsets[cfg.client.cid],
+            valset=valsets[cfg.client.cid],
+            dataset_name=dataset_name, 
+            poisoning_conf=poisoning_conf, 
+            cid=cfg.client.cid
         ).to_client(),
     )
 

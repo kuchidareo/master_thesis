@@ -17,6 +17,7 @@ dataset:
   shuffle:
     train: true
     test: false
+  directory: "./datasets"
 
 poisoning:
   is_enabled: false # only for trashnet, german_traffic.
@@ -34,12 +35,6 @@ strategy:
   min_fit_clients: 10
   min_evaluate_clients: 10
   min_available_clients: 10
-
-directory:
-  log: "./log"
-  figure: "./figure"
-  datasets: "./datasets"
-  loaders: "./loaders"
 
 mlflow:
   exname: "tutorial"

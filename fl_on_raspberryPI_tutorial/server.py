@@ -116,12 +116,6 @@ def main(cfg: DictConfig):
 
     print(OmegaConf.to_yaml(cfg))
     np.random.seed(cfg.seed)
-
-    log_directory = cfg.directory.log
-    now = datetime.now()
-    formatted_timestamp = now.strftime("%Y%m%d-%H%M%S")
-    log_filename = f"fl_aggregate_result_{formatted_timestamp}.json"
-    log_file = os.path.join(log_directory, log_filename)
    
     # Define strategy
     strategy = FedAvgWithLogging(
