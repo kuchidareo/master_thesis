@@ -242,7 +242,7 @@ def main(cfg: DictConfig) -> None:
             enable_train_on_train_data=(
                 cfg.enable_train_on_train_data_while_testing
                 if "enable_train_on_train_data_while_testing" in cfg
-                else False # Maybe False is the default.
+                else True
             ),
         )
 
