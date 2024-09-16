@@ -82,9 +82,10 @@ def flower_federated_dataset_partition(dataset:str, num_clients: int):
 
 
     def apply_transforms(batch):
+        if img_key not in batch:
+            return batch
         """Apply transforms to the partition from FederatedDataset."""
         batch[img_key] = [pytorch_transforms(img) for img in batch[img_key]]
-        batch[label_key] = batch[label_key]
         return batch
 
     trainsets = []
@@ -175,13 +176,13 @@ def datapoisoning_to_target_cids(trainset, dataset_name, poisoning, cid):
 
     match poisoning.method:
         case "label_flipping":
-            poisoned_trainset = label_flipping.flipping(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
+            poisoned_trainset = label_flipping.flipping(trainset, dataset_name, poisoning.rate)
         case "blurring":
-            poisoned_trainset = blurring(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
+            poisoned_trainset = blurring(trainset, dataset_name, poisoning.rate)
         case "occlusion":
-            poisoned_trainset = occlusion(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
+            poisoned_trainset = occlusion(trainset, dataset_name, poisoning.rate)
         case "steganography":
-            poisoned_trainset = steganography(trainset, dataset_name, poisoning.rate, poisoning.target_cids, cid)
+            poisoned_trainset = steganography(trainset, dataset_name, poisoning.rate)
         case _:
             print(f"Poisoning method {poisoning.method} is not supported.")
     return poisoned_trainset
