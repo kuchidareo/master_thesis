@@ -27,6 +27,7 @@ def flipping(trainset, dataset_name, rate):
                 "image": X_train,
                 "label": y_train
             })
+            poisoned_trainset.set_format(type='torch', columns=["image", "label"])
 
             return poisoned_trainset
         case "german_traffic":
