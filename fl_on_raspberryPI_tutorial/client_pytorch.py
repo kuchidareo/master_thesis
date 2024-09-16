@@ -63,16 +63,19 @@ def flower_federated_dataset_partition(dataset:str, num_clients: int):
         partitioner = {"train": num_clients}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
         img_key = "image"
+        label_key = "label"
         norm = Normalize((0.1307,), (0.3081,))
         pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset == "cifar10":
         fds = FederatedDataset(dataset="cifar10", partitioners={"train": num_clients})
         img_key = "img"
+        label_key = "label"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset == "trashnet":
         fds = FederatedDataset(dataset="kuchidareo/small_trashnet", partitioners={"train": num_clients})
         img_key = "image"
+        label_key = "label"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         resize = Resize((224, 224))
         pytorch_transforms = Compose([ToTensor(), norm, resize])
@@ -81,6 +84,7 @@ def flower_federated_dataset_partition(dataset:str, num_clients: int):
     def apply_transforms(batch):
         """Apply transforms to the partition from FederatedDataset."""
         batch[img_key] = [pytorch_transforms(img) for img in batch[img_key]]
+        batch[label_key] = batch[label_key]
         return batch
 
     trainsets = []
