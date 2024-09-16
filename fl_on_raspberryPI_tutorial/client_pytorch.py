@@ -15,7 +15,6 @@ from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 from ultralytics.nn.tasks import DetectionModel
 
-from datasets import CustomFederatedDataset
 from data_poisoning import label_flipping, blurring, steganography, occlusion
 from loaders import casas as casas_loader, aep as aep_loader, ecg as ecg_loader, visdrone as visdrone_loader, wisdm as wisdm_loader, uci_har as uci_har_loader, german_traffic as german_traffic_loader, trashnet as trashnet_loader
 from models import casas as casas_model, aep as aep_model, ecg as ecg_model, mnist as mnist_model, wisdm as wisdm_model, uci_har as uci_har_model, german_traffic as germann_traffic_model, trashnet as trashnet_model
@@ -72,8 +71,7 @@ def flower_federated_dataset_partition(dataset:str, num_clients: int):
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset == "trashnet":
-        fds = CustomFederatedDataset(dataset_path="datasets/trashnet/dataset-resized", partitioners={"train": num_clients})
-        # fds = FederatedDataset(dataset="garythung/trashnet", partitioners={"train": num_clients})
+        fds = FederatedDataset(dataset="kuchidareo/small_trashnet", partitioners={"train": num_clients})
         img_key = "image"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         resize = Resize((224, 224))
