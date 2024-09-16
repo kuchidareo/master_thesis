@@ -35,6 +35,12 @@ def train(net, trainloader, optimizer, criterion, epochs, device):
             if not isinstance(batch, list):
                 batch = list(batch.values())
             data, labels = batch[0], batch[1]
+
+            if not isinstance(data, torch.Tensor):
+                data = torch.from_numpy(np.asarray(data))
+            if not isinstance(labels, torch.Tensor):
+                labels = torch.from_numpy(np.asarray(labels))
+            
             optimizer.zero_grad()
             criterion(net(data.to(device)), labels.to(device)).backward()
             optimizer.step()
@@ -48,6 +54,12 @@ def test(net, testloader, criterion, device):
             if not isinstance(batch, list):
                 batch = list(batch.values())
             data, labels = batch[0], batch[1]
+
+            if not isinstance(data, torch.Tensor):
+                data = torch.from_numpy(np.asarray(data))
+            if not isinstance(labels, torch.Tensor):
+                labels = torch.from_numpy(np.asarray(labels))
+
             outputs = net(data.to(device))
             labels = labels.to(device)
             loss += criterion(outputs, labels).item()
