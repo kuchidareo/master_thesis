@@ -24,7 +24,7 @@ def flipping(trainset, dataset_name, rate):
                 y_train[index] = flipped_label
 
             poisoned_trainset = Dataset.from_dict({
-                "image": torch.stack(X_train),
+                "image": torch.from_numpy(np.asarray(X_train)),
                 "label": torch.tensor(y_train)
             })
 
