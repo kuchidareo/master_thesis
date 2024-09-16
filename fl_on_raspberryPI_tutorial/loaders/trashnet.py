@@ -18,7 +18,7 @@ def load_dataset(num_clients, train_size=0.8):
         transforms.ToTensor()
     ])
     dataset = load_dataset("imagefolder", data_dir=os.path.join(datasets_directory, "trashnet", "dataset-resized"))
-    dataset = ImageFolder(, transform=transform)
+    # dataset = ImageFolder(, transform=transform)
     train_data, val_data, _ = random_split(dataset, [train_size, 1-train_size, 0])
     return train_data, val_data, _
 
