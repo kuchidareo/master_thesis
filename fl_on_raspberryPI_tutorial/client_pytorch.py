@@ -73,7 +73,7 @@ def huggingface_federated_dataset_partition(dataset_name, dataset_conf, dataset_
     elif dataset_name == "trashnet":
         fds = FederatedDataset(dataset="kuchidareo/small_trashnet", partitioners={"train": num_clients})
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        resize = Resize((224, 224))
+        resize = Resize((300, 300))
         pytorch_transforms = Compose([ToTensor(), norm, resize])
 
 

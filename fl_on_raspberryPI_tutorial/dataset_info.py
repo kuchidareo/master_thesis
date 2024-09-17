@@ -26,7 +26,7 @@ def get_dataset_info(dataset_name):
             }
         case "trashnet":
             info = {
-                "model": trashnet_model.SimpleCNN(),
+                "model": trashnet_model.TrashNet(),
                 "num_classes": 6,
                 "category": "huggingface",
                 "dataset": None,
