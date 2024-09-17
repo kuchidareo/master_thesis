@@ -78,7 +78,7 @@ def huggingface_federated_dataset_partition(dataset_name, dataset_conf, dataset_
 
 
     def apply_transforms(batch):
-        image_key = dataset_info["image_key"]
+        image_key = dataset_info["data_key"]
         if image_key not in batch:
             return batch
         """Apply transforms to the partition from FederatedDataset."""
@@ -164,13 +164,13 @@ def prepare_dataset(num_clients: int,  dataset_name: str, dataset_conf: DictConf
         return fedaiot_federated_dataset_partition(dataset_name, dataset_conf, dataset_info, num_clients)
 
 
-def datapoisoning_to_target_cids(trainset, num_classes, poisoning, cid):
+def datapoisoning_to_target_cids(trainset, dataset_info, poisoning, cid):
     if not poisoning.is_enabled:
         return trainset
 
     match poisoning.method:
         case "label_flipping":
-            poisoned_trainset = label_flipping.flipping(trainset, num_classes, poisoning.rate)
+            poisoned_trainset = label_flipping.flipping(trainset, dataset_info, poisoning.rate)
         case "blurring":
             poisoned_trainset = blurring(trainset, num_classes, poisoning.rate)
         case "occlusion":
@@ -186,10 +186,10 @@ class FlowerClient(fl.client.NumPyClient):
     """A FlowerClient that trains a MobileNetV3 model for CIFAR-10 or a much smaller CNN
     for MNIST."""
 
-    def __init__(self, model, num_classes, trainset, valset, poisoning_conf, cid):
-        self.model = model
-        self.num_classes = num_classes
-        self.trainset = datapoisoning_to_target_cids(trainset, num_classes, poisoning_conf, cid)
+    def __init__(self, dataset_info, trainset, valset, poisoning_conf, cid):
+        self.model = dataset_info["model"]
+        self.num_classes = dataset_info["num_classes"]
+        self.trainset = datapoisoning_to_target_cids(trainset, dataset_info, poisoning_conf, cid)
         self.valset = valset
         self.criterion = nn.CrossEntropyLoss()
         self.cid = cid

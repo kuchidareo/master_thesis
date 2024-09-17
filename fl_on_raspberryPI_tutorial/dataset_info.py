@@ -12,7 +12,7 @@ def get_dataset_info(dataset_name):
                 "num_classes": 10,
                 "category": "huggingface",
                 "dataset": None,
-                "image_key": "image",
+                "data_key": "image",
                 "label_key": "label",
             }
         case "cifar10":
@@ -21,7 +21,7 @@ def get_dataset_info(dataset_name):
                 "num_classes": 10,
                 "category": "huggingface",
                 "dataset": None,
-                "image_key": "img",
+                "data_key": "img",
                 "label_key": "label",
             }
         case "trashnet":
@@ -30,7 +30,7 @@ def get_dataset_info(dataset_name):
                 "num_classes": 6,
                 "category": "huggingface",
                 "dataset": None,
-                "image_key": "image",
+                "data_key": "image",
                 "label_key": "label",
             }
         case "german_traffic":

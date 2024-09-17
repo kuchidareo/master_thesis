@@ -6,9 +6,12 @@ import torch
 from torchvision.transforms import ToTensor
 
 
-def flipping(trainset, num_classes, rate):
-    X_train = trainset["image"]
-    y_train = trainset["label"]
+def flipping(trainset, dataset_info, rate):
+    num_classes = dataset_info["num_classes"]
+
+    X_train = trainset[dataset_info["data_key"]]
+    y_train = trainset[dataset_info["label_key"]]
+
     poisoned_count = int(len(X_train) * rate)
     random_index = np.random.choice(len(X_train), poisoned_count, replace=False)
 
@@ -21,9 +24,9 @@ def flipping(trainset, num_classes, rate):
         y_train[index] = flipped_label
 
     poisoned_trainset = Dataset.from_dict({
-        "image": X_train,
-        "label": y_train
+        dataset_info["data_key"]: X_train,
+        dataset_info["label_key"]: y_train
     })
-    poisoned_trainset.set_format(type='torch', columns=["image", "label"])
+    poisoned_trainset.set_format(type='torch', columns=[dataset_info["data_key"], dataset_info["label_key"]])
 
     return poisoned_trainset
