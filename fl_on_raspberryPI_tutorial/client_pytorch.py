@@ -170,13 +170,13 @@ def datapoisoning_to_target_cids(trainset, dataset_info, poisoning, cid):
 
     match poisoning.method:
         case "label_flipping":
-            poisoned_trainset = label_flipping.flipping(trainset, dataset_info, poisoning.rate)
+            poisoned_trainset = label_flipping.attack(trainset, dataset_info, poisoning.rate)
         case "blurring":
-            poisoned_trainset = blurring(trainset, num_classes, poisoning.rate)
+            poisoned_trainset = blurring.attack(trainset, dataset_info, poisoning.rate)
         case "occlusion":
-            poisoned_trainset = occlusion.occlude(trainset, num_classes, poisoning.rate)
+            poisoned_trainset = occlusion.attack(trainset, dataset_info, poisoning.rate)
         case "steganography":
-            poisoned_trainset = steganography(trainset, num_classes, poisoning.rate)
+            poisoned_trainset = steganography.attack(trainset, dataset_info, poisoning.rate)
         case _:
             print(f"Poisoning method {poisoning.method} is not supported.")
     return poisoned_trainset

@@ -65,7 +65,7 @@ def show_data(image):
     return decoded_data[:-5] 
 
 
-def steganopraphy(trainset, dataset_info, rate):
+def attack(trainset, dataset_info, rate):
     X_train = trainset[dataset_info["data_key"]]
     y_train = trainset[dataset_info["label_key"]]
 

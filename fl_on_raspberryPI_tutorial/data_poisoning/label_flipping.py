@@ -2,7 +2,7 @@ from datasets import Dataset
 import numpy as np
 
 
-def flipping(trainset, dataset_info, rate):
+def attack(trainset, dataset_info, rate):
     num_classes = dataset_info["num_classes"]
 
     X_train = trainset[dataset_info["data_key"]]

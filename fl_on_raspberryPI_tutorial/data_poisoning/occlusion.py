@@ -7,7 +7,7 @@ rect_h = 16
 rect_top_left = ((32 - rect_w) // 2, (32 - rect_h) // 2)
 rect_bottom_right = (rect_top_left[0] + rect_w, rect_top_left[1] + rect_h)
 
-def occlude(trainset, dataset_info, rate):
+def attack(trainset, dataset_info, rate):
     X_train = trainset[dataset_info["data_key"]]
     y_train = trainset[dataset_info["label_key"]]
 
