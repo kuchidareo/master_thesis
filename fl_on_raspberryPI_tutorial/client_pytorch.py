@@ -58,33 +58,31 @@ def test(net, testloader, criterion, device):
     return loss, accuracy
 
 
-def huggingface_federated_dataset_partition(dataset:str, num_clients: int):
-    if dataset == "mnist":
+def huggingface_federated_dataset_partition(dataset_name, dataset_conf, dataset_info, num_clients):
+    if dataset_name == "mnist":
         # noniid_partitioner = ShardPartitioner(num_partitions=num_clients, partition_by="label", num_shards_per_partition=2, shard_size=int(30000/num_clients), shuffle=False, seed=42)
         # partitioner = {"train": noniid_partitioner} if non_iid else {"train": num_clients}
         partitioner = {"train": num_clients}
         fds = FederatedDataset(dataset="mnist", partitioners=partitioner)
-        img_key = "image"
         norm = Normalize((0.1307,), (0.3081,))
         pytorch_transforms = Compose([ToTensor(), norm])
-    elif dataset == "cifar10":
+    elif dataset_name == "cifar10":
         fds = FederatedDataset(dataset="cifar10", partitioners={"train": num_clients})
-        img_key = "img"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         pytorch_transforms = Compose([ToTensor(), norm])
-    elif dataset == "trashnet":
+    elif dataset_name == "trashnet":
         fds = FederatedDataset(dataset="kuchidareo/small_trashnet", partitioners={"train": num_clients})
-        img_key = "image"
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         resize = Resize((224, 224))
         pytorch_transforms = Compose([ToTensor(), norm, resize])
 
 
     def apply_transforms(batch):
-        if img_key not in batch:
+        image_key = dataset_info["image_key"]
+        if image_key not in batch:
             return batch
         """Apply transforms to the partition from FederatedDataset."""
-        batch[img_key] = [pytorch_transforms(img) for img in batch[img_key]]
+        batch[image_key] = [pytorch_transforms(img) for img in batch[image_key]]
         return batch
 
     trainsets = []
@@ -92,7 +90,7 @@ def huggingface_federated_dataset_partition(dataset:str, num_clients: int):
     for partition_id in range(num_clients):
         partition = fds.load_partition(partition_id, "train")
         # Divide data on each node: 90% train, 10% test
-        partition = partition.train_test_split(test_size=0.1, seed=42)
+        partition = partition.train_test_split(test_size=dataset_conf.testset_size, seed=42)
         partition = partition.with_transform(apply_transforms)
         trainsets.append(partition["train"])
         validsets.append(partition["test"])
@@ -102,20 +100,23 @@ def huggingface_federated_dataset_partition(dataset:str, num_clients: int):
     return trainsets, validsets
 
 
-def custom_federated_dataset_partition(dataset_name, partition_type, num_clients):
+def custom_federated_dataset_partition(dataset_name, dataset_conf, num_clients):
     if dataset_name == "ecg":
         ecg_train_dataset = ecg_loader.ECG(train=True, num_clients=num_clients)
-        ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=num_clients, train_test_split=0.2)
+        ecg_val_dataset = ecg_loader.ECG(train=False, num_clients=num_clients, train_test_split=dataset_conf.testset_size)
         return ecg_train_dataset, ecg_val_dataset
     elif dataset_name == "uci_har":
-        non_iid = True if partition_type == "user" else False
+        non_iid = True if dataset_conf.partition_type == "user" else False
         har_train_dataset = uci_har_loader.HAR(train=True, non_iid=non_iid, num_clients=num_clients)
-        har_val_dataset = uci_har_loader.HAR(train=False, num_clients=num_clients, train_test_split=0.2)
+        har_val_dataset = uci_har_loader.HAR(train=False, num_clients=num_clients, train_test_split=dataset_conf.testset_size)
         return har_train_dataset, har_val_dataset
     
 
-def fedaiot_federated_dataset_partition(dataset_name, partition_type, dataset_conf, num_classes, num_clients, dataset):
-    train_partition = get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, num_clients)
+def fedaiot_federated_dataset_partition(dataset_name, dataset_conf, dataset_info, num_clients):
+    dataset = dataset_info["dataset"]
+    num_classes = dataset_info["num_classes"]
+
+    train_partition = get_partition(dataset, dataset_name, dataset_conf, num_classes, num_clients)
     train_dataset = train_partition(dataset['train'])
     # data_distribution, class_distribution = compute_client_data_distribution(train_dataset, num_classes)
     # get_html_plots(data_distribution, class_distribution)
@@ -125,7 +126,9 @@ def fedaiot_federated_dataset_partition(dataset_name, partition_type, dataset_co
     return train_dataset, val_dataset
 
 
-def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_classes, client_num_in_total):
+def get_partition(dataset, dataset_name, dataset_conf, num_classes, client_num_in_total):
+    partition_type = dataset_conf.partition_type
+
     if partition_type == 'user' and dataset_name in {'wisdm_phone', 'wisdm_watch', 'widar', 'visdrone'}:
         partition = UserPartition(dataset['split']['train'], dataset_conf.user_selection)
         client_num_in_total = len(dataset['split']['train'].keys())
@@ -149,31 +152,31 @@ def get_partition(dataset, dataset_name, partition_type, dataset_conf, num_class
     return partition
 
 
-def prepare_dataset(num_clients: int, dataset_conf: DictConfig, dataset_name: str, num_classes, category, dataset):
+def prepare_dataset(num_clients: int,  dataset_name: str, dataset_conf: DictConfig, dataset_info: dict):
     """Get MNIST/CIFAR-10/ECG(local) and return client partitions and global testset."""
-    partition_type = dataset_conf.partition_type
+    category = dataset_info["category"]
 
     if category == "huggingface":
-        return huggingface_federated_dataset_partition(dataset_name, num_clients)
+        return huggingface_federated_dataset_partition(dataset_name, dataset_conf, dataset_info, num_clients)
     elif category == "custom":
-        return custom_federated_dataset_partition(dataset_name, partition_type, num_clients)
+        return custom_federated_dataset_partition(dataset_name, dataset_conf, num_clients)
     elif category == "fedaiot": # Imported from FedAIoT source code.
-        return fedaiot_federated_dataset_partition(dataset_name, partition_type, dataset_conf, num_classes, num_clients, dataset)
+        return fedaiot_federated_dataset_partition(dataset_name, dataset_conf, dataset_info, num_clients)
 
 
-def datapoisoning_to_target_cids(trainset, dataset_name, poisoning, cid):
+def datapoisoning_to_target_cids(trainset, num_classes, poisoning, cid):
     if not poisoning.is_enabled:
         return trainset
 
     match poisoning.method:
         case "label_flipping":
-            poisoned_trainset = label_flipping.flipping(trainset, dataset_name, poisoning.rate)
+            poisoned_trainset = label_flipping.flipping(trainset, num_classes, poisoning.rate)
         case "blurring":
-            poisoned_trainset = blurring(trainset, dataset_name, poisoning.rate)
+            poisoned_trainset = blurring(trainset, num_classes, poisoning.rate)
         case "occlusion":
-            poisoned_trainset = occlusion(trainset, dataset_name, poisoning.rate)
+            poisoned_trainset = occlusion.occlude(trainset, num_classes, poisoning.rate)
         case "steganography":
-            poisoned_trainset = steganography(trainset, dataset_name, poisoning.rate)
+            poisoned_trainset = steganography(trainset, num_classes, poisoning.rate)
         case _:
             print(f"Poisoning method {poisoning.method} is not supported.")
     return poisoned_trainset
@@ -183,9 +186,10 @@ class FlowerClient(fl.client.NumPyClient):
     """A FlowerClient that trains a MobileNetV3 model for CIFAR-10 or a much smaller CNN
     for MNIST."""
 
-    def __init__(self, model, trainset, valset, dataset_name, poisoning_conf, cid):
+    def __init__(self, model, num_classes, trainset, valset, poisoning_conf, cid):
         self.model = model
-        self.trainset = datapoisoning_to_target_cids(trainset, dataset_name, poisoning_conf, cid)
+        self.num_classes = num_classes
+        self.trainset = datapoisoning_to_target_cids(trainset, num_classes, poisoning_conf, cid)
         self.valset = valset
         self.criterion = nn.CrossEntropyLoss()
         self.cid = cid
@@ -247,19 +251,18 @@ def main(cfg: DictConfig):
     np.random.seed(cfg.seed)
     torch.manual_seed(cfg.seed)
 
-    model, num_classes, category, dataset = get_dataset_info(dataset_name)
+    dataset_info = get_dataset_info(dataset_name)
 
     # Download dataset and partition it
-    trainsets, valsets = prepare_dataset(num_clients, dataset_conf, dataset_name, num_classes, category)
+    trainsets, valsets = prepare_dataset(num_clients, dataset_name, dataset_conf, dataset_info)
 
     # Start Flower client setting its associated data partition
     fl.client.start_client(
         server_address=cfg.server_address,
         client=FlowerClient(
-            model = model,
+            dataset_info=dataset_info,
             trainset=trainsets[cfg.client.cid],
             valset=valsets[cfg.client.cid],
-            dataset_name=dataset_name, 
             poisoning_conf=poisoning_conf, 
             cid=cfg.client.cid
         ).to_client(),

@@ -17,6 +17,7 @@ dataset:
   shuffle:
     train: true
     test: false
+  testset_size: 0.1
 
 poisoning:
   is_enabled: true # only for trashnet, german_traffic.
