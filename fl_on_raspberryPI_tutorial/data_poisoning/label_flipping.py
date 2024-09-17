@@ -1,9 +1,5 @@
-import copy
-
 from datasets import Dataset 
 import numpy as np
-import torch
-from torchvision.transforms import ToTensor
 
 
 def flipping(trainset, dataset_info, rate):
