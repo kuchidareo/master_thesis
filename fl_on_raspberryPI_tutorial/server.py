@@ -127,7 +127,7 @@ def main(cfg: DictConfig):
         min_fit_clients=cfg.strategy.min_fit_clients,
         min_evaluate_clients=cfg.strategy.min_evaluate_clients,
         min_available_clients=cfg.strategy.min_available_clients,
-        on_fit_config_fn=lambda: fit_config(cfg),
+        on_fit_config_fn=fit_config,
         evaluate_metrics_aggregation_fn=weighted_average,
     )
 
