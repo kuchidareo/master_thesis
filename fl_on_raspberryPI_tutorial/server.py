@@ -26,7 +26,7 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 def fit_config(server_round: int):
     """Return a configuration with static batch size and (local) epochs."""
     config = {
-        "epochs": 3,  # Number of local epochs done by clients
+        "epochs": 1,  # Number of local epochs done by clients
         "batch_size": 32,  # Batch size to use by clients during fit()
         "lr": 0.01, # Learning rate by clients during fit(), using SGD optimizer.
         "optimizer_momentum": 0.9 # Use SGD optimizer. Set the momentum.
