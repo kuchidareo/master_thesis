@@ -20,13 +20,13 @@ dataset:
   testset_size: 0.1
 
 poisoning:
-  is_enabled: true # only for trashnet, german_traffic.
+  is_enabled: false # only for trashnet, german_traffic.
   method: "label_flipping" # blurring, occlusion, steganography, label_flipping
   rate: 0.05
   target_cids: [0, 1, 2, 3, 4]
 
 optim_scheduler:
-  lr: 0.01
+  lr: 0.1
   momentum: 0.9
 
 strategy:
