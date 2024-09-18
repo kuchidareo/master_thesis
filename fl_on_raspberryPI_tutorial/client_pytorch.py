@@ -72,17 +72,12 @@ def huggingface_federated_dataset_partition(dataset_name, dataset_conf, dataset_
         pytorch_transforms = Compose([ToTensor(), norm])
     elif dataset_name == "trashnet":
         fds = FederatedDataset(dataset="kuchidareo/small_trashnet", partitioners={"train": num_clients})
-        norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        resize = Resize((300, 300))
         pytorch_transforms = Compose([
+            RandomHorizontalFlip(),
             ToTensor(),
-            RandomHorizontalFlip(p=0.5),        # Horizontal flip
-            RandomVerticalFlip(p=0.5),          # Vertical flip
-            RandomAffine(degrees=0,             # Shear and shift
-                            shear=10,              # Shear range
-                            translate=(0.1, 0.1)),
-            norm,
-            resize])
+            Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            Resize((300, 300))
+        ])
 
 
     def apply_transforms(batch):

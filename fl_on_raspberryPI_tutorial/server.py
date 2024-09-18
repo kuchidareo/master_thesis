@@ -23,13 +23,13 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     return {"accuracy": sum(accuracies) / sum(examples)}
 
 
-def fit_config(server_round: int):
+def fit_config(server_round: int, cfg):
     """Return a configuration with static batch size and (local) epochs."""
     config = {
-        "epochs": 1,  # Number of local epochs done by clients
-        "batch_size": 32,  # Batch size to use by clients during fit()
-        "lr": 0.01, # Learning rate by clients during fit(), using SGD optimizer.
-        "optimizer_momentum": 0.9 # Use SGD optimizer. Set the momentum.
+        "epochs": cfg.num_epochs,  # Number of local epochs done by clients
+        "batch_size": cfg.dataset.batch_size.train,  # Batch size to use by clients during fit()
+        "lr": cfg.optim_scheduler.lr, # Learning rate by clients during fit(), using SGD optimizer.
+        "optimizer_momentum": cfg.optim_scheduler.momentum # Use SGD optimizer. Set the momentum.
     }
     return config
 
@@ -124,7 +124,7 @@ def main(cfg: DictConfig):
         min_fit_clients=cfg.strategy.min_fit_clients,
         min_evaluate_clients=cfg.strategy.min_evaluate_clients,
         min_available_clients=cfg.strategy.min_available_clients,
-        on_fit_config_fn=fit_config,
+        on_fit_config_fn=lambda: fit_config(cfg),
         evaluate_metrics_aggregation_fn=weighted_average,
     )
 
