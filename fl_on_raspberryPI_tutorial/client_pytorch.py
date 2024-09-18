@@ -10,7 +10,7 @@ from omegaconf import DictConfig, OmegaConf
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torchvision.transforms import Compose, Normalize, Resize, ToTensor
+from torchvision.transforms import Compose, Normalize, Resize, ToTensor, RandomHorizontalFlip, RandomVerticalFlip, RandomAffine
 from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
 from ultralytics.nn.tasks import DetectionModel
@@ -74,7 +74,15 @@ def huggingface_federated_dataset_partition(dataset_name, dataset_conf, dataset_
         fds = FederatedDataset(dataset="kuchidareo/small_trashnet", partitioners={"train": num_clients})
         norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         resize = Resize((300, 300))
-        pytorch_transforms = Compose([ToTensor(), norm, resize])
+        pytorch_transforms = Compose([
+            ToTensor(),
+            RandomHorizontalFlip(p=0.5),        # Horizontal flip
+            RandomVerticalFlip(p=0.5),          # Vertical flip
+            RandomAffine(degrees=0,             # Shear and shift
+                            shear=10,              # Shear range
+                            translate=(0.1, 0.1)),
+            norm,
+            resize])
 
 
     def apply_transforms(batch):
