@@ -10,6 +10,7 @@ import numpy as np
 import mlflow
 from omegaconf import DictConfig, OmegaConf
 
+
 # Define metric aggregation function
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     """This function averages teh `accuracy` metric sent by the clients in a `evaluate`
@@ -23,13 +24,13 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     return {"accuracy": sum(accuracies) / sum(examples)}
 
 
-def fit_config(server_round: int, cfg):
+def fit_config(server_round: int):
     """Return a configuration with static batch size and (local) epochs."""
     config = {
-        "epochs": cfg.num_epochs,  # Number of local epochs done by clients
-        "batch_size": cfg.dataset.batch_size.train,  # Batch size to use by clients during fit()
-        "lr": cfg.optim_scheduler.lr, # Learning rate by clients during fit(), using SGD optimizer.
-        "optimizer_momentum": cfg.optim_scheduler.momentum # Use SGD optimizer. Set the momentum.
+        "epochs": cfg_global.num_epochs,  # Number of local epochs done by clients
+        "batch_size": cfg_global.dataset.batch_size.train,  # Batch size to use by clients during fit()
+        "lr": cfg_global.optim_scheduler.lr, # Learning rate by clients during fit(), using SGD optimizer.
+        "optimizer_momentum": cfg_global.optim_scheduler.momentum # Use SGD optimizer. Set the momentum.
     }
     return config
 
@@ -113,6 +114,8 @@ def log_params_from_omegaconf_dict(cfg):
 
 @hydra.main(config_path="conf", config_name="base.yaml", version_base=None)
 def main(cfg: DictConfig):
+    global cfg_global
+    cfg_global = cfg
 
     print(OmegaConf.to_yaml(cfg))
     np.random.seed(cfg.seed)
