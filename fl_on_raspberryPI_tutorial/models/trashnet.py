@@ -51,5 +51,4 @@ class TrashNet(nn.Module):
         x = torch.relu(self.fc2(x))
         x = self.dropout2(x)
         x = self.fc3(x)
-        x = torch.softmax(x, dim=1)
         return x
