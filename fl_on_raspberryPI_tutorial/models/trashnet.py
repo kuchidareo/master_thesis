@@ -32,7 +32,7 @@ class TrashNet(nn.Module):
         self.conv3 = nn.Conv2d(64, 32, kernel_size=3, padding=1)
         self.max_pool3 = nn.MaxPool2d(2, 2)
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(32 * 75 * 75, 64)
+        self.fc1 = nn.Linear(32 * 37 * 37, 64)
         self.dropout1 = nn.Dropout(0.2)
         self.fc2 = nn.Linear(64, 32)
         self.dropout2 = nn.Dropout(0.2)
