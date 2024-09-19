@@ -29,6 +29,7 @@ def fit_config(server_round: int):
     config = {
         "epochs": cfg_global.num_epochs,  # Number of local epochs done by clients
         "batch_size": cfg_global.dataset.batch_size.train,  # Batch size to use by clients during fit()
+        "scheduler": cfg_global.optim_scheduler.scheduler,
         "lr": cfg_global.optim_scheduler.lr, # Learning rate by clients during fit(), using SGD optimizer.
         "optimizer_momentum": cfg_global.optim_scheduler.momentum # Use SGD optimizer. Set the momentum.
     }

@@ -1,6 +1,6 @@
 num_clients: 10
 num_epochs: 1
-num_rounds: 100
+num_rounds: 50
 server_address: "192.168.0.110:5555"
 seed: 1234
 
@@ -12,12 +12,12 @@ dataset:
   partition_type: uniform
   dirichlet_alpha: 0.1 # only used in case of dirichlet partition_type
   batch_size:
-    train: 32
-    test: 64
+    train: 16
+    test: 16
   shuffle:
     train: true
     test: false
-  testset_size: 0.1
+  testset_size: 0.2
 
 poisoning:
   is_enabled: false # only for trashnet, german_traffic.
@@ -26,8 +26,9 @@ poisoning:
   target_cids: [0, 1, 2, 3, 4]
 
 optim_scheduler:
-  lr: 0.01
-  momentum: 0.9
+  scheduler: "adam" # adam or sgd
+  lr: 0.005
+  momentum: 0.9 # for sgd
 
 strategy:
   fraction_fit: 1.0

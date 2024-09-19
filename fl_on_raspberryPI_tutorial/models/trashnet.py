@@ -26,6 +26,7 @@ class TrashNet(nn.Module):
     def __init__(self):
         super(TrashNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.leaky_relu = nn.LeakyReLU()
         self.max_pool1 = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.max_pool2 = nn.MaxPool2d(2, 2)
@@ -39,16 +40,21 @@ class TrashNet(nn.Module):
         self.fc3 = nn.Linear(32, 6)
 
     def forward(self, x):
-        x = torch.relu(self.conv1(x))
+        x = self.leaky_relu(self.conv1(x))
         x = self.max_pool1(x)
-        x = torch.relu(self.conv2(x))
+
+        x = self.leaky_relu(self.conv2(x))
         x = self.max_pool2(x)
-        x = torch.relu(self.conv3(x))
+
+        x = self.leaky_relu(self.conv3(x))
         x = self.max_pool3(x)
+
         x = self.flatten(x)
-        x = torch.relu(self.fc1(x))
+        x = self.leaky_relu(self.fc1(x))
         x = self.dropout1(x)
-        x = torch.relu(self.fc2(x))
+
+        x = self.leaky_relu(self.fc2(x))
         x = self.dropout2(x)
+        
         x = self.fc3(x)
         return x

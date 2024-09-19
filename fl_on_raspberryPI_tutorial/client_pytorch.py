@@ -218,11 +218,14 @@ class FlowerClient(fl.client.NumPyClient):
         print("Client sampled for fit()")
         self.set_parameters(parameters)
         # Read hyperparameters from config set by the server
-        batch, epochs, lr, momentum = config["batch_size"], config["epochs"], config["lr"], config["optimizer_momentum"]
+        batch, epochs, scheduler, lr, momentum = config["batch_size"], config["epochs"], config["scheduler"], config["lr"], config["optimizer_momentum"]
         # Construct dataloader
         trainloader = DataLoader(self.trainset, batch_size=batch, shuffle=True)
         # Define optimizer
-        optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
+        if scheduler == "adam":
+            optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+        elif scheduler == "sgd":
+            optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
         # Train
         train(self.model, trainloader, optimizer, self.criterion, epochs=epochs, device=self.device)
         # Return local model and statistics
