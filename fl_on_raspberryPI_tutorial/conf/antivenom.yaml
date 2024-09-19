@@ -1,6 +1,6 @@
 num_clients: 10
-num_epochs: 1
-num_rounds: 50
+num_epochs: 5
+num_rounds: 10
 server_address: "192.168.0.110:5555"
 seed: 1234
 
