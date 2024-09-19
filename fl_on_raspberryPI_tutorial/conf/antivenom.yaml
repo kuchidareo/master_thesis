@@ -12,8 +12,8 @@ dataset:
   partition_type: uniform
   dirichlet_alpha: 0.1 # only used in case of dirichlet partition_type
   batch_size:
-    train: 16
-    test: 16
+    train: 64
+    test: 64
   shuffle:
     train: true
     test: false
@@ -27,7 +27,7 @@ poisoning:
 
 optim_scheduler:
   scheduler: "adam" # adam or sgd
-  lr: 0.005
+  lr: 0.0001
   momentum: 0.9 # for sgd
 
 strategy:
