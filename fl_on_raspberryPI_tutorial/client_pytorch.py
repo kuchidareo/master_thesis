@@ -92,7 +92,6 @@ def huggingface_federated_dataset_partition(dataset_name, dataset_conf, dataset_
     validsets = []
     for partition_id in range(num_clients):
         partition = fds.load_partition(partition_id, "train")
-        # Divide data on each node: 90% train, 10% test
         partition = partition.train_test_split(test_size=dataset_conf.testset_size, seed=42)
         partition = partition.with_transform(apply_transforms)
         trainsets.append(partition["train"])
@@ -234,8 +233,9 @@ class FlowerClient(fl.client.NumPyClient):
     def evaluate(self, parameters, config):
         print("Client sampled for evaluate()")
         self.set_parameters(parameters)
+        batch = config["batch_size"]
         # Construct dataloader
-        valloader = DataLoader(self.valset, batch_size=64)
+        valloader = DataLoader(self.valset, batch_size=batch)
         # Evaluate
         loss, accuracy = test(self.model, valloader, self.criterion, device=self.device)
         # Return statistics

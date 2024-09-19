@@ -35,6 +35,18 @@ def fit_config(server_round: int):
     }
     return config
 
+
+def evaluate_config(server_round: int):
+    config = {
+        "epochs": cfg_global.num_epochs,  # Number of local epochs done by clients
+        "batch_size": cfg_global.dataset.batch_size.test,  # Batch size to use by clients during fit()
+        "scheduler": cfg_global.optim_scheduler.scheduler,
+        "lr": cfg_global.optim_scheduler.lr, # Learning rate by clients during fit(), using SGD optimizer.
+        "optimizer_momentum": cfg_global.optim_scheduler.momentum # Use SGD optimizer. Set the momentum.
+    }
+    return config
+
+
 class EarlyStopping:
     def __init__(self, mode, patience=5, delta=0):
         if mode not in {'min', 'max'}:
@@ -129,6 +141,7 @@ def main(cfg: DictConfig):
         min_evaluate_clients=cfg.strategy.min_evaluate_clients,
         min_available_clients=cfg.strategy.min_available_clients,
         on_fit_config_fn=fit_config,
+        on_evaluate_config_fn=evaluate_config,
         evaluate_metrics_aggregation_fn=weighted_average,
     )
 
