@@ -11,9 +11,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, Normalize, Resize, ToTensor, RandomHorizontalFlip, RandomVerticalFlip, RandomAffine
-from torchvision.models import mobilenet_v3_small
 from tqdm import tqdm
-from ultralytics.nn.tasks import DetectionModel
 
 from data_poisoning import label_flipping, blurring, steganography, occlusion
 from dataset_info import get_dataset_info
@@ -23,10 +21,11 @@ from partition.dirichlet import DirichletPartition
 from partition.uniform import UniformPartition
 from partition.uneven_amount import UnEvenAmountPartition
 from partition.user_index import UserPartition
-
 from partition.utils import get_html_plots, compute_client_data_distribution
 
+
 warnings.filterwarnings("ignore", category=UserWarning)
+
 
 def train(net, trainloader, optimizer, criterion, epochs, device):
     """Train the model on the training set."""
@@ -54,6 +53,7 @@ def test(net, testloader, criterion, device):
             labels = labels.to(device)
             loss += criterion(outputs, labels).item()
             correct += (torch.max(outputs.data, 1)[1] == labels).sum().item()
+    loss = loss / len(testloader)
     accuracy = correct / len(testloader.dataset)
     return loss, accuracy
 
@@ -188,6 +188,7 @@ def datapoisoning_to_target_cids(trainset, dataset_info, poisoning, cid):
             print(f"Poisoning method {poisoning.method} is not supported.")
     return poisoned_trainset
 
+
 # Flower client, adapted from Pytorch quickstart/simulation example
 class FlowerClient(fl.client.NumPyClient):
     """A FlowerClient that trains a MobileNetV3 model for CIFAR-10 or a much smaller CNN
@@ -245,6 +246,7 @@ class FlowerClient(fl.client.NumPyClient):
         loss, accuracy = test(self.model, valloader, self.criterion, device=self.device)
         # Return statistics
         return float(loss), len(valloader.dataset), {"accuracy": float(accuracy)}
+
 
 @hydra.main(config_path="conf", config_name="base.yaml", version_base=None)
 def main(cfg: DictConfig):
