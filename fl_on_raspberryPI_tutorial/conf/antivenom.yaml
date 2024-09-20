@@ -3,6 +3,7 @@ num_epochs: 5
 num_rounds: 50
 server_address: "192.168.0.110:5555"
 seed: 1234
+trial: 1
 
 client:
   cid: 0
