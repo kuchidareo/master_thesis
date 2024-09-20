@@ -9,7 +9,13 @@ import hydra
 import numpy as np
 import mlflow
 from omegaconf import DictConfig, OmegaConf
+import requests
 
+
+slack_webhook = os.environ['SLACK_WEBHOOK']
+
+def send_message_to_slack(message):
+    requests.post(slack_webhook, json={'text': message})
 
 # Define metric aggregation function
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
@@ -113,6 +119,9 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
                 "global_accuracy": accuracy
             }, step=rnd
         )
+        if slack_webhook:
+            message = f'Round: {rnd}  Loss: {loss_aggregated}  Acc.: {accuracy}'
+            send_message_to_slack(message)
 
         self.es(loss_aggregated, accuracy)
 
@@ -131,6 +140,10 @@ def main(cfg: DictConfig):
     cfg_global = cfg
 
     print(OmegaConf.to_yaml(cfg))
+    if slack_webhook:
+        message = f'Experiment start: {OmegaConf.to_yaml(cfg)}'
+        send_message_to_slack(message)
+
     np.random.seed(cfg.seed)
    
     # Define strategy
