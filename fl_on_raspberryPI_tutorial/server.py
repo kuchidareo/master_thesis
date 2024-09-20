@@ -109,8 +109,8 @@ class FedAvgWithLogging(fl.server.strategy.FedAvg):
 
         mlflow.log_metrics(
             {
-                "local_loss": loss_aggregated,
-                "local_accuracy": accuracy
+                "global_loss": loss_aggregated,
+                "global_accuracy": accuracy
             }, step=rnd
         )
 
