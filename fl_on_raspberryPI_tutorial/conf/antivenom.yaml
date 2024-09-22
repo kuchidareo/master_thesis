@@ -3,6 +3,7 @@ num_epochs: 5
 num_rounds: 50
 server_address: "192.168.0.110:5555"
 seed: 1234
+trial: 1
 
 client:
   cid: 0
@@ -20,7 +21,7 @@ dataset:
   testset_size: 0.2
 
 poisoning:
-  is_enabled: false # only for trashnet, german_traffic.
+  is_enabled: true # only for trashnet, german_traffic.
   method: "label_flipping" # blurring, occlusion, steganography, label_flipping
   rate: 0.05
   target_cids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
