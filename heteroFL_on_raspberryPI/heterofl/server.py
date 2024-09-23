@@ -176,18 +176,21 @@ def main(cfg: DictConfig) -> None:
             # send this array(client_model_rate_mapping) as
             # an argument to client_manager and client
             model_split_rate = {"a": 1, "b": 0.5, "c": 0.25, "d": 0.125, "e": 0.0625}
-            # model_split_mode = cfg.control.model_split_mode
+            model_split_mode = cfg.control.model_split_mode
             model_mode = cfg.control.model_mode
             manual_model_rate = cfg.control.manual_model_rate
+            cpu_scores = cfg.control.cpu_scores
 
             client_to_model_rate_mapping = [float(0) for _ in range(cfg.num_clients)]
             model_rate_manager = ModelRateManager(
-                cfg.control.model_split_mode, model_split_rate, model_mode, manual_model_rate
+                model_split_mode, model_split_rate, model_mode, manual_model_rate, cpu_scores
             )
-
-            model_config["global_model_rate"] = model_split_rate[
-                get_global_model_rate(model_mode)
-            ]
+            if model_split_mode in ["fix", "dynamic"]:
+                model_config["global_model_rate"] = model_split_rate[
+                    get_global_model_rate(model_mode)
+                ]
+            else:
+                model_config["global_model_rate"] = 1.0 # TODO: Flexible model size choise.
 
         test_model = models.create_model(
             model_config,
@@ -230,7 +233,7 @@ def main(cfg: DictConfig) -> None:
             models.create_model(
                 model_config,
                 model_rate=(
-                    model_split_rate[get_global_model_rate(model_mode)]
+                    model_split_rate[get_global_model_rate(model_mode)] # TODO: Debug. Change to "global_model_rate"?
                     if model_split_rate is not None
                     else None
                 ),
@@ -245,11 +248,6 @@ def main(cfg: DictConfig) -> None:
                 else True
             ),
         )
-
-        client_resources = {
-            "num_cpus": cfg.client_resources.num_cpus,
-            "num_gpus": cfg.client_resources.num_gpus if torch.cuda.is_available() else 0,
-        }
 
         if "HeteroFL" in cfg.strategy._target_:
             strategy_heterofl = instantiate(
@@ -296,9 +294,9 @@ def main(cfg: DictConfig) -> None:
             )
 
             history = fl.server.start_server(
+                server_address=cfg.server_address,
                 num_clients=cfg.num_clients,
                 config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
-                client_resources=client_resources,
                 strategy=strategy_fedavg,
             )
 
