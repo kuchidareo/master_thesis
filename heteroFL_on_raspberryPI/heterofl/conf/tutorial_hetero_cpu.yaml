@@ -5,7 +5,7 @@ num_rounds: 10
 seed: 0
 
 control:
-  model_split_mode: 'fix'  # fix, dynamic, manual, based_on_cpu
+  model_split_mode: 'based_on_cpu' # fix, dynamic, manual, based_on_cpu
   model_mode: 'a1-b1-c1-d1-e1'
   cpu_scores: [1000, 1000, 1000, 1000, 1000, 500, 500, 500, 250, 250] # only used in case of based_on_cpu 
   manual_model_rate: [1.0, 1.0, 0.5, 0.5, 0.25, 0.25, 0.125, 0.125, 0.0625, 0.0625] # only used in case of manual
@@ -47,4 +47,4 @@ strategy:
   min_evaluate_clients: 10
 
 mlflow:
-  exname: tutorial_cifar
+  exname: tutorial_hetero_cpu
