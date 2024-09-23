@@ -18,6 +18,7 @@ dataset:
     train: true
     test: false
   directory: "./datasets"
+  testset_size: 0.2
 
 poisoning:
   is_enabled: false # only for trashnet, german_traffic.
