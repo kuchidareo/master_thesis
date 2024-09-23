@@ -64,7 +64,7 @@ mlflow-skinny==2.16.2
 multidict==6.0.5
 multiprocess==0.70.16
 numpy==1.26.4
-nvidia-cublas-cu11==11.10.3.66
+nvidia-cublas-cu11==11.11.3.6
 nvidia-cuda-nvrtc-cu11==11.7.99
 nvidia-cuda-runtime-cu11==11.7.99
 nvidia-cudnn-cu11==8.5.0.96
