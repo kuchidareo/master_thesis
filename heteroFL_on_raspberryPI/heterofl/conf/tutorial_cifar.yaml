@@ -1,10 +1,8 @@
+server_address: '192.168.0.110:5555'
 num_clients: 10
 num_epochs: 5
 num_rounds: 10
 seed: 0
-client_resources:
-    num_cpus: 1
-    num_gpus: 0.08
 
 control:
   model_split_mode: 'fix'

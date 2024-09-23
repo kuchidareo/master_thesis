@@ -275,7 +275,7 @@ def main(cfg: DictConfig) -> None:
             )
 
             history = fl.server.start_server(
-                server_address="192.168.0.110:5555",
+                server_address=cfg.server_address,
                 config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
                 client_manager=ClientManagerHeteroFL(
                     model_rate_manager,

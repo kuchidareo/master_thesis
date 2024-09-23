@@ -1,12 +1,10 @@
+server_address: '192.168.0.110:5555'
 num_clients: 100
 num_epochs: 1
 num_rounds: 800
 seed: 0
 clip: False
 enable_train_on_train_data_while_testing: False
-client_resources:
-    num_cpus: 1
-    num_gpus: 0.4
 
 dataset:
   dataset_name: 'MNIST'
@@ -35,7 +33,10 @@ optim_scheduler:
 
 strategy:
   _target_: flwr.server.strategy.FedAvg
-  fraction_fit: 0.1
-  fraction_evaluate: 0.1
+  fraction_fit: 1.0
+  fraction_evaluate: 1.0
   min_fit_clients: 10
   min_evaluate_clients: 10
+
+mlflow:
+  exname: fedavg

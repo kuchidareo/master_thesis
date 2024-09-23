@@ -6,8 +6,6 @@ import torch
 from flwr.common.typing import NDArrays
 from flwr.common import Context
 import hydra
-from hydra.core.hydra_config import HydraConfig
-from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
 from heterofl.dataset import load_datasets
@@ -21,12 +19,9 @@ class FlowerNumPyClient(fl.client.NumPyClient):
 
     def __init__(
         self,
-        # cid: str,
-        # net: torch.nn.Module,
         dataloader,
         model_config,
         client_to_model_rate_mapping,
-        # model_rate: Optional[float],
         client_train_settings: Dict,
     ):
         self.cid = None
@@ -136,7 +131,6 @@ def gen_client_fn(
         """Create a Flower client representing a single organization."""
         # Note: each client gets a different trainloader/valloader, so each client
         # will train and evaluate on their own unique data
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         client_dataloader = {
             "trainloader": data_loaders["trainloaders"],
@@ -145,15 +139,8 @@ def gen_client_fn(
         }
 
         return FlowerNumPyClient(
-            # cid=cid,
-            # net=create_model(
-            #     model_config,
-            #     model_rate=model_rate,
-            #     device=device,
-            # ),
             dataloader=client_dataloader,
             model_config=model_config,
-            # model_rate=model_rate,
             client_to_model_rate_mapping=client_to_model_rate_mapping,
             client_train_settings=client_train_settings,
         ).to_client()
@@ -220,7 +207,7 @@ def main(cfg: DictConfig) -> None:
 
 
     fl.client.start_client(
-        server_address="192.168.0.110:5555",
+        server_address=cfg.server_address,
         client_fn=client_fn
     )
 
