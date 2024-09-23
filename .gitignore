@@ -3,6 +3,7 @@
 
 **/.DS_Store
 
+/flower
 
 # Ignore compiled Python files
 **/__pycache__/
