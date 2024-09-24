@@ -111,10 +111,10 @@ sympy==1.13.3
 threadpoolctl==3.5.0
 tomli==2.0.1
 tomli_w==1.0.0
-torch==2.4.1
+torch==1.13.1
 torchmetrics==1.4.2
 torchsummary==1.5.1
-torchvision==0.19.1
+torchvision==0.14.1
 tqdm==4.66.5
 typer==0.9.4
 typing_extensions==4.12.2
