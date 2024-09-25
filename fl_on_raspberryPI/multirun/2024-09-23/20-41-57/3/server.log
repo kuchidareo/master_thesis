@@ -1,0 +1,77 @@
+[2024-09-24 06:38:51,572][flwr][INFO] - Starting Flower server, config: num_rounds=50, no round_timeout
+[2024-09-24 06:38:51,573][flwr][INFO] - Flower ECE: gRPC server running (50 rounds), SSL is disabled
+[2024-09-24 06:38:51,573][flwr][INFO] - [INIT]
+[2024-09-24 06:38:51,573][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-24 06:39:17,120][flwr][INFO] - Received initial parameters from one random client
+[2024-09-24 06:39:17,120][flwr][INFO] - Evaluating initial global parameters
+[2024-09-24 06:39:17,120][flwr][INFO] - 
+[2024-09-24 06:39:17,120][flwr][INFO] - [ROUND 1]
+[2024-09-24 06:39:18,324][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 07:03:29,635][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 07:03:29,735][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-09-24 07:03:29,735][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 07:03:59,770][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 07:04:00,081][flwr][INFO] - 
+[2024-09-24 07:04:00,081][flwr][INFO] - [ROUND 2]
+[2024-09-24 07:04:00,081][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 07:28:34,090][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 07:28:34,153][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 07:29:04,420][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 07:29:04,689][flwr][INFO] - 
+[2024-09-24 07:29:04,690][flwr][INFO] - [ROUND 3]
+[2024-09-24 07:29:04,690][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 07:53:28,191][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 07:53:28,255][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 07:53:58,615][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 07:53:58,881][flwr][INFO] - 
+[2024-09-24 07:53:58,882][flwr][INFO] - [ROUND 4]
+[2024-09-24 07:53:58,882][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 08:18:17,243][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 08:18:17,307][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 08:18:47,592][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 08:18:47,919][flwr][INFO] - 
+[2024-09-24 08:18:47,919][flwr][INFO] - [ROUND 5]
+[2024-09-24 08:18:47,920][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 08:43:12,138][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 08:43:12,201][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 08:43:43,305][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 08:43:43,607][flwr][INFO] - 
+[2024-09-24 08:43:43,607][flwr][INFO] - [ROUND 6]
+[2024-09-24 08:43:43,608][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 09:08:05,131][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 09:08:05,193][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 09:08:36,435][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 09:08:36,714][flwr][INFO] - 
+[2024-09-24 09:08:36,714][flwr][INFO] - [ROUND 7]
+[2024-09-24 09:08:36,715][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 09:33:08,841][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 09:33:08,902][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 09:33:40,499][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 09:33:40,776][flwr][INFO] - 
+[2024-09-24 09:33:40,776][flwr][INFO] - [ROUND 8]
+[2024-09-24 09:33:40,777][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-24 09:58:00,538][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-24 09:58:00,604][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-24 09:58:31,900][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-24 09:58:32,179][flwr][INFO] - 
+[2024-09-24 09:58:32,179][flwr][INFO] - [SUMMARY]
+[2024-09-24 09:58:32,180][flwr][INFO] - Run finished 50 round(s) in 11955.05s
+[2024-09-24 09:58:32,180][flwr][INFO] - 	History (loss, distributed):
+[2024-09-24 09:58:32,180][flwr][INFO] - 		round 1: 1.6346970796585083
+[2024-09-24 09:58:32,180][flwr][INFO] - 		round 2: 1.3889623880386353
+[2024-09-24 09:58:32,180][flwr][INFO] - 		round 3: 1.3319218039512635
+[2024-09-24 09:58:32,180][flwr][INFO] - 		round 4: 1.3670066952705384
+[2024-09-24 09:58:32,181][flwr][INFO] - 		round 5: 1.6651925206184388
+[2024-09-24 09:58:32,181][flwr][INFO] - 		round 6: 1.5819474697113036
+[2024-09-24 09:58:32,181][flwr][INFO] - 		round 7: 1.7281901717185975
+[2024-09-24 09:58:32,181][flwr][INFO] - 		round 8: 1.7959245324134827
+[2024-09-24 09:58:32,181][flwr][INFO] - 	History (metrics, distributed, evaluate):
+[2024-09-24 09:58:32,181][flwr][INFO] - 	{'accuracy': [(1, 0.3431372549019608),
+[2024-09-24 09:58:32,181][flwr][INFO] - 	              (2, 0.4294117647058823),
+[2024-09-24 09:58:32,181][flwr][INFO] - 	              (3, 0.4843137254901961),
+[2024-09-24 09:58:32,181][flwr][INFO] - 	              (4, 0.49411764705882355),
+[2024-09-24 09:58:32,181][flwr][INFO] - 	              (5, 0.4588235294117647),
+[2024-09-24 09:58:32,181][flwr][INFO] - 	              (6, 0.4803921568627451),
+[2024-09-24 09:58:32,182][flwr][INFO] - 	              (7, 0.47843137254901963),
+[2024-09-24 09:58:32,182][flwr][INFO] - 	              (8, 0.49607843137254903)]}
+[2024-09-24 09:58:32,182][flwr][INFO] - 

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/490129448521065149/5b0bb8572f28468b83d8f8130e676772/artifacts
+end_time: 1727110569497
+entry_point_name: ''
+experiment_id: '490129448521065149'
+lifecycle_stage: active
+run_id: 5b0bb8572f28468b83d8f8130e676772
+run_name: trusting-smelt-834
+run_uuid: 5b0bb8572f28468b83d8f8130e676772
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727110520089
+status: 4
+tags: []
+user_id: user

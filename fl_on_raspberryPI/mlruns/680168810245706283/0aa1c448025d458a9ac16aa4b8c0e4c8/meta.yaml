@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/0aa1c448025d458a9ac16aa4b8c0e4c8/artifacts
+deleted_time: 1727161579099
+end_time: 1727113044010
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 0aa1c448025d458a9ac16aa4b8c0e4c8
+run_name: bold-shoat-902
+run_uuid: 0aa1c448025d458a9ac16aa4b8c0e4c8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727111224112
+status: 4
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/490129448521065149/850a58137bb049b199789b3cdee143ff/artifacts
+end_time: 1727110463949
+entry_point_name: ''
+experiment_id: '490129448521065149'
+lifecycle_stage: active
+run_id: 850a58137bb049b199789b3cdee143ff
+run_name: thundering-jay-541
+run_uuid: 850a58137bb049b199789b3cdee143ff
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727110413054
+status: 4
+tags: []
+user_id: user

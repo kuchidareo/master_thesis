@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/06bae0926f184e8db1e6941e4054e109/artifacts
+deleted_time: 1727111286191
+end_time: 1727110169004
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 06bae0926f184e8db1e6941e4054e109
+run_name: rebellious-newt-624
+run_uuid: 06bae0926f184e8db1e6941e4054e109
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727109013037
+status: 4
+tags: []
+user_id: user

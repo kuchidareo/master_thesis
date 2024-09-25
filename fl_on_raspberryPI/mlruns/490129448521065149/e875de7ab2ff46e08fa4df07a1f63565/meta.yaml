@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/490129448521065149/e875de7ab2ff46e08fa4df07a1f63565/artifacts
+end_time: 1727111190671
+entry_point_name: ''
+experiment_id: '490129448521065149'
+lifecycle_stage: active
+run_id: e875de7ab2ff46e08fa4df07a1f63565
+run_name: burly-horse-563
+run_uuid: e875de7ab2ff46e08fa4df07a1f63565
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727111082722
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/35b00640e1d243b897eb737a8fc75c4e/artifacts
+deleted_time: 1727111286191
+end_time: 1727110331425
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 35b00640e1d243b897eb737a8fc75c4e
+run_name: bustling-sponge-923
+run_uuid: 35b00640e1d243b897eb737a8fc75c4e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727110182360
+status: 4
+tags: []
+user_id: user

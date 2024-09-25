@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/490129448521065149/17d491243a0e45f8b5e187a7a1fbb6d7/artifacts
+end_time: 1727110879499
+entry_point_name: ''
+experiment_id: '490129448521065149'
+lifecycle_stage: active
+run_id: 17d491243a0e45f8b5e187a7a1fbb6d7
+run_name: bittersweet-cat-610
+run_uuid: 17d491243a0e45f8b5e187a7a1fbb6d7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727110840690
+status: 4
+tags: []
+user_id: user

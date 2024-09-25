@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/cc8d19efb1db4e1ca107364ea5a82497/artifacts
+end_time: 1727201020219
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: cc8d19efb1db4e1ca107364ea5a82497
+run_name: marvelous-moose-29
+run_uuid: cc8d19efb1db4e1ca107364ea5a82497
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727195422874
+status: 3
+tags: []
+user_id: user

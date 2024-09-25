@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/490129448521065149/f464aa07f8fe48928faf9d832918a759/artifacts
+end_time: 1727110686484
+entry_point_name: ''
+experiment_id: '490129448521065149'
+lifecycle_stage: active
+run_id: f464aa07f8fe48928faf9d832918a759
+run_name: redolent-goose-739
+run_uuid: f464aa07f8fe48928faf9d832918a759
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727110649700
+status: 4
+tags: []
+user_id: user

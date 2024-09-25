@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/b46bae7d8bc34912b760080aa32874f4/artifacts
+end_time: 1727125264995
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: b46bae7d8bc34912b760080aa32874f4
+run_name: burly-zebra-903
+run_uuid: b46bae7d8bc34912b760080aa32874f4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727113318549
+status: 3
+tags: []
+user_id: user

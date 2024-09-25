@@ -1,0 +1,1 @@
+{'dataset_name': 'mnist', 'partition_type': 'uniform', 'dirichlet_alpha': 0.1, 'batch_size': {'train': 32, 'test': 64}, 'shuffle': {'train': True, 'test': False}, 'directory': './datasets', 'testset_size': 0.2}

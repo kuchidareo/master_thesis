@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/7cde77ce968e4d4097c33afa9c402fb7/artifacts
+end_time: 1727183219138
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 7cde77ce968e4d4097c33afa9c402fb7
+run_name: stylish-shrew-679
+run_uuid: 7cde77ce968e4d4097c33afa9c402fb7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727177646963
+status: 3
+tags: []
+user_id: user

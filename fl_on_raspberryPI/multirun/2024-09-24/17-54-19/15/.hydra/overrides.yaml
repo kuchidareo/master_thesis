@@ -1,0 +1,3 @@
+- trial=2
+- poisoning.target_cids=[0]
+- poisoning.rate=0.05

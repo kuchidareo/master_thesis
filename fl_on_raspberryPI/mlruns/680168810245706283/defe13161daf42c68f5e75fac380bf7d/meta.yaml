@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/defe13161daf42c68f5e75fac380bf7d/artifacts
+end_time: 1727176461018
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: defe13161daf42c68f5e75fac380bf7d
+run_name: incongruous-sow-566
+run_uuid: defe13161daf42c68f5e75fac380bf7d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727164517762
+status: 3
+tags: []
+user_id: user

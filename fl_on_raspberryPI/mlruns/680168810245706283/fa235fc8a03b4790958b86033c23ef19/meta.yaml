@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/fa235fc8a03b4790958b86033c23ef19/artifacts
+end_time: 1727245905191
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: fa235fc8a03b4790958b86033c23ef19
+run_name: beautiful-eel-282
+run_uuid: fa235fc8a03b4790958b86033c23ef19
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727240399612
+status: 3
+tags: []
+user_id: user

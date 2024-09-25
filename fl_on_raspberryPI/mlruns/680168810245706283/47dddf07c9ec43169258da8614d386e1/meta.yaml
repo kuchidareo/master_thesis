@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/47dddf07c9ec43169258da8614d386e1/artifacts
+deleted_time: 1727190091198
+end_time: 1727176483645
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 47dddf07c9ec43169258da8614d386e1
+run_name: unruly-deer-718
+run_uuid: 47dddf07c9ec43169258da8614d386e1
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727176461370
+status: 4
+tags: []
+user_id: user

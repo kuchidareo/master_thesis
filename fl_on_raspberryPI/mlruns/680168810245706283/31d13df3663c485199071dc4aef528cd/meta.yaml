@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/31d13df3663c485199071dc4aef528cd/artifacts
+deleted_time: 1727111286191
+end_time: 1727109012697
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 31d13df3663c485199071dc4aef528cd
+run_name: wise-elk-221
+run_uuid: 31d13df3663c485199071dc4aef528cd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727107420631
+status: 4
+tags: []
+user_id: user

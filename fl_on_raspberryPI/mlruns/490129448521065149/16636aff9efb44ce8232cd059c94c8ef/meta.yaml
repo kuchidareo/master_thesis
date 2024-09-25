@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/490129448521065149/16636aff9efb44ce8232cd059c94c8ef/artifacts
+end_time: 1727110742980
+entry_point_name: ''
+experiment_id: '490129448521065149'
+lifecycle_stage: active
+run_id: 16636aff9efb44ce8232cd059c94c8ef
+run_name: serious-swan-241
+run_uuid: 16636aff9efb44ce8232cd059c94c8ef
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727110717625
+status: 4
+tags: []
+user_id: user

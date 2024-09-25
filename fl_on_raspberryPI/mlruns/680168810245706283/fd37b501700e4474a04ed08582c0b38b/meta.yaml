@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/fd37b501700e4474a04ed08582c0b38b/artifacts
+end_time: 1727212345805
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: fd37b501700e4474a04ed08582c0b38b
+run_name: persistent-panda-311
+run_uuid: fd37b501700e4474a04ed08582c0b38b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727206690795
+status: 3
+tags: []
+user_id: user

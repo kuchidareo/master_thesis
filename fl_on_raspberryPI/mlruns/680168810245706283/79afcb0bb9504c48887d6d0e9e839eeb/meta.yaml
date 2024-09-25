@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/79afcb0bb9504c48887d6d0e9e839eeb/artifacts
+deleted_time: 1727190091198
+end_time: 1727177529409
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 79afcb0bb9504c48887d6d0e9e839eeb
+run_name: resilient-rook-753
+run_uuid: 79afcb0bb9504c48887d6d0e9e839eeb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727177456818
+status: 4
+tags: []
+user_id: user

@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/aafc37846ef4466eb91bd44c0cac3d18/artifacts
+deleted_time: 1727190091198
+end_time: 1727163740913
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: aafc37846ef4466eb91bd44c0cac3d18
+run_name: traveling-calf-272
+run_uuid: aafc37846ef4466eb91bd44c0cac3d18
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727163503278
+status: 4
+tags: []
+user_id: user
