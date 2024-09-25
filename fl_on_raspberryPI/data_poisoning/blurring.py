@@ -6,7 +6,7 @@ from PIL import Image, ImageFilter
 def attack(trainset, dataset_info, rate):
     X_train = trainset[dataset_info["data_key"]]
     y_train = trainset[dataset_info["label_key"]]
-    trans = torchvision.ToPILImage()
+    trans = torchvision.transforms.ToPILImage()
 
     poisoned_count = int(len(X_train) * rate)
     random_index = np.random.choice(len(X_train), poisoned_count, replace=False)
