@@ -174,6 +174,8 @@ def prepare_dataset(num_clients: int,  dataset_name: str, dataset_conf: DictConf
 def datapoisoning_to_target_cids(trainset, dataset_info, poisoning, cid):
     if not poisoning.is_enabled:
         return trainset
+    if cid not in poisoning.target_cids:
+        return trainset
 
     match poisoning.method:
         case "label_flipping":
