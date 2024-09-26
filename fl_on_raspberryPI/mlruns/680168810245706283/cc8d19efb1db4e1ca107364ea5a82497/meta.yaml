@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/cc8d19efb1db4e1ca107364ea5a82497/artifacts
+deleted_time: 1727358940979
 end_time: 1727201020219
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: cc8d19efb1db4e1ca107364ea5a82497
 run_name: marvelous-moose-29
 run_uuid: cc8d19efb1db4e1ca107364ea5a82497

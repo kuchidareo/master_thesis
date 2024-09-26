@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/1116417f696d4156b6366eb4e67d4664/artifacts
+deleted_time: 1727358940979
 end_time: 1727195422525
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: 1116417f696d4156b6366eb4e67d4664
 run_name: magnificent-deer-693
 run_uuid: 1116417f696d4156b6366eb4e67d4664

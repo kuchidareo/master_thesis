@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/92c5817531b148a0bf6782730c6d6281/artifacts
+deleted_time: 1727358940989
 end_time: 1727251446656
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: 92c5817531b148a0bf6782730c6d6281
 run_name: useful-crab-846
 run_uuid: 92c5817531b148a0bf6782730c6d6281

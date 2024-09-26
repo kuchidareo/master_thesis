@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/a217ed875c8047568153cf85e33ccc09/artifacts
+deleted_time: 1727358940995
 end_time: 1727262527907
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: a217ed875c8047568153cf85e33ccc09
 run_name: able-kit-542
 run_uuid: a217ed875c8047568153cf85e33ccc09

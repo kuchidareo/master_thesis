@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/1e6c87b3a0ea448d91e853a08069be05/artifacts
+deleted_time: 1727358940995
 end_time: 1727268178925
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: 1e6c87b3a0ea448d91e853a08069be05
 run_name: indecisive-yak-602
 run_uuid: 1e6c87b3a0ea448d91e853a08069be05

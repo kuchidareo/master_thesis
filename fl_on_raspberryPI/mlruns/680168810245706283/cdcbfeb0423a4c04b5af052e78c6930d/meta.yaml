@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/cdcbfeb0423a4c04b5af052e78c6930d/artifacts
+deleted_time: 1727358941003
+end_time: 1727341966678
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: cdcbfeb0423a4c04b5af052e78c6930d
+run_name: capable-finch-381
+run_uuid: cdcbfeb0423a4c04b5af052e78c6930d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727335724126
+status: 3
+tags: []
+user_id: user

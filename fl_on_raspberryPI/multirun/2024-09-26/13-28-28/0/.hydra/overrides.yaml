@@ -1,0 +1,4 @@
+- trial=1
+- poisoning.method=blurring
+- poisoning.target_cids=[0]
+- poisoning.rate=0.05

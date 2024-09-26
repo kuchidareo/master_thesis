@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/7913c6bb499644089eb634dedb002052/artifacts
+deleted_time: 1727280189365
+end_time: 1727278788932
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 7913c6bb499644089eb634dedb002052
+run_name: fun-midge-89
+run_uuid: 7913c6bb499644089eb634dedb002052
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727278584280
+status: 4
+tags: []
+user_id: user

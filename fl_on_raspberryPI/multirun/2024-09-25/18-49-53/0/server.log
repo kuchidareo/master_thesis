@@ -1,0 +1,21 @@
+[2024-09-25 18:49:54,690][flwr][INFO] - Starting Flower server, config: num_rounds=50, no round_timeout
+[2024-09-25 18:49:54,695][flwr][INFO] - Flower ECE: gRPC server running (50 rounds), SSL is disabled
+[2024-09-25 18:49:54,695][flwr][INFO] - [INIT]
+[2024-09-25 18:49:54,695][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-25 18:55:44,190][flwr][INFO] - Received initial parameters from one random client
+[2024-09-25 18:55:44,190][flwr][INFO] - Evaluating initial global parameters
+[2024-09-25 18:55:44,190][flwr][INFO] - 
+[2024-09-25 18:55:44,190][flwr][INFO] - [ROUND 1]
+[2024-09-25 18:55:48,674][grpc._server][ERROR] - Exception iterating responses: 
+Traceback (most recent call last):
+  File "/home/user/kuchida/master_thesis/fl_on_raspberryPI/venv/lib/python3.10/site-packages/grpc/_server.py", line 653, in _take_response_from_response_iterator
+    return next(response_iterator), True
+  File "/home/user/kuchida/master_thesis/fl_on_raspberryPI/venv/lib/python3.10/site-packages/flwr/server/superlink/fleet/grpc_bidi/flower_service_servicer.py", line 117, in Join
+    ins_wrapper: InsWrapper = next(ins_wrapper_iterator)
+  File "/home/user/kuchida/master_thesis/fl_on_raspberryPI/venv/lib/python3.10/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 165, in ins_wrapper_iterator
+    self._raise_if_closed()
+  File "/home/user/kuchida/master_thesis/fl_on_raspberryPI/venv/lib/python3.10/site-packages/flwr/server/superlink/fleet/grpc_bidi/grpc_bridge.py", line 81, in _raise_if_closed
+    raise GrpcBridgeClosed()
+flwr.server.superlink.fleet.grpc_bidi.grpc_bridge.GrpcBridgeClosed
+[2024-09-25 18:58:28,156][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-25 18:58:48,015][flwr][INFO] - aggregate_fit: received 0 results and 10 failures

@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/8752f9e06a604f8fb901a12747522f1d/artifacts
+deleted_time: 1727358941001
+end_time: 1727323503657
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 8752f9e06a604f8fb901a12747522f1d
+run_name: respected-dove-450
+run_uuid: 8752f9e06a604f8fb901a12747522f1d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727317103478
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/67cc67e81a254be0af32a521ad9b32bf/artifacts
+deleted_time: 1727358940996
+end_time: 1727304656556
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 67cc67e81a254be0af32a521ad9b32bf
+run_name: victorious-panda-10
+run_uuid: 67cc67e81a254be0af32a521ad9b32bf
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727298460145
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/e5b591f3a9ed45fab768412986737264/artifacts
+deleted_time: 1727358941001
+end_time: 1727329641399
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: e5b591f3a9ed45fab768412986737264
+run_name: fun-rook-540
+run_uuid: e5b591f3a9ed45fab768412986737264
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727323504084
+status: 3
+tags: []
+user_id: user

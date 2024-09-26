@@ -1,0 +1,46 @@
+[2024-09-26 12:12:47,040][flwr][INFO] - Starting Flower server, config: num_rounds=50, no round_timeout
+[2024-09-26 12:12:47,042][flwr][INFO] - Flower ECE: gRPC server running (50 rounds), SSL is disabled
+[2024-09-26 12:12:47,042][flwr][INFO] - [INIT]
+[2024-09-26 12:12:47,042][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-26 12:13:14,771][flwr][INFO] - Received initial parameters from one random client
+[2024-09-26 12:13:14,771][flwr][INFO] - Evaluating initial global parameters
+[2024-09-26 12:13:14,771][flwr][INFO] - 
+[2024-09-26 12:13:14,771][flwr][INFO] - [ROUND 1]
+[2024-09-26 12:13:17,427][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:24:19,562][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-26 12:24:19,620][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-09-26 12:24:19,620][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:24:34,368][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-26 12:24:34,642][flwr][INFO] - 
+[2024-09-26 12:24:34,642][flwr][INFO] - [ROUND 2]
+[2024-09-26 12:24:34,642][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:35:42,662][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-26 12:35:42,721][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:35:57,002][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-26 12:35:57,274][flwr][INFO] - 
+[2024-09-26 12:35:57,274][flwr][INFO] - [ROUND 3]
+[2024-09-26 12:35:57,275][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:47:02,960][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-26 12:47:03,022][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:47:17,719][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-26 12:47:17,983][flwr][INFO] - 
+[2024-09-26 12:47:17,983][flwr][INFO] - [ROUND 4]
+[2024-09-26 12:47:17,984][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:58:25,184][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-26 12:58:25,245][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-26 12:58:39,742][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-26 12:58:40,004][flwr][INFO] - 
+[2024-09-26 12:58:40,004][flwr][INFO] - [ROUND 5]
+[2024-09-26 12:58:40,004][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-26 13:09:48,579][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-26 13:09:48,638][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-26 13:10:02,852][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-26 13:10:03,118][flwr][INFO] - 
+[2024-09-26 13:10:03,118][flwr][INFO] - [ROUND 6]
+[2024-09-26 13:10:03,119][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-09-26 13:21:12,709][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-09-26 13:21:12,770][flwr][INFO] - configure_evaluate: strategy sampled 10 clients (out of 10)
+[2024-09-26 13:21:27,141][flwr][INFO] - aggregate_evaluate: received 10 results and 0 failures
+[2024-09-26 13:21:27,442][flwr][INFO] - 
+[2024-09-26 13:21:27,442][flwr][INFO] - [ROUND 7]
+[2024-09-26 13:21:27,443][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)

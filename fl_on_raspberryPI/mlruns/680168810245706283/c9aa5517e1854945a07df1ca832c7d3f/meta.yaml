@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/c9aa5517e1854945a07df1ca832c7d3f/artifacts
+deleted_time: 1727280189365
+end_time: 1727278518382
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: c9aa5517e1854945a07df1ca832c7d3f
+run_name: resilient-steed-48
+run_uuid: c9aa5517e1854945a07df1ca832c7d3f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727278439659
+status: 4
+tags: []
+user_id: user

@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/ea0f55b808b043fa9649b351e93c9883/artifacts
+deleted_time: 1727358940995
 end_time: 1727273949963
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: ea0f55b808b043fa9649b351e93c9883
 run_name: incongruous-wren-248
 run_uuid: ea0f55b808b043fa9649b351e93c9883

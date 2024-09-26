@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/5db6588919ba4b2cada492cdafcc318f/artifacts
+deleted_time: 1727358941001
+end_time: 1727317103141
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 5db6588919ba4b2cada492cdafcc318f
+run_name: efficient-goat-677
+run_uuid: 5db6588919ba4b2cada492cdafcc318f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727310866195
+status: 3
+tags: []
+user_id: user

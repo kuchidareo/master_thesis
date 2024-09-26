@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/f0e1a6949a01457288a987a030e4b7df/artifacts
+deleted_time: 1727358940987
 end_time: 1727229175161
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: f0e1a6949a01457288a987a030e4b7df
 run_name: tasteful-swan-924
 run_uuid: f0e1a6949a01457288a987a030e4b7df

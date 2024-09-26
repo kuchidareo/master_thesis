@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/b2738ec78d3b4578a704988865a6252e/artifacts
+deleted_time: 1727358940981
 end_time: 1727223564454
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: b2738ec78d3b4578a704988865a6252e
 run_name: suave-quail-743
 run_uuid: b2738ec78d3b4578a704988865a6252e

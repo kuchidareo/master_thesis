@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/956f8ce107084ea38b233e94d67b8c0c/artifacts
+deleted_time: 1727358940987
 end_time: 1727234807854
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: 956f8ce107084ea38b233e94d67b8c0c
 run_name: luminous-turtle-639
 run_uuid: 956f8ce107084ea38b233e94d67b8c0c

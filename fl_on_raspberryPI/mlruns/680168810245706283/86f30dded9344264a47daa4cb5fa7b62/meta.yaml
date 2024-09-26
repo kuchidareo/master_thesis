@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/86f30dded9344264a47daa4cb5fa7b62/artifacts
+deleted_time: 1727358941002
+end_time: 1727346359750
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 86f30dded9344264a47daa4cb5fa7b62
+run_name: spiffy-shark-392
+run_uuid: 86f30dded9344264a47daa4cb5fa7b62
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727341967021
+status: 4
+tags: []
+user_id: user

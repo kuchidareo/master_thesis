@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/b3d9e2b08fc14f13a5d11181fb92d4a1/artifacts
+deleted_time: 1727358941006
+end_time: 1727358682366
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: b3d9e2b08fc14f13a5d11181fb92d4a1
+run_name: skittish-kit-693
+run_uuid: b3d9e2b08fc14f13a5d11181fb92d4a1
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727346540128
+status: 4
+tags: []
+user_id: user

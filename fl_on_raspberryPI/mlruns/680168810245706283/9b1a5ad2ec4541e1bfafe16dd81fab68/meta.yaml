@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/9b1a5ad2ec4541e1bfafe16dd81fab68/artifacts
+deleted_time: 1727280189365
+end_time: 1727278219254
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 9b1a5ad2ec4541e1bfafe16dd81fab68
+run_name: clean-cod-326
+run_uuid: 9b1a5ad2ec4541e1bfafe16dd81fab68
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727277496089
+status: 4
+tags: []
+user_id: user

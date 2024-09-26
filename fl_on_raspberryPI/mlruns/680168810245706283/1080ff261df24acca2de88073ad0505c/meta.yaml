@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/1080ff261df24acca2de88073ad0505c/artifacts
+deleted_time: 1727358940987
 end_time: 1727240399249
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: 1080ff261df24acca2de88073ad0505c
 run_name: judicious-deer-763
 run_uuid: 1080ff261df24acca2de88073ad0505c

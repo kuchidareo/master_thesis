@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/e0c43654f6a648cca6a833f5a6f31a2b/artifacts
+deleted_time: 1727358940996
+end_time: 1727310865843
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: e0c43654f6a648cca6a833f5a6f31a2b
+run_name: enthused-sow-80
+run_uuid: e0c43654f6a648cca6a833f5a6f31a2b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727304656917
+status: 3
+tags: []
+user_id: user

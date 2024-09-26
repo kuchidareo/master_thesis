@@ -1,8 +1,9 @@
 artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/c136767873ff439eb5e5f1e47432d651/artifacts
+deleted_time: 1727358940989
 end_time: 1727256954161
 entry_point_name: ''
 experiment_id: '680168810245706283'
-lifecycle_stage: active
+lifecycle_stage: deleted
 run_id: c136767873ff439eb5e5f1e47432d651
 run_name: sincere-quail-604
 run_uuid: c136767873ff439eb5e5f1e47432d651

@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/fd8497a604ac4431b360b1975246fed0/artifacts
+deleted_time: 1727346619644
+end_time: 1727346511341
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: fd8497a604ac4431b360b1975246fed0
+run_name: honorable-crab-964
+run_uuid: fd8497a604ac4431b360b1975246fed0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727346509480
+status: 4
+tags: []
+user_id: user

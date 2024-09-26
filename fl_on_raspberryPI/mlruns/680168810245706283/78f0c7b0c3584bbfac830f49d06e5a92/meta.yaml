@@ -1,0 +1,16 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/78f0c7b0c3584bbfac830f49d06e5a92/artifacts
+deleted_time: 1727280189365
+end_time: 1727279947220
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: deleted
+run_id: 78f0c7b0c3584bbfac830f49d06e5a92
+run_name: clean-shrimp-61
+run_uuid: 78f0c7b0c3584bbfac830f49d06e5a92
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727279394679
+status: 4
+tags: []
+user_id: user
