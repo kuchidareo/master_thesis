@@ -1,13 +1,16 @@
 import os
 import random
 
+import csv
 import pandas as pd
+from openai import OpenAI
 
 from config import UCI_dataset_config
 
 class UCIDataHandler():
     dataset_directory = "OpportunityUCIDataset/dataset"
-    filtered_csv_directory = "filtered_action_csv"
+    poisoned_csv_directory = "UCIDataset/poisoned_csv"
+    llm_answer_directory = "UCIDataset/llm_answers"
     config = UCI_dataset_config
 
     def __init__(self, dataset_name, num_sensor_labels, poisoning_conf) -> None:
@@ -79,20 +82,45 @@ class UCIDataHandler():
                 df[f"{label}_label_{i}"] = df[f"{label}_label_0"].copy()
         return df
 
+    def export_csv(self, df, filename):
+        df.to_csv(os.path.join(self.poisoned_csv_directory, f"{filename}.csv"), index=False)
 
-    def export_csv(self, df):
-        attack_labels = str(self.poisoning_conf["attack_labels"])
-        label_mode = self.poisoning_conf["label_mode"]
-        in_column = self.poisoning_conf["position"]["in_column"]
-        num_of_column = self.poisoning_conf["position"]["num_of_column"]
-        rate = self.poisoning_conf["position"]["rate"]
+    def export_llm_answer(self, answer, filename):
+        with open(os.path.join(self.llm_answer_directory, f"{filename}.md"), "w") as f:
+            f.write(answer)
 
-        csv_name = f"{dataset_name}_{self.num_sensor_labels}_{attack_labels}_{label_mode}_{in_column}_{num_of_column}_{rate}.csv"
 
-        df.to_csv(os.path.join(self.filtered_csv_directory, csv_name), index=False)
+def generate_filename(dataset_name, trial, num_sensor_labels, poisoning_conf):
+        attack_labels = str(poisoning_conf["attack_labels"])
+        label_mode = poisoning_conf["label_mode"]
+        in_column = poisoning_conf["position"]["in_column"]
+        num_of_column = poisoning_conf["position"]["num_of_column"]
+        rate = poisoning_conf["position"]["rate"]
+
+        filename = f"{dataset_name}_{num_sensor_labels}_{attack_labels}_{label_mode}_{in_column}_{num_of_column}_{rate}_{trial}"
+        return filename
+
+def get_answer_from_llm(csv):
+    header = """
+        This CSV file provides timestamps along with human activity labels captured by different independent sensors.
+        Could you help explain step by step what might have happened and determine what situation the person might be in?
+    """
+
+    input_text = header + "\n" + csv
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assstant."},
+            {"role": "user", "content": input_text},
+        ]
+    )
+
+    return response.choices[0].message.content
 
 
 dataset_name = "S1-ADL1.dat"
+
+trial = 1
 num_sensor_labels = 2
 poisoning_conf = {
     "attack_labels": ["locomotion"], # Add gesture, location?
@@ -104,13 +132,20 @@ poisoning_conf = {
     }
 }
 
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 def main():
     UCI_data_handler = UCIDataHandler(dataset_name, num_sensor_labels, poisoning_conf)
     df = UCI_data_handler.load_df()
     filtered_df = UCI_data_handler.filter(df)
     poisoned_df = UCI_data_handler.poisoning(filtered_df)
-    UCI_data_handler.export_csv(poisoned_df)
-    print("Finished.")
+
+    filename = generate_filename(dataset_name, trial, num_sensor_labels, poisoning_conf)
+    UCI_data_handler.export_csv(poisoned_df, filename)
+
+    csv_text = poisoned_df.to_csv(index=False, header=False)
+    answer = get_answer_from_llm(csv_text)
+    UCI_data_handler.export_llm_answer(answer, filename)
 
 if __name__ == "__main__":
     main()
