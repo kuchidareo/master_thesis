@@ -1,0 +1,222 @@
+locomotion_label,locomotion_label_sensor2,gesture_label,relative_time(s)
+Stand,Swim,0,92
+Walk,Swim,0,261
+Lie,Lie,0,272
+Stand,Swim,0,302
+Walk,Swim,0,315
+Stand,Stand,0,319
+Walk,Swim,0,326
+Stand,Swim,0,330
+Stand,Swim,Open Fridge,336
+Stand,Swim,0,339
+Stand,Swim,Close Fridge,343
+Stand,Stand,0,345
+Walk,Swim,0,347
+Stand,Swim,0,355
+Stand,Swim,Open Door 2,355
+Stand,Swim,0,359
+Walk,Swim,0,362
+Walk,Swim,Open Door 1,366
+Stand,Stand,Open Door 1,366
+Stand,Stand,0,371
+Walk,Swim,0,371
+Stand,Swim,Open Drawer 2,378
+Stand,Swim,0,380
+Stand,Swim,Close Drawer 2,383
+Stand,Swim,0,384
+Stand,Swim,Open Drawer 1,385
+Stand,Swim,0,387
+Stand,Swim,Close Drawer 1,389
+Stand,Swim,0,390
+Stand,Swim,Open Drawer 3,391
+Stand,Stand,0,393
+Stand,Stand,Close Drawer 3,394
+Stand,Swim,0,397
+Walk,Swim,0,398
+Stand,Swim,0,404
+Walk,Swim,0,422
+Walk,Swim,Close Door 2,424
+0,0,Close Door 2,427
+Stand,Swim,Close Door 2,427
+0,Swim,Close Door 2,428
+Walk,Swim,Close Door 2,428
+Walk,Swim,0,428
+Walk,Walk,Toggle Switch,436
+Stand,Swim,Toggle Switch,436
+Stand,Stand,0,438
+Walk,Swim,0,439
+Stand,Swim,0,443
+Stand,Swim,Open Door 1,443
+0,Swim,Open Door 1,447
+Walk,Swim,Open Door 1,447
+Walk,Swim,0,447
+Stand,Swim,0,673
+Walk,Swim,0,675
+Walk,Swim,Close Door 1,676
+Walk,Walk,0,678
+Stand,Swim,0,678
+Stand,Swim,Close Door 1,678
+0,Swim,Close Door 1,679
+Walk,Swim,Close Door 1,679
+Walk,Walk,0,679
+Stand,Swim,0,685
+Stand,Swim,Open Door 2,687
+Stand,Swim,0,689
+Walk,Swim,0,690
+Walk,Swim,Open Drawer 2,699
+Stand,Stand,Open Drawer 2,700
+Stand,Swim,0,701
+Stand,Swim,Close Drawer 2,702
+0,Swim,Close Drawer 2,704
+0,0,Open Drawer 1,704
+Walk,Swim,Open Drawer 1,704
+0,Swim,Open Drawer 1,705
+Stand,Swim,Open Drawer 1,705
+Stand,Stand,Close Drawer 1,706
+Stand,Swim,0,708
+Walk,Swim,0,711
+Stand,Stand,0,714
+Walk,Walk,0,718
+Stand,Swim,0,721
+Walk,Walk,0,722
+Walk,Swim,Open Fridge,723
+Stand,Swim,Open Fridge,724
+Stand,Swim,0,726
+Stand,Swim,Close Fridge,733
+Stand,Swim,0,735
+Walk,Swim,0,747
+Stand,Swim,0,749
+Stand,Swim,Drink from Cup,843
+Walk,Swim,Drink from Cup,850
+0,0,Drink from Cup,850
+Stand,Swim,Drink from Cup,851
+0,Swim,Drink from Cup,851
+Sit,Swim,Drink from Cup,855
+Sit,Swim,0,862
+Sit,Sit,Drink from Cup,865
+Sit,Swim,0,874
+Sit,Swim,Drink from Cup,876
+Sit,Sit,0,885
+Stand,Stand,0,889
+Walk,Walk,0,896
+Stand,Swim,0,897
+Walk,Walk,0,900
+Stand,Swim,0,905
+Stand,Swim,Open Fridge,907
+Stand,Swim,0,909
+Walk,Swim,0,947
+Stand,Swim,0,949
+Walk,Swim,0,992
+Walk,Swim,Open Drawer 1,993
+0,Swim,Open Drawer 1,994
+Stand,Swim,Open Drawer 1,994
+Stand,Swim,0,995
+Stand,Swim,Close Drawer 1,1004
+Stand,Stand,0,1006
+Stand,Swim,Open Drawer 2,1007
+Stand,Swim,0,1007
+Stand,Swim,Close Drawer 2,1010
+Stand,Swim,0,1012
+Walk,Swim,0,1012
+Stand,Swim,0,1015
+Walk,Walk,0,1025
+Stand,Swim,0,1026
+Walk,Walk,0,1031
+Stand,Stand,0,1034
+Walk,Swim,0,1037
+Stand,Swim,0,1039
+Walk,Swim,0,1040
+Walk,Swim,Open Fridge,1043
+0,Swim,Open Fridge,1043
+Stand,Swim,Open Fridge,1043
+Stand,Swim,0,1046
+Stand,Swim,Close Fridge,1047
+Walk,Swim,Close Fridge,1048
+Walk,Swim,0,1049
+Stand,Swim,0,1051
+Walk,Swim,0,1063
+Walk,Swim,Open Drawer 3,1066
+0,Swim,Open Drawer 3,1066
+Stand,Swim,Open Drawer 3,1066
+Stand,Swim,0,1068
+Stand,Stand,Close Drawer 3,1071
+Stand,Stand,0,1073
+Walk,Swim,0,1073
+Stand,Swim,0,1077
+Walk,Swim,0,1100
+Stand,Stand,0,1102
+Sit,Sit,0,1109
+Walk,Swim,0,1311
+Walk,Swim,Open Fridge,1313
+0,Swim,Open Fridge,1314
+Stand,Swim,Open Fridge,1314
+Stand,Swim,0,1315
+Stand,Swim,Close Fridge,1326
+Walk,Swim,Close Fridge,1328
+Walk,Swim,0,1328
+Stand,Swim,0,1330
+Walk,Swim,0,1335
+Walk,Swim,Open Dishwasher,1337
+Stand,Swim,Open Dishwasher,1338
+Stand,Swim,0,1340
+Walk,Swim,0,1352
+Stand,Stand,0,1353
+Walk,Swim,0,1356
+Stand,Stand,0,1357
+Walk,Walk,0,1362
+Stand,Swim,0,1364
+Walk,Swim,0,1365
+Stand,Swim,0,1367
+Walk,Swim,0,1373
+Stand,Swim,0,1374
+Stand,Swim,Close Dishwasher,1379
+Stand,Swim,0,1382
+Walk,Swim,0,1383
+Stand,Swim,0,1387
+Walk,Swim,0,1397
+Walk,Swim,Open Drawer 2,1401
+0,Swim,Open Drawer 2,1401
+Stand,Swim,Open Drawer 2,1401
+Stand,Stand,Close Drawer 2,1402
+Stand,Swim,0,1404
+Stand,Swim,Open Drawer 3,1404
+Stand,Stand,0,1406
+Stand,Swim,Close Drawer 3,1407
+Stand,Swim,0,1410
+Walk,Swim,0,1411
+Stand,Swim,Open Door 1,1414
+Stand,Stand,0,1419
+Walk,Walk,0,1419
+Walk,Swim,Close Door 2,1423
+0,Swim,Close Door 2,1423
+Stand,Stand,Close Door 2,1423
+Stand,Swim,0,1426
+Walk,Swim,0,1427
+Stand,Swim,0,1436
+Walk,Swim,0,1438
+Stand,Swim,0,1439
+Stand,Swim,Clean Table,1440
+Stand,Stand,0,1446
+Walk,Walk,0,1448
+0,0,Clean Table,1451
+Stand,Swim,Clean Table,1451
+Stand,Swim,0,1452
+Walk,Swim,0,1453
+Stand,Swim,0,1457
+Walk,Swim,0,1460
+Stand,Swim,0,1461
+Walk,Swim,0,1463
+Stand,Swim,0,1469
+Stand,Swim,Open Door 2,1469
+Walk,Swim,Open Door 2,1473
+Walk,Swim,0,1473
+Walk,Swim,Close Door 1,1476
+0,Swim,Close Door 1,1476
+Stand,Swim,Close Door 1,1476
+Walk,Swim,0,1481
+Walk,Swim,Close Door 2,1484
+Stand,Swim,Close Door 2,1485
+Stand,Stand,0,1489
+Walk,Swim,0,1490
+Lie,Lie,0,1504
+Walk,Swim,0,1522
