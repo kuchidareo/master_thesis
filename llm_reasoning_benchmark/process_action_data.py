@@ -95,27 +95,27 @@ def export_llm_conversation(conversation, filename):
             f.write(f"{utterance['content']}\n")
 
 
-def generate_filename(dataset_name, trial, num_sensor_labels, poisoning_conf):
+def generate_filename(dataset_name, gpt_model, trial, num_sensor_labels, poisoning_conf):
         attack_labels = str(poisoning_conf["attack_labels"])
         label_mode = poisoning_conf["label_mode"]
         in_column = poisoning_conf["position"]["in_column"]
         num_of_column = poisoning_conf["position"]["num_of_column"]
         rate = poisoning_conf["position"]["rate"]
 
-        filename = f"{dataset_name}_{num_sensor_labels}_{attack_labels}_{label_mode}_{in_column}_{num_of_column}_{rate}_{trial}"
+        filename = f"{dataset_name}_{gpt_model}_{num_sensor_labels}_{attack_labels}_{label_mode}_{in_column}_{num_of_column}_{rate}_{trial}"
         return filename
 
 
-def get_answer_from_llm(conversation):
+def get_answer_from_llm(conversation, gpt_model):
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model=gpt_model,
         messages=conversation
     )
 
     return response.choices[0].message.content
 
 
-def llm_experiment(UCI_data_handler, poisoned_df, csv_text):
+def llm_experiment(UCI_data_handler, gpt_model, poisoned_df, csv_text):
     conversation = [{"role": "system", "content": "You are a helpful assstant. You'll read sensor label table and analyze what might have happened."}]
     
     first_question = """
@@ -130,10 +130,10 @@ def llm_experiment(UCI_data_handler, poisoned_df, csv_text):
     """
     
     conversation.append({"role": "user", "content": f"{first_question}\n{csv_text}"})
-    first_answer = get_answer_from_llm(conversation)
+    first_answer = get_answer_from_llm(conversation, gpt_model)
     conversation.append({"role": "assistant", "content": first_answer})
     conversation.append({"role": "user", "content": second_question})
-    second_answer = get_answer_from_llm(conversation)
+    second_answer = get_answer_from_llm(conversation, gpt_model)
     conversation.append({"role": "assistant", "content": second_answer})
 
     return conversation
@@ -151,11 +151,11 @@ def main(cfg: DictConfig):
     filtered_df = UCI_data_handler.filter(df)
     poisoned_df = UCI_data_handler.poisoning(filtered_df)
 
-    filename = generate_filename(cfg.dataset_name, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
+    filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
     export_csv(poisoned_df, filename)
 
     csv_text = poisoned_df.to_csv(index=False, header=False)
-    conversation = llm_experiment(UCI_data_handler, poisoned_df, csv_text, filename)
+    conversation = llm_experiment(UCI_data_handler, cfg.gpt_model, poisoned_df, csv_text)
     export_llm_conversation(conversation, filename)
    
 
