@@ -1,4 +1,5 @@
 UCI_dataset_config = {
+    "dataset_directory": "OpportunityUCIDataset/dataset",
     "sampling_frequency_hz": 32,
     "locomotion_column_index": 243, # Read dataset/column_names.txt, label_legend.txt
     "HL_Activity_column_index": 244,

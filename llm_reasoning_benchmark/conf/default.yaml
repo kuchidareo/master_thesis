@@ -1,0 +1,10 @@
+dataset_name: "S1-ADL1.dat"
+trial: 1
+num_sensor_labels: 2
+poisoning_conf:
+  attack_labels: ["locomotion"] # Add gesture, location?
+  label_mode: "swim" # swim or swap
+  position:
+    in_column: "random" # random or consecutive??
+    num_of_column: 1 # don't over num_sensor_labels.
+    rate: 0.1
