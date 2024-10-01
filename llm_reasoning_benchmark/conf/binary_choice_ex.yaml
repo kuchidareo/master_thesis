@@ -1,5 +1,5 @@
 dataset_name: "S1-ADL1.dat"
-gpt_model: "gpt-3.5-turbo"
+gpt_model: "gpt-3.5-turbo" # gpt-4o-mini or gpt-4o-2024-08-06
 trial: 1
 num_sensor_labels: 2
 poisoning_conf:

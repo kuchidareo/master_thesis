@@ -61,16 +61,21 @@ class UCIDataHandler():
         poisoned_df = df.copy()
         poisoned_df = self.duplicate_attack_columns(poisoned_df, attack_labels)
 
-        if self.poisoning_conf["label_mode"] == "swim":
-            if self.poisoning_conf["position"]["in_column"] == "random":
-                num_rows_to_poison = int(len(poisoned_df) * self.poisoning_conf["position"]["rate"])
-                self.indices_to_poison = random.sample(range(len(poisoned_df)), num_rows_to_poison)
+        
+        if self.poisoning_conf["position"]["in_column"] == "random":
+            num_rows_to_poison = int(len(poisoned_df) * self.poisoning_conf["position"]["rate"])
+            self.indices_to_poison = random.sample(range(len(poisoned_df)), num_rows_to_poison)
 
-                for i in self.indices_to_poison:
-                    for j in range(self.poisoning_conf["position"]["num_of_column"]):
-                        for label in attack_labels:
+            for i in self.indices_to_poison:
+                for j in range(self.poisoning_conf["position"]["num_of_column"]):
+                    for label in attack_labels:
+                        if self.poisoning_conf["label_mode"] == "swim":
                             poisoned_df.loc[i, f"{label}_label_{j}"] = 'Swim'
-
+                        elif self.poisoning_conf["label_mode"] == "flip":
+                            flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
+                            while flipped_label == poisoned_df.loc[i, f"{label}_label_{j}"]:
+                                flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
+                            poisoned_df.loc[i, f"{label}_label_{j}"] = flipped_label
 
         column_order = sorted(poisoned_df.columns)
         poisoned_df = poisoned_df[column_order]
