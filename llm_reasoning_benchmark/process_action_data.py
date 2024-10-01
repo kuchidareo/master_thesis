@@ -126,7 +126,7 @@ def llm_experiment(UCI_data_handler, gpt_model, poisoned_df, csv_text):
     poisoned_index = random.choice(UCI_data_handler.indices_to_poison)
     relative_time = poisoned_df.loc[poisoned_index, "relative_time(s)"]
     second_question = f"""
-        Based on the context, what migh have happend at {relative_time} second?
+        Based on the context, what might have happened at {relative_time} seconds?
     """
     
     conversation.append({"role": "user", "content": f"{first_question}\n{csv_text}"})
