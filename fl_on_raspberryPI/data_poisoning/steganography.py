@@ -1,6 +1,7 @@
 import cv2
 from datasets import Dataset 
 import numpy as np
+import torchvision
 
 text = """Lorem ipsum dolor sit amet. consectupidatat non proident, sunt in culpa qui offici."""
 secret_message_delimeter = "#####"
@@ -68,15 +69,17 @@ def show_data(image):
 def attack(trainset, dataset_info, rate):
     X_train = trainset[dataset_info["data_key"]]
     y_train = trainset[dataset_info["label_key"]]
+    trans_to_pil = torchvision.transforms.ToPILImage()
+    trans_to_tensor = torchvision.transforms.PILToTensor()
 
     poisoned_count = int(len(X_train) * rate)
     random_index = np.random.choice(len(X_train), poisoned_count, replace=False)
 
     for index in random_index:
-        steganographed_image = np.array(X_train[index]).copy()
-        steganographed_image = hide_data(steganographed_image, text)
+        image = trans_to_pil(X_train[index])
+        steganographed_image = hide_data(image, text)
         assert text == show_data(steganographed_image)
-        X_train[index] = steganographed_image
+        X_train[index] = trans_to_tensor(steganographed_image)
     
     poisoned_trainset = Dataset.from_dict({
         dataset_info["data_key"]: X_train,

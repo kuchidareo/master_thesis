@@ -1,7 +1,7 @@
 from datasets import Dataset 
 import numpy as np
 import torchvision
-from PIL import Image, ImageFilter
+from PIL import ImageFilter
 
 def attack(trainset, dataset_info, rate):
     X_train = trainset[dataset_info["data_key"]]
