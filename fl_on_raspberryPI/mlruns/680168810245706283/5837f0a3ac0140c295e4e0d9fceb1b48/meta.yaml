@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/5837f0a3ac0140c295e4e0d9fceb1b48/artifacts
+end_time: 1727703818117
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 5837f0a3ac0140c295e4e0d9fceb1b48
+run_name: adaptable-pig-12
+run_uuid: 5837f0a3ac0140c295e4e0d9fceb1b48
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727680673174
+status: 3
+tags: []
+user_id: user

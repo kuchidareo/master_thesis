@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/72a2093f89a8428093d05719a222b6a0/artifacts
+end_time: 1727593099559
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 72a2093f89a8428093d05719a222b6a0
+run_name: serious-kite-163
+run_uuid: 72a2093f89a8428093d05719a222b6a0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727575018308
+status: 3
+tags: []
+user_id: user

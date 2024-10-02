@@ -1,0 +1,1 @@
+{'is_enabled': True, 'method': 'blurring', 'rate': 0.15, 'target_cids': [0, 1, 2, 3, 4, 5, 6]}

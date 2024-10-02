@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/17b66dddea6f4ae2a71d66ecdeade498/artifacts
+end_time: 1727680672772
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 17b66dddea6f4ae2a71d66ecdeade498
+run_name: learned-dove-926
+run_uuid: 17b66dddea6f4ae2a71d66ecdeade498
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727667516358
+status: 3
+tags: []
+user_id: user

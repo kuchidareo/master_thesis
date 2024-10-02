@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/f1875cd59bec4b7a83ce592d411572d5/artifacts
+end_time: 1727866822363
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: f1875cd59bec4b7a83ce592d411572d5
+run_name: fun-hare-823
+run_uuid: f1875cd59bec4b7a83ce592d411572d5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727853712008
+status: 4
+tags: []
+user_id: user

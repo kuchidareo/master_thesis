@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/3c17dc890a664f268f04e1a199ab5c34/artifacts
+end_time: 1727759720636
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 3c17dc890a664f268f04e1a199ab5c34
+run_name: monumental-crow-263
+run_uuid: 3c17dc890a664f268f04e1a199ab5c34
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727754473082
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/394edbc15b6a45a5a3974ca5308bea04/artifacts
+end_time: 1727459639728
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 394edbc15b6a45a5a3974ca5308bea04
+run_name: defiant-owl-341
+run_uuid: 394edbc15b6a45a5a3974ca5308bea04
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727436470689
+status: 3
+tags: []
+user_id: user

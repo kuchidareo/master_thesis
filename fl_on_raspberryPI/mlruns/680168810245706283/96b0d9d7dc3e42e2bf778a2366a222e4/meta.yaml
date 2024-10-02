@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/96b0d9d7dc3e42e2bf778a2366a222e4/artifacts
+end_time: 1727546179170
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 96b0d9d7dc3e42e2bf778a2366a222e4
+run_name: smiling-gnu-65
+run_uuid: 96b0d9d7dc3e42e2bf778a2366a222e4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727529679931
+status: 3
+tags: []
+user_id: user

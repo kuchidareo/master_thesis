@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/f9468f9fb9a946c69c72c0b437a4956f/artifacts
+end_time: 1727748308911
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: f9468f9fb9a946c69c72c0b437a4956f
+run_name: bittersweet-duck-948
+run_uuid: f9468f9fb9a946c69c72c0b437a4956f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727742386163
+status: 3
+tags: []
+user_id: user

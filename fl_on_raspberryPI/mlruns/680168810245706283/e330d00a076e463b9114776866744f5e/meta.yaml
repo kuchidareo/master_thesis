@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/e330d00a076e463b9114776866744f5e/artifacts
+end_time: 1727436470345
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: e330d00a076e463b9114776866744f5e
+run_name: bemused-gnat-317
+run_uuid: e330d00a076e463b9114776866744f5e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727423274572
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/508af8a6578847888ae4f4db5d981d16/artifacts
+end_time: 1727650328773
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 508af8a6578847888ae4f4db5d981d16
+run_name: honorable-conch-58
+run_uuid: 508af8a6578847888ae4f4db5d981d16
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727637303084
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/85df046421bd49ad906edef57b0983c0/artifacts
+end_time: 1727637302744
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 85df046421bd49ad906edef57b0983c0
+run_name: silent-rat-749
+run_uuid: 85df046421bd49ad906edef57b0983c0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727630111997
+status: 3
+tags: []
+user_id: user

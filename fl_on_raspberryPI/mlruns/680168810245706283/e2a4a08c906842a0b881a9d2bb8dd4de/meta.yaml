@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/e2a4a08c906842a0b881a9d2bb8dd4de/artifacts
+end_time: 1727575017964
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: e2a4a08c906842a0b881a9d2bb8dd4de
+run_name: judicious-deer-225
+run_uuid: e2a4a08c906842a0b881a9d2bb8dd4de
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727559317841
+status: 3
+tags: []
+user_id: user
