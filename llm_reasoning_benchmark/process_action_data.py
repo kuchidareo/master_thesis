@@ -89,6 +89,7 @@ class UCIDataHandler():
         sequence_length = self.poisoning_conf["position"]["sequence_length"]
         num_poison_blocks = (num_rows_to_poison // sequence_length) + 1
         num_of_block = total_length // num_poison_blocks
+        self.indices_to_poison = []
         poison_counter = 0
 
         if num_poison_blocks * sequence_length > total_length:
@@ -99,13 +100,14 @@ class UCIDataHandler():
             for i in range(start_index, start_index + sequence_length):
                 if poison_counter >= num_rows_to_poison:
                     break
-
+                
                 for j in range(self.poisoning_conf["position"]["num_of_column"]):
                     for label in attack_labels:
                         if self.poisoning_conf["label_mode"] == "swim":
                             df.loc[i, f"{label}_label_{j}"] = 'Swim'
                         elif self.poisoning_conf["label_mode"] == "flip":
                             df.loc[i, f"{label}_label_{j}"] = self.flip_label(df, i, label, j)
+                self.indices_to_poison.append(i)
                 poison_counter += 1
         return df
 
