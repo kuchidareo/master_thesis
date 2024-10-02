@@ -77,7 +77,8 @@ def attack(trainset, dataset_info, rate):
 
     for index in random_index:
         image = trans_to_pil(X_train[index])
-        steganographed_image = hide_data(image, text)
+        steganographed_image = np.array(image).copy()
+        steganographed_image = hide_data(steganographed_image, text)
         assert text == show_data(steganographed_image)
         X_train[index] = trans_to_tensor(steganographed_image)
     
