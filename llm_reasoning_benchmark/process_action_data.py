@@ -192,9 +192,9 @@ def main(cfg: DictConfig):
     filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
     export_csv(poisoned_df, filename)
 
-    # csv_text = poisoned_df.to_csv(index=False, header=False)
-    # conversation = llm_experiment(UCI_data_handler, cfg.gpt_model, poisoned_df, csv_text)
-    # export_llm_conversation(conversation, filename)
+    csv_text = poisoned_df.to_csv(index=False, header=False)
+    conversation = llm_experiment(UCI_data_handler, cfg.gpt_model, poisoned_df, csv_text)
+    export_llm_conversation(conversation, filename)
    
 
 if __name__ == "__main__":
