@@ -4,6 +4,7 @@
 **/.DS_Store
 
 /flower
+.env
 
 # Ignore compiled Python files
 **/__pycache__/

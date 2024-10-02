@@ -57,36 +57,69 @@ class UCIDataHandler():
 
     def poisoning(self, df):
         attack_labels = self.poisoning_conf["attack_labels"]
-
         poisoned_df = df.copy()
         poisoned_df = self.duplicate_attack_columns(poisoned_df, attack_labels)
 
-        
         if self.poisoning_conf["position"]["in_column"] == "random":
-            num_rows_to_poison = int(len(poisoned_df) * self.poisoning_conf["position"]["rate"])
-            self.indices_to_poison = random.sample(range(len(poisoned_df)), num_rows_to_poison)
-
-            for i in self.indices_to_poison:
-                for j in range(self.poisoning_conf["position"]["num_of_column"]):
-                    for label in attack_labels:
-                        if self.poisoning_conf["label_mode"] == "swim":
-                            poisoned_df.loc[i, f"{label}_label_{j}"] = 'Swim'
-                        elif self.poisoning_conf["label_mode"] == "flip":
-                            flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
-                            while flipped_label == poisoned_df.loc[i, f"{label}_label_{j}"]:
-                                flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
-                            poisoned_df.loc[i, f"{label}_label_{j}"] = flipped_label
+            poisoned_df = self.random_poisoning(poisoned_df, attack_labels)
+        elif self.poisoning_conf["position"]["in_column"] == "sequential":
+            poisoned_df = self.sequential_poisoning(poisoned_df, attack_labels)
 
         column_order = sorted(poisoned_df.columns)
         poisoned_df = poisoned_df[column_order]
 
         return poisoned_df
 
+    def random_poisoning(self, df, attack_labels):
+        num_rows_to_poison = int(len(df) * self.poisoning_conf["position"]["rate"])
+        self.indices_to_poison = random.sample(range(len(df)), num_rows_to_poison)
+
+        for i in self.indices_to_poison:
+            for j in range(self.poisoning_conf["position"]["num_of_column"]):
+                for label in attack_labels:
+                    if self.poisoning_conf["label_mode"] == "swim":
+                        df.loc[i, f"{label}_label_{j}"] = 'Swim'
+                    elif self.poisoning_conf["label_mode"] == "flip":
+                        df.loc[i, f"{label}_label_{j}"] = self.flip_label(df, i, label, j)
+        return df
+
+    def sequential_poisoning(self, df, attack_labels):
+        total_length = len(df)
+        num_rows_to_poison = int(total_length * self.poisoning_conf["position"]["rate"])
+        sequence_length = self.poisoning_conf["position"]["sequence_length"]
+        num_poison_blocks = (num_rows_to_poison // sequence_length) + 1
+        num_of_block = total_length // num_poison_blocks
+        poison_counter = 0
+
+        if num_poison_blocks * sequence_length > total_length:
+            raise ValueError("Too many elements to poison")
+
+        for block_index in range(num_poison_blocks):
+            start_index = random.randint(block_index*num_of_block, (block_index+1)*num_of_block - sequence_length + 1)
+            for i in range(start_index, start_index + sequence_length):
+                if poison_counter >= num_rows_to_poison:
+                    break
+
+                for j in range(self.poisoning_conf["position"]["num_of_column"]):
+                    for label in attack_labels:
+                        if self.poisoning_conf["label_mode"] == "swim":
+                            df.loc[i, f"{label}_label_{j}"] = 'Swim'
+                        elif self.poisoning_conf["label_mode"] == "flip":
+                            df.loc[i, f"{label}_label_{j}"] = self.flip_label(df, i, label, j)
+                poison_counter += 1
+        return df
+
     def duplicate_attack_columns(self, df, attack_labels):
         for label in attack_labels:
             for i in range(1, self.num_sensor_labels):
                 df[f"{label}_label_{i}"] = df[f"{label}_label_0"].copy()
         return df
+
+    def flip_label(self, df, index, label, column):
+        flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
+        while flipped_label == df.loc[index, f"{label}_label_{column}"]:
+            flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
+        return flipped_label
 
 
 def export_csv(df, filename):
@@ -159,9 +192,9 @@ def main(cfg: DictConfig):
     filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
     export_csv(poisoned_df, filename)
 
-    csv_text = poisoned_df.to_csv(index=False, header=False)
-    conversation = llm_experiment(UCI_data_handler, cfg.gpt_model, poisoned_df, csv_text)
-    export_llm_conversation(conversation, filename)
+    # csv_text = poisoned_df.to_csv(index=False, header=False)
+    # conversation = llm_experiment(UCI_data_handler, cfg.gpt_model, poisoned_df, csv_text)
+    # export_llm_conversation(conversation, filename)
    
 
 if __name__ == "__main__":
