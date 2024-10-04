@@ -4,6 +4,7 @@
 **/.DS_Store
 
 /flower
+.env
 
 # Ignore compiled Python files
 **/__pycache__/
@@ -17,6 +18,7 @@ heterofl_on_simulation/venv/
 heterofl_on_simulation/data/
 heterofl_on_simulation/outputs/
 
+llm_reasoning_benchmark/OpportunityUCIDataset/
 # Optionally, ignore IDE or editor-specific files
 .vscode/
 *.swp
