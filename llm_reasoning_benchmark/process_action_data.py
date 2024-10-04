@@ -75,7 +75,8 @@ class UCIDataHandler():
         self.indices_to_poison = random.sample(range(len(df)), num_rows_to_poison)
 
         for i in self.indices_to_poison:
-            for j in range(self.poisoning_conf["position"]["num_of_column"]):
+            poisoning_column_indices = random.sample(range(self.num_sensor_labels), self.poisoning_conf["position"]["num_of_column"])
+            for j in poisoning_column_indices:
                 for label in attack_labels:
                     if self.poisoning_conf["label_mode"] == "swim":
                         df.loc[i, f"{label}_label_{j}"] = 'Swim'
