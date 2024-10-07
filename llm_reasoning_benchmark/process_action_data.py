@@ -119,7 +119,7 @@ class UCIDataHandler():
         return df
 
     def flip_label(self, df, index, label, column):
-        flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
+        flipped_label = (list(self.config["locomotion_label_legend"].values()))
         while flipped_label == df.loc[index, f"{label}_label_{column}"]:
             flipped_label = random.choice(list(self.config["locomotion_label_legend"].values()))
         return flipped_label
@@ -164,7 +164,7 @@ def llm_experiment(UCI_data_handler, gpt_model, poisoned_df, csv_text):
         Could you help explain step by step what might have happened and determine what situation the person might be in?
     """
 
-    poisoned_index = random.choice(UCI_data_handler.indices_to_poison)
+    poisoned_index = random.choice(UCI_data_handler.indices_to_poison) if UCI_data_handler.indices_to_poison else 0
     relative_time = poisoned_df.loc[poisoned_index, "relative_time(s)"]
     second_question = f"""
         Based on the context, what might have happened at {relative_time} seconds?
