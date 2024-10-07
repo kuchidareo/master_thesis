@@ -34,3 +34,16 @@ UCI_dataset_config = {
         "405506": "Toggle Switch"
     },
 }
+UCI_ex_result_annotation = {
+    "story_correction": {
+        "gpt-4o-2024-08-06": {
+            0.1: [True, True, False, True, True, True, True, True, True, True],
+            0.2: [True, True, True, False, True, True, True, True, True, True],
+            0.3: [True, True, True, True, True, True, True, True, False, True],
+            0.4: [False, False, False, True, True, False, False, False, True, False],
+            0.5: [True, True, False, True, False, True, False, True, True, True],
+            0.6: [False, False, False, True, False, False, True, False, False, False],
+            0.7: [False, True, False, False, False, False, True, False, False, True]
+        }
+    }
+}
