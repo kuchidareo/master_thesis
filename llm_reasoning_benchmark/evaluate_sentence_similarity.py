@@ -1,4 +1,4 @@
-from collections import defaultdict
+import csv
 import os
 
 from sentence_transformers import SentenceTransformer, util
@@ -39,11 +39,15 @@ class SentenceSimilarity:
     def get_pca_embedding(self):
         pca = PCA(n_components=self.pca_components)
         if self.model_type == "sentence-transformer":
-            embedding_list = [self.model.encode(sentence, convert_to_tensor=True).cpu() for sentence in self.sentence_list]  
+            embedding_list = [self.model.encode(self.base_sentence, convert_to_tensor=True).cpu()]
+            embedding_list.extend([self.model.encode(sentence, convert_to_tensor=True).cpu() for sentence in self.sentence_list])
         elif self.model_type == "openai-embeddings":
-            embedding_list = [client.embeddings.create(input=[sentence], model=self.model).data[0].embedding for sentence in self.sentence_list]
+            embedding_list = [client.embeddings.create(input=[self.base_sentence], model=self.model).data[0].embedding]
+            embedding_list.extend([client.embeddings.create(input=[sentence], model=self.model).data[0].embedding for sentence in self.sentence_list])
+
         pca.fit(embedding_list)
-        return pca.transform(embedding_list)        
+        pca_list = pca.transform(embedding_list)
+        return {"baseline": pca_list[0], "sentence": pca_list[1:]}
     
     def get_cosine_similarity_list(self):
         for sentence in self.sentence_list:
@@ -54,19 +58,32 @@ class SentenceSimilarity:
         pca_embedding = self.get_pca_embedding()
         title = f"{ex_tag}_{embedding_model}_{model}_{rate}"
 
-        plt.scatter(0.0, 0.0, c="blue")
-        plt.annotate(f'baseline', (0.0, 0.0))
+        plt.scatter(pca_embedding["baseline"][0], pca_embedding["baseline"][1], c="blue")
+        plt.annotate(f'baseline', (pca_embedding["baseline"][0], pca_embedding["baseline"][1]))
 
         for i in range(len(self.sentence_list)):
             color = "blue" if annotation[ex_tag][model][rate][i] else "red"
-            plt.scatter(pca_embedding[i, 0], pca_embedding[i, 1], c=color)
-            plt.annotate(f'trial: {i+1}', (pca_embedding[i, 0], pca_embedding[i, 1]))
+            plt.scatter(pca_embedding["sentence"][i, 0], pca_embedding["sentence"][i, 1], c=color)
+            plt.annotate(f'trial: {i+1}', (pca_embedding["sentence"][i, 0], pca_embedding["sentence"][i, 1]))
 
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
-        plt.savefig(os.path.join("ex_result", ex_tag, "pca_fig", f"{title}.png"))
+        # plt.savefig(os.path.join("ex_result", ex_tag, "pca_fig", f"{title}.png"))
         plt.show()
+
+        # For zhigang analysis
+        self.export_pca_embedding_to_csv(pca_embedding, annotation, ex_tag, model, embedding_model, rate)
+
+    def export_pca_embedding_to_csv(self, pca_embedding, annotation, ex_tag, model, embedding_model, rate):
+        csv_path = os.path.join("log_for_paper_figures", ex_tag, "pca_embedding", f"{ex_tag}_{embedding_model}_{model}_{rate}.csv")
+        with open(csv_path, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Trial', 'Color', 'PCA_X', 'PCA_Y'])
+            writer.writerow(["baseline", "blue", pca_embedding["baseline"][0], pca_embedding["baseline"][1]])
+            for i, embedding in enumerate(pca_embedding["sentence"]):
+                color = "blue" if annotation[ex_tag][model][rate][i] else "red"
+                writer.writerow([i+1, color, embedding[0], embedding[1]])
 
     def make_cosine_dist_plot(self, cosine_similarity, annotation, ex_tag, model, embedding_model, rate, xlabel, ylabel):
         title = f"{ex_tag}_{embedding_model}_{model}_{rate}"
@@ -77,7 +94,6 @@ class SentenceSimilarity:
             plt.bar(i+1, cosine_similarity[i], color=color)
 
         # Add title and labels
-        title = f"{ex_tag}_{embedding_model}_{model}_{rate}"
         plt.title(title)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
@@ -93,10 +109,9 @@ def extract_sentence_list(base_sentence_path, path_list):
         lines = str(file.readlines())
         start_index = lines.find('### assistant') + 1
         end_index = lines.rfind('### user')
-        base_sentence = str([line.strip() for line in lines[start_index:end_index]])
+        base_sentence = str(lines[start_index:end_index].strip())
 
     for path in path_list:
-        print(path)
         with open(path, 'r') as file:
             lines = str(file.readlines())
             start_index = lines.find('### assistant') + 1
@@ -128,6 +143,8 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 def main():
     for rate in rates: 
         path_list = get_path_list(ex_tag, model, rate)
+        # path_list = [os.path.join('ex_result', 'baseline_story', "S1-ADL1.dat_gpt-4o-2024-08-06_1_['locomotion']_swim_random_1_0.0_2.md")]
+
         base_sentence, sentence_list = extract_sentence_list(base_sentence_path, path_list)
         similarity = SentenceSimilarity(base_sentence, sentence_list, model_name=embedding_model)
         similarity.make_pca_plot(
@@ -147,7 +164,7 @@ def main():
             model,
             embedding_model,
             rate,
-            xlabel="Rate",
+            xlabel="Trial ID",
             ylabel="Cosine Distance",
         )
 

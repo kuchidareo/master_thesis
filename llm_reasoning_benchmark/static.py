@@ -37,6 +37,7 @@ UCI_dataset_config = {
 UCI_ex_result_annotation = {
     "story_correction": {
         "gpt-4o-2024-08-06": {
+            0.0: [True, True],
             0.1: [True, True, False, True, True, True, True, True, True, True],
             0.2: [True, True, True, False, True, True, True, True, True, True],
             0.3: [True, True, True, True, True, True, True, True, False, True],
