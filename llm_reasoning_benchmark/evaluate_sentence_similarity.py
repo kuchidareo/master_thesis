@@ -26,7 +26,7 @@ class SentenceSimilarity:
         self.cosine_similarity_list = []
 
     def get_cosine_similarity(self, sentence1, sentence2):
-        if self.model_type == "sentence_transformer":
+        if self.model_type == "sentence-transformer":
             embedding1 = self.model.encode(sentence1, convert_to_tensor=True)
             embedding2 = self.model.encode(sentence2, convert_to_tensor=True)
         elif self.model_type == "openai-embeddings":
@@ -50,7 +50,7 @@ class SentenceSimilarity:
             self.cosine_similarity_list.append(self.get_cosine_similarity(sentence, self.base_sentence))
         return self.cosine_similarity_list
     
-    def make_plot(self, annotation, ex_tag, model, embedding_model, rate, xlabel, ylabel):
+    def make_pca_plot(self, annotation, ex_tag, model, embedding_model, rate, xlabel, ylabel):
         pca_embedding = self.get_pca_embedding()
         title = f"{ex_tag}_{embedding_model}_{model}_{rate}"
 
@@ -66,6 +66,24 @@ class SentenceSimilarity:
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.savefig(os.path.join("ex_result", ex_tag, "pca_fig", f"{title}.png"))
+        plt.show()
+
+    def make_cosine_dist_plot(self, cosine_similarity, annotation, ex_tag, model, embedding_model, rate, xlabel, ylabel):
+        title = f"{ex_tag}_{embedding_model}_{model}_{rate}"
+
+        # Create a bar plot with color based on UCI_ex_annotation
+        for i in range(len(self.sentence_list)):
+            color = "blue" if annotation[ex_tag][model][rate][i] else "red"
+            plt.bar(i+1, cosine_similarity[i], color=color)
+
+        # Add title and labels
+        title = f"{ex_tag}_{embedding_model}_{model}_{rate}"
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+
+        # Show the plot
+        plt.savefig(os.path.join("ex_result", ex_tag, "cosine_dist_fig", f"{title}.png"))
         plt.show()
 
     
@@ -101,19 +119,18 @@ def get_path_list(ex_tag, model, rate):
 
 ex_tag = "story_correction" # binary_choice, story_correction, seq_story_correction
 model = "gpt-4o-2024-08-06"
-embedding_model = "all-MiniLM-L6-v2" # all-MiniLM-L6-v2, text-embedding-3-small
+embedding_model = "text-embedding-3-small" # all-MiniLM-L6-v2, text-embedding-3-small
 rates = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
 
 base_sentence_path = os.path.join('ex_result', 'baseline_story', "S1-ADL1.dat_gpt-4o-2024-08-06_1_['locomotion']_swim_random_1_0.0_1.md")
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def main():
-    cosine_similarity_list = defaultdict(list)
     for rate in rates: 
         path_list = get_path_list(ex_tag, model, rate)
         base_sentence, sentence_list = extract_sentence_list(base_sentence_path, path_list)
         similarity = SentenceSimilarity(base_sentence, sentence_list, model_name=embedding_model)
-        similarity.make_plot(
+        similarity.make_pca_plot(
             UCI_ex_result_annotation,
             ex_tag=ex_tag,
             model=model,
@@ -122,9 +139,17 @@ def main():
             xlabel="PCA 1",
             ylabel="PCA 2"
         )
-        cosine_similarity_list[rate] = similarity.get_cosine_similarity_list()
-
-    print(cosine_similarity_list)
+        cosine_similarity_list = similarity.get_cosine_similarity_list()
+        similarity.make_cosine_dist_plot(
+            cosine_similarity_list,
+            UCI_ex_result_annotation,
+            ex_tag,
+            model,
+            embedding_model,
+            rate,
+            xlabel="Rate",
+            ylabel="Cosine Distance",
+        )
 
 if __name__ == "__main__":
     main()
