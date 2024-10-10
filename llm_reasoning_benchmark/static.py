@@ -78,3 +78,35 @@ UCI_ex_result_annotation = {
         }
     }
 }
+UCI_index_to_label = {
+    0: "None",
+    1: "Stand",
+    2: "Walk",
+    3: "Sit",
+    4: "Lie"
+}
+UCI_label_to_index = {
+    "None": 0,
+    "Stand": 1,
+    "Walk": 2,
+    "Sit": 3,
+    "Lie": 4
+}
+UCI_misclassify_trend = {
+    "cnn_confusion_matrix": [
+        [1200, 0, 0, 0, 0],
+        [2, 1188, 23, 0, 0],
+        [1, 0, 706, 11, 0],
+        [0, 0, 3, 589, 1],
+        [0, 0, 0, 1, 247],
+    ],
+    "misclassify_trend": [
+        ["Stand", "Null", 0.034278133339900256],
+        ["Stand", "Walk", 0.39419853340885297],
+        ["Walk", "Null", 0.028954997034330788],
+        ["Walk", "Sit", 0.31850496737763867],
+        ["Sit", "Walk", 0.10517548669805821],
+        ["Sit", "Lie", 0.0350584955660194],
+        ["Lie", "Sit", 0.08382938657519962],
+    ],
+}
