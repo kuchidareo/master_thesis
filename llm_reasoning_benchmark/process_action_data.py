@@ -119,7 +119,6 @@ class UCIDataHandler():
         columns_to_poison = random.sample(
             range(self.num_sensor_labels), 
             self.poisoning_conf["position"]["num_of_column"]
-        
         )
 
         for column_index in columns_to_poison:
@@ -135,8 +134,17 @@ class UCIDataHandler():
                     weights=misclassify_trend_rate, 
                     k=num_rows_to_poison
                 )
-                for attack_label, change_label, _ in misclassifications:
-                    self.apply_label_change(df, label, column_index, attack_label, change_label)
+                if self.poisoning_conf["label_mode"] == "real":
+                    for attack_label, change_label, _ in misclassifications:
+                        self.apply_label_change(df, label, column_index, attack_label, change_label)
+                elif self.poisoning_conf["label_mode"] == "fuse":
+                    for attack_label, _, _ in misclassifications:
+                        if label == "locomotion":
+                            change_label = "Swim"
+                        elif label == "gesture":
+                            change_label = "Shake Hands"
+                        self.apply_label_change(df, label, column_index, attack_label, change_label)
+                        
         return df
 
     def duplicate_attack_columns(self, df, attack_labels):
@@ -231,25 +239,24 @@ def main(cfg: DictConfig):
 
     UCI_data_handler = UCIDataHandler(get_original_cwd(), cfg.dataset_name, cfg.num_sensor_labels, cfg.poisoning_conf)
     df = UCI_data_handler.load_df()
-    # activity_col_idx = UCI_dataset_config["HL_Activity_column_index"]
-    # activity_df = df.iloc[:, activity_col_idx]
-    # print(activity_df.value_counts().values)
+    activity_col_idx = UCI_dataset_config["HL_Activity_column_index"]
+    activity_df = df.iloc[:, activity_col_idx]
+    print(activity_df.value_counts())
 
-    filtered_df = UCI_data_handler.filter(df)
-    poisoned_df = UCI_data_handler.poisoning(filtered_df)
+    # filtered_df = UCI_data_handler.filter(df)
+    # poisoned_df = UCI_data_handler.poisoning(filtered_df)
 
-    filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
-    export_csv(poisoned_df, filename)
+    # filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
+    # export_csv(poisoned_df, filename)
 
-    csv_text = poisoned_df.to_csv(index=False, header=False)
+    # csv_text = poisoned_df.to_csv(index=False, header=False)
 
-    if cfg.experiment_type == "household":
-        conversation = household_experiment(csv_text, cfg.gpt_model, poisoned_df, UCI_data_handler)
-    elif cfg.experiment_type == "measure_activity_duration":
-        conversation = measure_activity_duration(csv_text, cfg.gpt_model)
+    # if cfg.experiment_type == "household":
+    #     conversation = household_experiment(csv_text, cfg.gpt_model, poisoned_df, UCI_data_handler)
+    # elif cfg.experiment_type == "measure_activity_duration":
+    #     conversation = measure_activity_duration(csv_text, cfg.gpt_model)
 
-    export_llm_conversation(conversation, filename)
-   
+    # export_llm_conversation(conversation, filename)
 
 if __name__ == "__main__":
     main()

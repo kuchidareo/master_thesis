@@ -189,7 +189,8 @@ UCI_cnn_gesture_confusion_matrix = [
 ]
 UCI_locomotion_misclassify_trend = calculate_misclassification_trend(UCI_cnn_locomotion_confusion_matrix, UCI_index_to_locomotion_label)
 UCI_gesture_misclassify_trend = calculate_misclassification_trend(UCI_cnn_gesture_confusion_matrix, UCI_index_to_gesture_label)
-
+# print(UCI_locomotion_misclassify_trend)
+print(UCI_gesture_misclassify_trend)
 UCI_activity_durations = {
     "Relaxing": 57,
     "Coffee-time": 178,
