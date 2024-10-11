@@ -14,6 +14,13 @@ UCI_dataset_config = {
         "4": "Sit",
         "5": "Lie"
     },
+    "activity_label_legend": {
+        "101": "Relaxing",
+        "102": "Coffee time",
+        "103": "Early morning",
+        "104": "Cleanup",
+        "105": "Sandwich time",
+    },
     "ML_Both_Arms_label_legend": {
         "406516": "Open Door 1",
         "406517": "Open Door 2",
@@ -78,35 +85,131 @@ UCI_ex_result_annotation = {
         }
     }
 }
-UCI_index_to_label = {
+UCI_index_to_locomotion_label = {
     0: "None",
     1: "Stand",
     2: "Walk",
     3: "Sit",
     4: "Lie"
 }
-UCI_label_to_index = {
+UCI_locomotion_label_to_index = {
     "None": 0,
     "Stand": 1,
     "Walk": 2,
     "Sit": 3,
     "Lie": 4
 }
-UCI_misclassify_trend = {
-    "cnn_confusion_matrix": [
-        [1200, 0, 0, 0, 0],
-        [2, 1188, 23, 0, 0],
-        [1, 0, 706, 11, 0],
-        [0, 0, 3, 589, 1],
-        [0, 0, 0, 1, 247],
-    ],
-    "misclassify_trend": [
-        ["Stand", "Null", 0.034278133339900256],
-        ["Stand", "Walk", 0.39419853340885297],
-        ["Walk", "Null", 0.028954997034330788],
-        ["Walk", "Sit", 0.31850496737763867],
-        ["Sit", "Walk", 0.10517548669805821],
-        ["Sit", "Lie", 0.0350584955660194],
-        ["Lie", "Sit", 0.08382938657519962],
-    ],
+UCI_index_to_gesture_label = {
+    0: "None",
+    1: "Open Door 1",
+    2: "Open Door 2",
+    3: "Close Door 1",
+    4: "Close Door 2",
+    5: "Open Fridge",
+    6: "Close Fridge",
+    7: "Open Dishwasher",
+    8: "Close Dishwasher",
+    9: "Open Drawer 1",
+    10: "Close Drawer 1",
+    11: "Open Drawer 2",
+    12: "Close Drawer 2",
+    13: "Open Drawer 3",
+    14: "Close Drawer 3",
+    15: "Clean Table",
+    16: "Drink from Cup",
+    17: "Toggle Switch"
 }
+UCI_gesture_label_to_index = {
+    "None": 0,
+    "Open Door 1": 1,
+    "Open Door 2": 2,
+    "Close Door 1": 3,
+    "Close Door 2": 4,
+    "Open Fridge": 5,
+    "Close Fridge": 6,
+    "Open Dishwasher": 7,
+    "Close Dishwasher": 8,
+    "Open Drawer 1": 9,
+    "Close Drawer 1": 10,
+    "Open Drawer 2": 11,
+    "Close Drawer 2": 12,
+    "Open Drawer 3": 13,
+    "Close Drawer 3": 14,
+    "Clean Table": 15,
+    "Drink from Cup": 16,
+    "Toggle Switch": 17
+}
+
+def calculate_misclassification_trend(confusion_matrix, index_to_label):
+    regular_matrix = [[0 for _ in range(len(confusion_matrix))] for _ in range(len(confusion_matrix[0]))]
+    misclassify_trend = []
+    total_proportion = 0
+
+    for i, row in enumerate(confusion_matrix):
+        num_total = sum(row)
+        for j, value in enumerate(row):
+            if i == j:
+                regular_matrix[i][j] = 0
+            else:
+                regular_matrix[i][j] = value / num_total
+                total_proportion += value / num_total
+
+    for i, row in enumerate(regular_matrix):
+        for j, value in enumerate(row):
+            probability = value / total_proportion
+            if probability > 0.0:
+                misclassify_trend.append([index_to_label[i], index_to_label[j], probability])
+    return misclassify_trend
+
+UCI_cnn_locomotion_confusion_matrix = [
+    [1200, 0, 0, 0, 0],
+    [2, 1188, 23, 0, 0],
+    [1, 0, 706, 11, 0],
+    [0, 0, 3, 589, 1],
+    [0, 0, 0, 1, 247],
+]
+UCI_cnn_gesture_confusion_matrix = [
+    [4297, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+    [0, 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 1, 96, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 1, 79, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 35, 1, 0, 0, 0, 0, 2, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 30, 1, 0, 0, 0, 5, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 2, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 17, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 24, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 205, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 20],
+]
+UCI_locomotion_misclassify_trend = calculate_misclassification_trend(UCI_cnn_locomotion_confusion_matrix, UCI_index_to_locomotion_label)
+UCI_gesture_misclassify_trend = calculate_misclassification_trend(UCI_cnn_gesture_confusion_matrix, UCI_index_to_gesture_label)
+
+UCI_activity_durations = {
+    "Relaxing": 57,
+    "Coffee-time": 178,
+    "Early-morning": 349,
+    "Cleanup": 160,
+    "Sandwich-time": 319,
+}
+
+UCI_household_llm_ex_questions = [
+    """
+This CSV file provides timestamps along with human activity labels captured by different independent sensors.
+Could you help explain step by step what might have happened and determine what situation the person might be in?
+    """,
+    """
+Based on the context, what might have happened at
+    """,
+]
+UCI_activity_duration_measure_llm_ex_questions = [
+    """
+This CSV file provides timestamps along with human activity labels captured by different independent sensors.
+Calculate the duration of each activity: Relaxing, Coffee time, Early morning, Cleanup, and Sandwich time.
+    """,
+]

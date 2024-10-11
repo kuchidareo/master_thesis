@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 import torch
 
-from static import UCI_ex_result_annotation
+from static import UCI_ex_result_annotation, UCI_activity_durations
 
 # Import the all csv data from story_correction/cosine_similarity dir.
 # The file name contains the poisoning rate. e.g. story_correction_text-embedding-3-small_gpt-4o-2024-08-06_0.1.csv
@@ -74,6 +74,25 @@ def import_embedding_data(ex_tag):
                 index += 1
     
     return returning_list, index_to_content
+
+def import_measure_activity_duration_csv_file(ex_tag):
+    data = {}
+    with open (f"{ex_tag}/log.csv") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if row[1] == "gpt_model":
+                continue
+            model, rate, trial = row[1], row[2], row[3]
+            cleanup, coffee_time, early_morning, relaxing, sandwich_time = row[-5], row[-4], row[-3], row[-2], row[-1]
+
+            if model not in data:
+                data[model] = {}
+            if rate not in data[model]:
+                data[model][rate] = []
+            
+            data[model][rate].append((trial, {"Relaxing": relaxing, "Coffee-time": coffee_time, "Early-morning": early_morning, "Cleanup": cleanup, "Sandwich-time": sandwich_time}))
+            data[model][rate].sort(key=lambda x: x[0])
+    return data
 
 # Make box figure of accuracy on the different rate of poisoning .
 def make_cosine_similarity_box_figure():
@@ -150,7 +169,7 @@ def make_line_plot_of_cosine_similarity():
 def make_pca_plot():
     ex_tag = "story_correction"
     embedding, index_to_content = import_embedding_data(ex_tag)
-    import pdb; pdb.set_trace()
+
     pca = PCA(n_components=2)
     pca.fit(embedding)
     pca_list = pca.transform(embedding)
@@ -180,13 +199,36 @@ def make_pca_plot():
     plt.savefig("pca_plot.png")
     plt.show()
 
+def make_activity_duration_box_plot():
+    ex_tag = "measure_activity_duration"
+    model = "gpt-3.5-turbo" # gpt-3.5-turbo, gpt-4o-mini, gpt-4o-2024-08-06
+    activity_label = "Sandwich-time" # Relaxing, Coffee-time, Early-morning, Cleanup, Sandwich-time
+    data = import_measure_activity_duration_csv_file(ex_tag)[model]
+    
+    durations = {rate: [] for rate in data.keys()}  # Initialize with empty lists for each rate
+    durations["label"] = [UCI_activity_durations[activity_label] for _ in range(5)]
+    for rate, rows in data.items():
+        for row in rows:
+            if row[1][activity_label] == "":
+                continue
+            durations[rate].append(float(row[1][activity_label]))  # Collect cosine similarities for each rate
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.boxplot(durations.values())
+    ax.set_xticklabels([f"{rate}" for rate in durations.keys()])
+    ax.set_ylabel("Duration")
+    ax.set_title(f"{model}_{activity_label}_Activity Duration")
+    plt.savefig(f"measure_activity_duration/{model}_{activity_label}.png")
+    plt.show()
 
 
 def main():
     # make_cosine_similarity_box_figure()
     # make_line_plot_of_accuracy()
     # make_line_plot_of_cosine_similarity()
-    make_pca_plot()
+    # make_pca_plot()
+    make_activity_duration_box_plot()
 
 if __name__ == "__main__":
     main()

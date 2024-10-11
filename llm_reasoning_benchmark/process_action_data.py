@@ -7,7 +7,7 @@ import pandas as pd
 from omegaconf import DictConfig, OmegaConf
 from openai import OpenAI
 
-from static import UCI_dataset_config, UCI_label_to_index, UCI_index_to_label, UCI_misclassify_trend
+from static import UCI_dataset_config, UCI_locomotion_misclassify_trend, UCI_gesture_misclassify_trend, UCI_household_llm_ex_questions, UCI_activity_duration_measure_llm_ex_questions
 
 class UCIDataHandler():
     config = UCI_dataset_config
@@ -115,7 +115,6 @@ class UCIDataHandler():
 
     def real_poisoning(self, df, attack_labels):
         num_rows_to_poison = int(len(df) * self.poisoning_conf["position"]["rate"])
-        misclassify_trend_rate = [row[2] for row in UCI_misclassify_trend["misclassify_trend"]]
         
         columns_to_poison = random.sample(
             range(self.num_sensor_labels), 
@@ -125,8 +124,14 @@ class UCIDataHandler():
 
         for column_index in columns_to_poison:
             for label in attack_labels:
+                if label == "locomotion":
+                    misclassify_trend = UCI_locomotion_misclassify_trend
+                elif label == "gesture":
+                    misclassify_trend = UCI_gesture_misclassify_trend
+
+                misclassify_trend_rate = [row[2] for row in misclassify_trend]
                 misclassifications = random.choices(
-                    UCI_misclassify_trend["misclassify_trend"], 
+                    misclassify_trend,
                     weights=misclassify_trend_rate, 
                     k=num_rows_to_poison
                 )
@@ -153,7 +158,7 @@ class UCIDataHandler():
         if not target_indexes.empty:
             target_index = random.choice(target_indexes)
             df.loc[target_index, f"{label}_label_{column_index}"] = change_label
-            print(f"index: {target_index}: {attack_label} -> {change_label}")
+            print(f"index: {target_index}, {label}_label_{column_index}: {attack_label} -> {change_label}")
         else:
             print(f"No instances of {attack_label} found in column {label}_label_{column_index}")
 
@@ -189,27 +194,31 @@ def get_answer_from_llm(conversation, gpt_model):
 
     return response.choices[0].message.content
 
-
-def llm_experiment(UCI_data_handler, gpt_model, poisoned_df, csv_text):
+def llm_experiment(gpt_model, questions):
     conversation = [{"role": "system", "content": "You are a helpful assstant. You'll read sensor label table and analyze what might have happened."}]
     
-    first_question = """
-        This CSV file provides timestamps along with human activity labels captured by different independent sensors.
-        Could you help explain step by step what might have happened and determine what situation the person might be in?
-    """
+    for question in questions:
+        conversation.append({"role": "user", "content": question})
+        answer = get_answer_from_llm(conversation, gpt_model)
+        conversation.append({"role": "assistant", "content": answer})
 
+    return conversation
+
+def household_experiment(csv_text, gpt_model, poisoned_df, UCI_data_handler):
+    first_question = f"{UCI_household_llm_ex_questions[0]}\n{csv_text}"
     poisoned_index = random.choice(UCI_data_handler.indices_to_poison) if UCI_data_handler.indices_to_poison else 0
     relative_time = poisoned_df.loc[poisoned_index, "relative_time(s)"]
-    second_question = f"""
-        Based on the context, what might have happened at {relative_time} seconds?
-    """
-    
-    conversation.append({"role": "user", "content": f"{first_question}\n{csv_text}"})
-    first_answer = get_answer_from_llm(conversation, gpt_model)
-    conversation.append({"role": "assistant", "content": first_answer})
-    conversation.append({"role": "user", "content": second_question})
-    second_answer = get_answer_from_llm(conversation, gpt_model)
-    conversation.append({"role": "assistant", "content": second_answer})
+    second_question = f"{UCI_household_llm_ex_questions[1]} at {relative_time} seconds."
+
+    questions = [first_question, second_question]
+    conversation = llm_experiment(gpt_model, questions)
+
+    return conversation
+
+def measure_activity_duration(csv_text, gpt_model):
+    first_question = f"{UCI_activity_duration_measure_llm_ex_questions[0]}\n{csv_text}"
+    questions = [first_question]
+    conversation = llm_experiment(gpt_model, questions)
 
     return conversation
 
@@ -222,6 +231,9 @@ def main(cfg: DictConfig):
 
     UCI_data_handler = UCIDataHandler(get_original_cwd(), cfg.dataset_name, cfg.num_sensor_labels, cfg.poisoning_conf)
     df = UCI_data_handler.load_df()
+    # activity_col_idx = UCI_dataset_config["HL_Activity_column_index"]
+    # activity_df = df.iloc[:, activity_col_idx]
+    # print(activity_df.value_counts().values)
 
     filtered_df = UCI_data_handler.filter(df)
     poisoned_df = UCI_data_handler.poisoning(filtered_df)
@@ -229,9 +241,14 @@ def main(cfg: DictConfig):
     filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
     export_csv(poisoned_df, filename)
 
-    # csv_text = poisoned_df.to_csv(index=False, header=False)
-    # conversation = llm_experiment(UCI_data_handler, cfg.gpt_model, poisoned_df, csv_text)
-    # export_llm_conversation(conversation, filename)
+    csv_text = poisoned_df.to_csv(index=False, header=False)
+
+    if cfg.experiment_type == "household":
+        conversation = household_experiment(csv_text, cfg.gpt_model, poisoned_df, UCI_data_handler)
+    elif cfg.experiment_type == "measure_activity_duration":
+        conversation = measure_activity_duration(csv_text, cfg.gpt_model)
+
+    export_llm_conversation(conversation, filename)
    
 
 if __name__ == "__main__":

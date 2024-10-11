@@ -78,3 +78,10 @@ UCI_ex_result_annotation = {
         }
     }
 }
+UCI_activity_durations = {
+    "Relaxing": 57,
+    "Coffee-time": 178,
+    "Early-morning": 349,
+    "Cleanup": 160,
+    "Sandwich-time": 319,
+}
