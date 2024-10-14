@@ -4,6 +4,8 @@ import os
 import numpy as np
 from numpy.linalg import norm
 import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 from sklearn.decomposition import PCA
 import torch
 
@@ -100,23 +102,24 @@ def import_measure_activity_duration_csv_file(ex_tag):
 # Make box figure of accuracy on the different rate of poisoning .
 def make_cosine_similarity_box_figure():
     ex_tag = "story_correction"
-    model = "gpt-4o-2024-08-06"
-    data = import_csv_data(ex_tag)[model]
-    cosine_similarity = {rate: [] for rate in data.keys()}  # Initialize with empty lists for each rate
-    for rate, rows in data.items():
-        for row in rows:
-            if row[0] == "Trial" or row[0] == "baseline":
-                continue
-            cosine_similarity[rate].append(float(row[2]))  # Collect cosine similarities for each rate
+    models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o-2024-08-06"]
+    for model in models:
+        data = import_csv_data(ex_tag)[model]
+        cosine_similarity = {rate: [] for rate in data.keys()}  # Initialize with empty lists for each rate
+        for rate, rows in data.items():
+            for row in rows:
+                if row[0] == "Trial" or row[0] == "baseline":
+                    continue
+                cosine_similarity[rate].append(float(row[2]))  # Collect cosine similarities for each rate
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.boxplot(cosine_similarity.values())
-    ax.set_xticklabels([f"{rate}" for rate in cosine_similarity.keys()])
-    ax.set_ylabel("Cosine Similarity")
-    ax.set_title("Cosine Similarity of Story Correction")
-    plt.savefig("box_figure.png")
-    plt.show()
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.boxplot(cosine_similarity.values())
+        ax.set_xticklabels([f"{rate}" for rate in cosine_similarity.keys()])
+        ax.set_ylabel("Cosine Similarity")
+        ax.set_title("Cosine Similarity of Story Correction")
+        plt.savefig("box_figure.png")
+        plt.show()
 
 # Make a line plot of accuracy on the story_correction ex.
 def make_line_plot_of_accuracy():
@@ -230,43 +233,81 @@ def make_activity_duration_box_plot():
             plt.show()
 
 def make_activity_duration_box_plot_with_all_activities():
-    ex_tag = "measure_activity_duration_fuse"
-    model = "gpt-4o-2024-08-06" # gpt-3.5-turbo, gpt-4o-mini, gpt-4o-2024-08-06
+    ex_tag = "measure_activity_duration"
+    models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o-2024-08-06"] # gpt-3.5-turbo, gpt-4o-mini, gpt-4o-2024-08-06
     rate_extract = "0"
     activity_labels = ["Relaxing", "Coffee-time", "Early-morning", "Cleanup", "Sandwich-time"] # Relaxing, Coffee-time, Early-morning, Cleanup, Sandwich-time
 
-    data = import_measure_activity_duration_csv_file(ex_tag)[model]
-    durations = {activity_label: [] for activity_label in activity_labels}
-    for activity_label in activity_labels:
-        for rate, rows in data.items():
-            if rate == rate_extract:
-                for row in rows:
-                    if row[1][activity_label] == "":
-                        continue
-                    durations[activity_label].append(float(row[1][activity_label]))  # Collect cosine similarities for each rate
-    fig = plt.figure(figsize=(7,7))
-    ax = fig.add_subplot(111)
-    ax.boxplot(durations.values())
-    ax.set_xticklabels([activity_label for activity_label in durations.keys()], rotation=45, fontsize=8)
-    ax.set_ylabel("Duration(s)", fontsize=12)
-    # ax.set_title(f"{model}_{activity_label}_Activity Duration [Swim & Hand Shake]")
-    plt.savefig(f"{ex_tag}/all_activities_{model}.png")
-    plt.show()
-
     csv_path = os.path.join(ex_tag, "activity_duration_0.0_baseline.csv")
     with open(csv_path, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Model', 'activity_label', 'activity_duration'])
-        for label, duration in durations.items():
-            for value in duration:
-                writer.writerow([f"{model}", f"{label}", value])
+        for model in models:
+            data = import_measure_activity_duration_csv_file(ex_tag)[model]
+            durations = {activity_label: [] for activity_label in activity_labels}
+            for activity_label in activity_labels:
+                for rate, rows in data.items():
+                    if rate == rate_extract:
+                        for row in rows:
+                            if row[1][activity_label] == "":
+                                continue
+                            durations[activity_label].append(float(row[1][activity_label]))  # Collect cosine similarities for each rate
+            
+            fig = plt.figure(figsize=(7,7)) 
+            ax = fig.add_subplot(111)
+            ax.boxplot(durations.values())
+
+            writer = csv.writer(file)
+            writer.writerow(['Model', 'activity_label', 'activity_duration'])
+            for label, duration in durations.items():
+                for value in duration:
+                    writer.writerow([f"{model}", f"{label}", value])
+
+            ax.set_xticklabels([activity_label for activity_label in durations.keys()], rotation=45, fontsize=8)
+            ax.set_ylabel("Duration(s)", fontsize=12)
+            # ax.set_title(f"{model}_{activity_label}_Activity Duration [Swim & Hand Shake]")
+            plt.savefig(f"{ex_tag}/all_activities_{model}.png")
+            plt.show()
+
+def make_activity_duration_box_plot_with_all_activities_multiple():
+    ex_tag = "measure_activity_duration"
+    csv_path = os.path.join(ex_tag, "activity_duration_0.0_baseline.csv")
+    df = pd.read_csv(csv_path)
+    sns.set(font_scale=1.6)
+    sns.set_style("whitegrid")
+    plt.rcParams['figure.subplot.left'] = 0.17
+    plt.rcParams['figure.subplot.bottom'] = 0.23
+    
+    sns.boxplot(x='activity_label', y='activity_duration', hue="Model", data=df)
+    plt.xlabel("")
+    plt.xticks(rotation=30)
+    plt.ylabel("Duration(s)")
+    plt.savefig("activity_duration_0.0_baseline_test.png")
+    plt.show()
+
+def make_cosine_similarity():
+    ex_tag = "measure_activity_duration"
+    models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o"]
+    csv_path = os.path.join(ex_tag, "misclassification_ex_cosine_similarity.csv")
+    df = pd.read_csv(csv_path)
+    sns.set(font_scale=1.6)
+    sns.set_style("whitegrid")
+
+    sns.lineplot(
+        x="Rate",
+        y="cosine similarity",
+        hue="Model",
+        style="Model",
+        data=df,
+        markers=True,
+        dashes=False
+    )
+    plt.show()
 
 def calculate_cosine_similarity(a, b):
     return float(np.dot(a, b) / (norm(a) * norm(b)))
 
 
 def make_cosine_similarity_misclassification_plot():
-    ex_tag = "measure_activity_duration_fuse"
+    ex_tag = "measure_activity_duration"
     models = ["gpt-3.5-turbo", "gpt-4o-mini", "gpt-4o-2024-08-06"]
     correct_duration = [57, 178, 349, 160, 319]
     
@@ -292,7 +333,8 @@ def make_cosine_similarity_misclassification_plot():
     ax.set_xlabel("Misclassification Rate")
     ax.set_ylabel("Cosine Similarity")
     ax.legend()
-    # plt.savefig("cosine_similarity_misclassification.png")
+    plt.savefig("cosine_similarity_misclassification.png")
+    # plt.savefig("cosine_similarity_fuse.png")
 
     plt.show()
     
@@ -303,8 +345,10 @@ def main():
     # make_line_plot_of_cosine_similarity()
     # make_pca_plot()
     # make_activity_duration_box_plot()
-    make_activity_duration_box_plot_with_all_activities()
+    # make_activity_duration_box_plot_with_all_activities()
     # make_cosine_similarity_misclassification_plot()
+    # make_activity_duration_box_plot_with_all_activities_multiple()
+    make_cosine_similarity()
 
 if __name__ == "__main__":
     main()

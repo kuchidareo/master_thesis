@@ -1,0 +1,3 @@
+- gpt_model=gpt-4o-mini
+- trial=5
+- poisoning_conf.position.rate=0.5

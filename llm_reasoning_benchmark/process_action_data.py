@@ -8,6 +8,8 @@ from omegaconf import DictConfig, OmegaConf
 from openai import OpenAI
 
 from static import UCI_dataset_config, UCI_locomotion_misclassify_trend, UCI_gesture_misclassify_trend, UCI_household_llm_ex_questions, UCI_activity_duration_measure_llm_ex_questions
+from static import UCI_locomotion_label_to_index, UCI_gesture_label_to_index
+
 
 class UCIDataHandler():
     config = UCI_dataset_config
@@ -114,7 +116,13 @@ class UCIDataHandler():
         return df
 
     def real_poisoning(self, df, attack_labels):
-        num_rows_to_poison = int(len(df) * self.poisoning_conf["position"]["rate"])
+        non_zero_locomotion_rows = len(df[df['locomotion_label_0'] != "0"])
+        print(f"Number of rows where 'locomotion_label' is not 0: {non_zero_locomotion_rows}")
+        non_zero_gesture_rows = len(df[df['gesture_label_0'] != "0"])
+        print(f"Number of rows where 'gesture_label' is not 0: {non_zero_gesture_rows}")
+
+        num_rows_to_locomotion_poison = int(non_zero_locomotion_rows * self.poisoning_conf["position"]["rate"])
+        num_rows_to_gesture_poison = int(non_zero_gesture_rows * self.poisoning_conf["position"]["rate"])
         
         columns_to_poison = random.sample(
             range(self.num_sensor_labels), 
@@ -125,8 +133,12 @@ class UCIDataHandler():
             for label in attack_labels:
                 if label == "locomotion":
                     misclassify_trend = UCI_locomotion_misclassify_trend
+                    attack_labels = list(UCI_locomotion_label_to_index.keys())
+                    num_rows_to_poison = num_rows_to_locomotion_poison
                 elif label == "gesture":
                     misclassify_trend = UCI_gesture_misclassify_trend
+                    attack_labels = list(UCI_gesture_label_to_index.keys())
+                    num_rows_to_poison = num_rows_to_gesture_poison
 
                 misclassify_trend_rate = [row[2] for row in misclassify_trend]
                 misclassifications = random.choices(
@@ -136,14 +148,14 @@ class UCIDataHandler():
                 )
                 if self.poisoning_conf["label_mode"] == "real":
                     for attack_label, change_label, _ in misclassifications:
-                        self.apply_label_change(df, label, column_index, attack_label, change_label)
+                        self.apply_label_change(df, label, column_index, attack_label, change_label, attack_labels)
                 elif self.poisoning_conf["label_mode"] == "fuse":
                     for attack_label, _, _ in misclassifications:
                         if label == "locomotion":
                             change_label = "Swim"
                         elif label == "gesture":
                             change_label = "Shake Hands"
-                        self.apply_label_change(df, label, column_index, attack_label, change_label)
+                        self.apply_label_change(df, label, column_index, attack_label, change_label, attack_labels)
                         
         return df
 
@@ -161,15 +173,20 @@ class UCIDataHandler():
 
         return flipped_label
 
-    def apply_label_change(self, df, label, column_index, attack_label, change_label):
-        target_indexes = df[df[f"{label}_label_{column_index}"] == attack_label].index
-        if not target_indexes.empty:
-            target_index = random.choice(target_indexes)
-            df.loc[target_index, f"{label}_label_{column_index}"] = change_label
-            print(f"index: {target_index}, {label}_label_{column_index}: {attack_label} -> {change_label}")
-        else:
-            print(f"No instances of {attack_label} found in column {label}_label_{column_index}")
-
+    def apply_label_change(self, df, label, column_index, attack_label, change_label, attack_labels):
+        is_attacked = False
+        while not is_attacked:
+            target_indexes = df[df[f"{label}_label_{column_index}"] == attack_label].index
+            if not target_indexes.empty:
+                target_index = random.choice(target_indexes)
+                df.loc[target_index, f"{label}_label_{column_index}"] = change_label
+                print(f"index: {target_index}, {label}_label_{column_index}: {attack_label} -> {change_label}")
+                is_attacked = True
+            else:
+                print(f"No instances of {attack_label} found in column {label}_label_{column_index}")
+                attack_label = random.choice(attack_labels)
+                while attack_label == "0":
+                    attack_label = random.choice(attack_labels)
 
 
 def export_csv(df, filename):
@@ -239,24 +256,24 @@ def main(cfg: DictConfig):
 
     UCI_data_handler = UCIDataHandler(get_original_cwd(), cfg.dataset_name, cfg.num_sensor_labels, cfg.poisoning_conf)
     df = UCI_data_handler.load_df()
-    activity_col_idx = UCI_dataset_config["HL_Activity_column_index"]
-    activity_df = df.iloc[:, activity_col_idx]
-    print(activity_df.value_counts())
+    # activity_col_idx = UCI_dataset_config["HL_Activity_column_index"]
+    # activity_df = df.iloc[:, activity_col_idx]
+    # print(activity_df.value_counts())
 
-    # filtered_df = UCI_data_handler.filter(df)
-    # poisoned_df = UCI_data_handler.poisoning(filtered_df)
+    filtered_df = UCI_data_handler.filter(df)
+    poisoned_df = UCI_data_handler.poisoning(filtered_df)
 
-    # filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
-    # export_csv(poisoned_df, filename)
+    filename = generate_filename(cfg.dataset_name, cfg.gpt_model, cfg.trial, cfg.num_sensor_labels, cfg.poisoning_conf)
+    export_csv(poisoned_df, filename)
 
-    # csv_text = poisoned_df.to_csv(index=False, header=False)
+    csv_text = poisoned_df.to_csv(index=False, header=False)
 
-    # if cfg.experiment_type == "household":
-    #     conversation = household_experiment(csv_text, cfg.gpt_model, poisoned_df, UCI_data_handler)
-    # elif cfg.experiment_type == "measure_activity_duration":
-    #     conversation = measure_activity_duration(csv_text, cfg.gpt_model)
+    if cfg.experiment_type == "household":
+        conversation = household_experiment(csv_text, cfg.gpt_model, poisoned_df, UCI_data_handler)
+    elif cfg.experiment_type == "measure_activity_duration":
+        conversation = measure_activity_duration(csv_text, cfg.gpt_model)
 
-    # export_llm_conversation(conversation, filename)
+    export_llm_conversation(conversation, filename)
 
 if __name__ == "__main__":
     main()

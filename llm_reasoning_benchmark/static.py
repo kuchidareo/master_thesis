@@ -100,7 +100,7 @@ UCI_locomotion_label_to_index = {
     "Lie": 4
 }
 UCI_index_to_gesture_label = {
-    0: "None",
+    0: "0",
     1: "Open Door 1",
     2: "Open Door 2",
     3: "Close Door 1",
@@ -120,7 +120,7 @@ UCI_index_to_gesture_label = {
     17: "Toggle Switch"
 }
 UCI_gesture_label_to_index = {
-    "None": 0,
+    "0": 0,
     "Open Door 1": 1,
     "Open Door 2": 2,
     "Close Door 1": 3,
@@ -189,8 +189,7 @@ UCI_cnn_gesture_confusion_matrix = [
 ]
 UCI_locomotion_misclassify_trend = calculate_misclassification_trend(UCI_cnn_locomotion_confusion_matrix, UCI_index_to_locomotion_label)
 UCI_gesture_misclassify_trend = calculate_misclassification_trend(UCI_cnn_gesture_confusion_matrix, UCI_index_to_gesture_label)
-# print(UCI_locomotion_misclassify_trend)
-print(UCI_gesture_misclassify_trend)
+
 UCI_activity_durations = {
     "Relaxing": 57,
     "Coffee-time": 178,
