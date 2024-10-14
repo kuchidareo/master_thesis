@@ -1,9 +1,8 @@
-import os
-import random
 import yaml
+import os
 
-import pandas as pd
 from omegaconf import DictConfig
+import pandas as pd
 
 class FilterData():
     def __init__(self, config):
@@ -46,43 +45,14 @@ class FilterData():
         df.reset_index(drop=True, inplace=True)
 
         return df
-    
-class MislabelingProcessor():
-    def __init__(self, config):
-        self.config = config
-        self.indices_to_mislabel = None
-
-    @staticmethod
-    def wild_mislabeling(self, df, mislabeling_mode, target_labels, mislabeling_rate, num_label_duplication, num_label_mislabeling):
-        for label in target_labels:
-            num_row_mislabeling = int(df[df[label]] * mislabeling_rate)
-            
-        
-    @staticmethod
-    def random_mislabeling(self, df, mislabeling_mode, target_labels, mislabeling_rate, num_label_duplication, num_label_mislabeling):
-        num_row_mislabeling = int(len(df) * mislabeling_rate)
-        self.indices_to_mislabel = random.sample(range(len(df)), num_row_mislabeling)
-
-        for row_index in self.indices_to_mislabel:
-            mislabeling_column_index = random.sample(range(num_label_duplication), num_label_mislabeling)
-            for col_index in mislabeling_column_index:
-                for label in target_labels:
-                    if mislabeling_mode == "wild":
-                        df.loc[row_index, f"{label}_label_{col_index}"] = self.generate_flip_label(df, row_index, label, col_index)
-                    elif mislabeling_mode == "fused":
-                        df.loc[row_index, f"{label}_label_{col_index}"] = 'Swim'
-        return df
-
-
 
 def filter_data(
+    df: pd.DataFrame,
     config: DictConfig,
+    metadata: DictConfig
 ):
     match config.dataset_name:
         case "opportunity":
-            with open(config.metadata_path, "r") as file:
-                metadata = yaml.safe_load(file)
-
             column_index_to_save = [
                 metadata.locomotion_column_index,
                 metadata.ML_Both_Arms_column_index
@@ -92,12 +62,6 @@ def filter_data(
                 metadata.ML_Both_Arms_column_index: metadata.ML_Both_Arms_label_legend
             }
             sensor_frequency = metadata.sampling_frequency_hz
-
-            df = pd.read_csv(
-                os.path.join(metadata.dataset_directory, metadata.adl_name),
-                sep=' ',
-                header=None
-            )
             
             df = FilterData.filter_out_zero_values(df, column_index_to_save)
             df = FilterData.replace_labels_with_legend(df, column_index_to_legend)
@@ -113,17 +77,20 @@ def filter_data(
             pass
         case default:
             raise ValueError(f"Dataset {config.dataset_name} not recognized.")
+        
 
-def apply_misclassification(
-    df: pd.DataFrame,
+def load_datasets(
     config: DictConfig,
 ):
-    match config.dataset_name:
-        case "opportunity":
-            pass
-        case "your-dataset-name":
-            # Add preprocess code here.
-            pass
-        case default:
-            raise ValueError(f"Dataset {config.dataset_name} not recognized.")
-    
+    with open(config.metadata_path, "r") as file:
+        metadata = yaml.safe_load(file)
+
+    df = pd.read_csv(
+        os.path.join(metadata.dataset_directory, metadata.adl_name),
+        sep=' ',
+        header=None
+    )
+            
+    filtered_dataset = filter_data(df, config, metadata)
+
+    return filtered_dataset
