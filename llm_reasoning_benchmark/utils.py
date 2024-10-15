@@ -1,8 +1,5 @@
 import os
 
-import hydra
-
-
 opportunity_index_to_locomotion_label = {
     0: "0",
     1: "Stand",

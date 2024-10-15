@@ -1,7 +1,6 @@
-import yaml
 import os
 
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 import pandas as pd
 
 class FilterData():
