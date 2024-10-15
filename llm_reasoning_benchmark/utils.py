@@ -1,5 +1,10 @@
+import os
+
+import hydra
+
+
 opportunity_index_to_locomotion_label = {
-    0: "None",
+    0: "0",
     1: "Stand",
     2: "Walk",
     3: "Sit",
@@ -27,7 +32,7 @@ opportunity_index_to_gesture_label = {
     17: "Toggle Switch"
 }
 
-def calculate_misclassification_trend(label):
+def calculate_cnn_misclassification_trend(label):
     if label == "locomotion":
         confusion_matrix = opportunity_cnn_locomotion_confusion_matrix
         index_to_label = opportunity_index_to_locomotion_label
@@ -55,6 +60,7 @@ def calculate_misclassification_trend(label):
                 misclassify_trend.append([index_to_label[i], index_to_label[j], probability])
     return misclassify_trend
 
+## TODO: Add explanation for this matrix.
 opportunity_cnn_locomotion_confusion_matrix = [
     [1200, 0, 0, 0, 0],
     [2, 1188, 23, 0, 0],
@@ -83,7 +89,7 @@ opportunity_cnn_gesture_confusion_matrix = [
 ]
 
 ## TODO: Add experiment_type to the filename
-def generate_filename(dataset_config, misclassification_config, gpt_model, trial):
+def generate_filename(dataset_config, misclassification_config, ex_type, gpt_model, trial):
         dataset_name = dataset_config.dataset_name
         target_labels = str(misclassification_config.target_labels)
         mislabeling_mode = misclassification_config.mislabeling_mode
@@ -91,14 +97,14 @@ def generate_filename(dataset_config, misclassification_config, gpt_model, trial
         num_label_mislabeling = misclassification_config.num_label_mislabeling
         mislabeling_rate = misclassification_config.mislabeling_rate
 
-        filename = f"{dataset_name}_{gpt_model}_{mislabeling_mode}_{target_labels}_{num_label_duplication}_{num_label_mislabeling}_{mislabeling_rate}_{trial}"
+        filename = f"{dataset_name}_{gpt_model}_{ex_type}_{mislabeling_mode}_{target_labels}_{num_label_duplication}_{num_label_mislabeling}_{mislabeling_rate}_{trial}"
         return filename
 
-def export_csv(df, filename):
-    df.to_csv(f"{filename}.csv", index=False)
+def export_csv(df, output_dir, filename):
+    df.to_csv(os.path.join(output_dir, f"{filename}.csv"), index=False)
 
-def export_llm_conversation(conversation, filename):
-    with open(f"{filename}.md", "w") as f:
+def export_llm_conversation(conversation, output_dir, filename):
+    with open(os.path.join(output_dir, f"{filename}.md"), "w") as f:
         for utterance in conversation:
             f.write(f"### {utterance['role']}\n")
             f.write(f"{utterance['content']}\n")

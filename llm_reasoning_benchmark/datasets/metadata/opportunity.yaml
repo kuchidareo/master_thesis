@@ -1,4 +1,4 @@
-dataset_directory: "datasets/OpportunityUCIDataset/dataset"
+dataset_directory: "./datasets/OpportunityUCIDataset/dataset"
 adl_name: "S1-ADL1.dat"
 sampling_frequency_hz: 32
 locomotion_column_index: 243 # Read dataset/column_names.txt, label_legend.txt

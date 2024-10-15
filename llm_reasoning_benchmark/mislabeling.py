@@ -3,7 +3,7 @@ import random
 from omegaconf import DictConfig
 import pandas as pd
 
-from utils import calculate_misclassification_trend
+from utils import calculate_cnn_misclassification_trend
 
 class MislabelingProcessor():
     def __init__(self):
@@ -11,15 +11,16 @@ class MislabelingProcessor():
 
     def mislabeling(self, df, mislabeling_mode, target_labels, mislabeling_rate, num_label_duplication, num_label_mislabeling, metadata):
         for label in target_labels:
-            num_row_mislabeling = int(df[df[label]] * mislabeling_rate)
+            num_row_mislabeling = int(len(df[df[f"{label}_label_0"] != "0"]) * mislabeling_rate)
             mislabeling_column_index = random.sample(range(num_label_duplication), num_label_mislabeling)
+
             for col_index in mislabeling_column_index:
                 if label == "locomotion":
-                    misclassification_trend = calculate_misclassification_trend(label)
+                    misclassification_trend = calculate_cnn_misclassification_trend(label)
                     values = metadata.locomotion_label_values
                     fused_mislabel_value = metadata.locomotion_fused_mislabel
                 elif label == "gesture":
-                    misclassification_trend = calculate_misclassification_trend(label)
+                    misclassification_trend = calculate_cnn_misclassification_trend(label)
                     values = metadata.gesture_label_values
                     fused_mislabel_value = metadata.gesture_fused_mislabel
 
@@ -35,6 +36,8 @@ class MislabelingProcessor():
                     for target, _, _ in misclassifications:
                         self.apply_label_change(df, label, col_index, target, fused_mislabel_value, values)
 
+        return df
+
     def apply_label_change(self, df, label, col_index, target_value, mislabel_value, attack_labels):
         is_changed = False
         while not is_changed:
@@ -48,29 +51,30 @@ class MislabelingProcessor():
             else:
                 print(f"No instances of {target_value} found in column {label}_label_{col_index}")
                 target_value = random.choice(attack_labels)
-                while target_value == "0":
+                while target_value in ["0", mislabel_value]:
                     target_value = random.choice(attack_labels)
 
-def apply_misclassification(
+def apply_mislabeling(
     df: pd.DataFrame,
     mislabeling_config: DictConfig,
-    dataset_config: DictConfig,
+    dataset_name: str,
+    metadata: DictConfig
 ):
-    match dataset_config.dataset_name:
+    match dataset_name:
         case "opportunity":
             processor = MislabelingProcessor()
-            misclassified_df = processor.mislabeling(
+            mislabeled_df = processor.mislabeling(
                 df, 
                 mislabeling_config.mislabeling_mode,
                 mislabeling_config.target_labels,
                 mislabeling_config.mislabeling_rate,
                 mislabeling_config.num_label_duplication,
                 mislabeling_config.num_label_mislabeling,
-                dataset_config.metadata
+                metadata
             )
-            return misclassified_df, processor.indices_to_mislabel
+            return mislabeled_df, processor.indices_to_mislabel
         case "your-dataset-name":
             # Add preprocess code here.
             pass
         case default:
-            raise ValueError(f"Dataset {dataset_config.dataset_name} not recognized.")
+            raise ValueError(f"Dataset {dataset_name} not recognized.")

@@ -1,3 +1,4 @@
+import os
 import random
 
 from openai import OpenAI
@@ -8,7 +9,7 @@ This CSV file provides timestamps along with human activity labels captured by d
 Could you help explain step by step what might have happened and determine what situation the person might be in?
     """,
     """
-Based on the context, what might have happened at
+Based on the context, what might have happened
     """,
 ]
 duration_comprehension_ex_questions = [
