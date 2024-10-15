@@ -19,6 +19,8 @@ heterofl_on_simulation/data/
 heterofl_on_simulation/outputs/
 
 llm_reasoning_benchmark/OpportunityUCIDataset/
+llm_reasoning_benchmark/WEEEDataset/
+llm_reasoning_benchmark/SphereNetworkDataset/
 # Optionally, ignore IDE or editor-specific files
 .vscode/
 *.swp

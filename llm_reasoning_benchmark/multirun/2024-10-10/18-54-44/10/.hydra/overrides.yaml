@@ -1,0 +1,4 @@
+- gpt_model=gpt-4o-2024-08-06
+- trial=1
+- poisoning_conf.position.in_column=real
+- poisoning_conf.position.rate=0.1
