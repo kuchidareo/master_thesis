@@ -15,7 +15,10 @@ import requests
 slack_webhook = os.environ['SLACK_WEBHOOK']
 
 def send_message_to_slack(message):
-    requests.post(slack_webhook, json={'text': message})
+    try:
+        requests.post(slack_webhook, json={'text': message})
+    except:
+        pass # ignore
 
 # Define metric aggregation function
 def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
