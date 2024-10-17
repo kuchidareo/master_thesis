@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/170d4f26dd2240ac885a3522b2d00829/artifacts
+end_time: 1728720814215
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 170d4f26dd2240ac885a3522b2d00829
+run_name: agreeable-bee-775
+run_uuid: 170d4f26dd2240ac885a3522b2d00829
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728714908979
+status: 3
+tags: []
+user_id: user

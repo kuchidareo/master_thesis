@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/92309c41e69843c7a9615f6b1ba16a0e/artifacts
+end_time: 1728896484647
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 92309c41e69843c7a9615f6b1ba16a0e
+run_name: masked-mouse-172
+run_uuid: 92309c41e69843c7a9615f6b1ba16a0e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728884262400
+status: 3
+tags: []
+user_id: user

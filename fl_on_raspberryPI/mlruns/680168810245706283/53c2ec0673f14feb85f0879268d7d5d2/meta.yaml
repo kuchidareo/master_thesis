@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/53c2ec0673f14feb85f0879268d7d5d2/artifacts
+end_time: 1727919240714
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 53c2ec0673f14feb85f0879268d7d5d2
+run_name: thundering-seal-322
+run_uuid: 53c2ec0673f14feb85f0879268d7d5d2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727906191994
+status: 3
+tags: []
+user_id: user

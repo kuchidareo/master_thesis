@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/d05870dd157641e0be3b1f832904785b/artifacts
+end_time: 1728734671473
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: d05870dd157641e0be3b1f832904785b
+run_name: unruly-swan-274
+run_uuid: d05870dd157641e0be3b1f832904785b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728727546886
+status: 3
+tags: []
+user_id: user

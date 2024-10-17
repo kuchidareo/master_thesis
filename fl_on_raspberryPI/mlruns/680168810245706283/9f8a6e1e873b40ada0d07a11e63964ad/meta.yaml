@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/9f8a6e1e873b40ada0d07a11e63964ad/artifacts
+end_time: 1727906191656
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 9f8a6e1e873b40ada0d07a11e63964ad
+run_name: monumental-horse-987
+run_uuid: 9f8a6e1e873b40ada0d07a11e63964ad
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727896598878
+status: 3
+tags: []
+user_id: user

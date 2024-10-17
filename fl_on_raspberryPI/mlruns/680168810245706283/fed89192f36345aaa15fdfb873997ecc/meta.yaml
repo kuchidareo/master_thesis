@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/fed89192f36345aaa15fdfb873997ecc/artifacts
+end_time: 1728191456842
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: fed89192f36345aaa15fdfb873997ecc
+run_name: painted-trout-996
+run_uuid: fed89192f36345aaa15fdfb873997ecc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728185438066
+status: 3
+tags: []
+user_id: user

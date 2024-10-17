@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/7213e553a30a4a60a29f0e226b86d208/artifacts
+end_time: 1727986892469
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 7213e553a30a4a60a29f0e226b86d208
+run_name: placid-turtle-426
+run_uuid: 7213e553a30a4a60a29f0e226b86d208
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727960134479
+status: 3
+tags: []
+user_id: user

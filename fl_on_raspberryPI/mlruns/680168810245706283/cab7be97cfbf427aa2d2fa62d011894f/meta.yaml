@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/cab7be97cfbf427aa2d2fa62d011894f/artifacts
+end_time: 1728098559478
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: cab7be97cfbf427aa2d2fa62d011894f
+run_name: placid-mole-656
+run_uuid: cab7be97cfbf427aa2d2fa62d011894f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728087143219
+status: 3
+tags: []
+user_id: user

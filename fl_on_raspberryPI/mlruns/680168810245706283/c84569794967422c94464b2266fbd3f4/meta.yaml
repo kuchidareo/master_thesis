@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/c84569794967422c94464b2266fbd3f4/artifacts
+end_time: 1728492410267
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: c84569794967422c94464b2266fbd3f4
+run_name: unequaled-shark-448
+run_uuid: c84569794967422c94464b2266fbd3f4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728473506561
+status: 3
+tags: []
+user_id: user

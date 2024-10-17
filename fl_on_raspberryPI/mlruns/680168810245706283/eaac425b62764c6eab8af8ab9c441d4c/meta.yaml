@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/eaac425b62764c6eab8af8ab9c441d4c/artifacts
+end_time: 1729045789323
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: eaac425b62764c6eab8af8ab9c441d4c
+run_name: receptive-turtle-15
+run_uuid: eaac425b62764c6eab8af8ab9c441d4c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729039885385
+status: 3
+tags: []
+user_id: user

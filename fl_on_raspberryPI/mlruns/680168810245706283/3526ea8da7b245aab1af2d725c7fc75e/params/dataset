@@ -1,0 +1,1 @@
+{'dataset_name': 'trashnet', 'partition_type': 'uniform', 'dirichlet_alpha': 0.1, 'batch_size': {'train': 16, 'test': 16}, 'shuffle': {'train': True, 'test': False}, 'testset_size': 0.2}

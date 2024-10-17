@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/9d7eb11b6e004c979788fca59b3427fc/artifacts
+end_time: 1729096890024
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 9d7eb11b6e004c979788fca59b3427fc
+run_name: fun-fox-494
+run_uuid: 9d7eb11b6e004c979788fca59b3427fc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729084452041
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/0fd6db3fe0a244df9839e46633ffb322/artifacts
+end_time: 1728762583510
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 0fd6db3fe0a244df9839e46633ffb322
+run_name: beautiful-tern-751
+run_uuid: 0fd6db3fe0a244df9839e46633ffb322
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728749759454
+status: 3
+tags: []
+user_id: user

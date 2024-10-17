@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/2e453526e0f7450ba9c090885edc0fcf/artifacts
+end_time: 1729029360785
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 2e453526e0f7450ba9c090885edc0fcf
+run_name: worried-dog-118
+run_uuid: 2e453526e0f7450ba9c090885edc0fcf
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729023499835
+status: 3
+tags: []
+user_id: user

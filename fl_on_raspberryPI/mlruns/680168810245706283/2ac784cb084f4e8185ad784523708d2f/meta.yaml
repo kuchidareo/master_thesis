@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/2ac784cb084f4e8185ad784523708d2f/artifacts
+end_time: 1728056606397
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 2ac784cb084f4e8185ad784523708d2f
+run_name: carefree-boar-336
+run_uuid: 2ac784cb084f4e8185ad784523708d2f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728051158844
+status: 3
+tags: []
+user_id: user

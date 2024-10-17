@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/3159d85336d64154a8d48960dcef9902/artifacts
+end_time: 1729058558263
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 3159d85336d64154a8d48960dcef9902
+run_name: nimble-duck-667
+run_uuid: 3159d85336d64154a8d48960dcef9902
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729052646505
+status: 3
+tags: []
+user_id: user

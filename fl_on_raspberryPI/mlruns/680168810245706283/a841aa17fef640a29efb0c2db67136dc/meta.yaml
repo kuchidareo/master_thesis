@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/a841aa17fef640a29efb0c2db67136dc/artifacts
+end_time: 1728636325339
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: a841aa17fef640a29efb0c2db67136dc
+run_name: grandiose-pug-5
+run_uuid: a841aa17fef640a29efb0c2db67136dc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728623233084
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/3c45062ac57c4bdba9b00f70b4b68b92/artifacts
+end_time: 1727926166520
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 3c45062ac57c4bdba9b00f70b4b68b92
+run_name: fearless-grouse-559
+run_uuid: 3c45062ac57c4bdba9b00f70b4b68b92
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727919241070
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/8951acdeea73485889d00ed65d1d3c1b/artifacts
+end_time: 1728623232743
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 8951acdeea73485889d00ed65d1d3c1b
+run_name: skillful-robin-614
+run_uuid: 8951acdeea73485889d00ed65d1d3c1b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728609467575
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/ae5fb4cfab6443a8943b0c088049b4bd/artifacts
+end_time: 1728833196621
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: ae5fb4cfab6443a8943b0c088049b4bd
+run_name: fortunate-newt-299
+run_uuid: ae5fb4cfab6443a8943b0c088049b4bd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728815895809
+status: 3
+tags: []
+user_id: user

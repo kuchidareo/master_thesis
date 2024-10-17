@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/924865cd5fbd4d6d8f5538d71165289a/artifacts
+end_time: 1727873392142
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 924865cd5fbd4d6d8f5538d71165289a
+run_name: likeable-cow-333
+run_uuid: 924865cd5fbd4d6d8f5538d71165289a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727873279778
+status: 4
+tags: []
+user_id: user

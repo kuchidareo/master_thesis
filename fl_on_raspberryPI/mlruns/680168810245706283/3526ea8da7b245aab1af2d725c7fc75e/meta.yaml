@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/3526ea8da7b245aab1af2d725c7fc75e/artifacts
+end_time: 1728454850664
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 3526ea8da7b245aab1af2d725c7fc75e
+run_name: sassy-auk-643
+run_uuid: 3526ea8da7b245aab1af2d725c7fc75e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728435798454
+status: 3
+tags: []
+user_id: user

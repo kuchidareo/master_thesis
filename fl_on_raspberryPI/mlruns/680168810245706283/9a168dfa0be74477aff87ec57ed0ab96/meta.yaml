@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/9a168dfa0be74477aff87ec57ed0ab96/artifacts
+end_time: 1728688159695
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 9a168dfa0be74477aff87ec57ed0ab96
+run_name: monumental-shad-6
+run_uuid: 9a168dfa0be74477aff87ec57ed0ab96
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728664300996
+status: 3
+tags: []
+user_id: user

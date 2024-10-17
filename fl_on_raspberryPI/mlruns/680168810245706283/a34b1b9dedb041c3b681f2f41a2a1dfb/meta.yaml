@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/a34b1b9dedb041c3b681f2f41a2a1dfb/artifacts
+end_time: 1728749759116
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: a34b1b9dedb041c3b681f2f41a2a1dfb
+run_name: trusting-crow-617
+run_uuid: a34b1b9dedb041c3b681f2f41a2a1dfb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728742583758
+status: 3
+tags: []
+user_id: user

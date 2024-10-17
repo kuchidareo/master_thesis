@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/98a049e3c9fc408c89b0a6e7fe2dadcf/artifacts
+end_time: 1727960134124
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 98a049e3c9fc408c89b0a6e7fe2dadcf
+run_name: luxuriant-moth-243
+run_uuid: 98a049e3c9fc408c89b0a6e7fe2dadcf
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727944343013
+status: 3
+tags: []
+user_id: user

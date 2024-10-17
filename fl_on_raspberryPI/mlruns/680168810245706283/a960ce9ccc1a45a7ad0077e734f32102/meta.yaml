@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/a960ce9ccc1a45a7ad0077e734f32102/artifacts
+end_time: 1728742583426
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: a960ce9ccc1a45a7ad0077e734f32102
+run_name: mercurial-cod-421
+run_uuid: a960ce9ccc1a45a7ad0077e734f32102
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728734671828
+status: 3
+tags: []
+user_id: user

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/c6156e4d07a04e249d4b4e6ca36d2490/artifacts
+end_time: 1728051158490
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: c6156e4d07a04e249d4b4e6ca36d2490
+run_name: traveling-worm-818
+run_uuid: c6156e4d07a04e249d4b4e6ca36d2490
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728033889188
+status: 3
+tags: []
+user_id: user

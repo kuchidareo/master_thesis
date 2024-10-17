@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/fd20bbfd60d5472fbb7f254bc2f6b0f2/artifacts
+end_time: 1728787185704
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: fd20bbfd60d5472fbb7f254bc2f6b0f2
+run_name: delightful-dog-990
+run_uuid: fd20bbfd60d5472fbb7f254bc2f6b0f2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728762583858
+status: 3
+tags: []
+user_id: user

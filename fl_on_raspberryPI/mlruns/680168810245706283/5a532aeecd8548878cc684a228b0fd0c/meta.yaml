@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/5a532aeecd8548878cc684a228b0fd0c/artifacts
+end_time: 1728387938502
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 5a532aeecd8548878cc684a228b0fd0c
+run_name: nebulous-swan-194
+run_uuid: 5a532aeecd8548878cc684a228b0fd0c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728381994391
+status: 3
+tags: []
+user_id: user

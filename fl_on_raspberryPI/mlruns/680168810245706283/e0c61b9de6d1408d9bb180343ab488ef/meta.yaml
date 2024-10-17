@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/e0c61b9de6d1408d9bb180343ab488ef/artifacts
+end_time: 1728062118613
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: e0c61b9de6d1408d9bb180343ab488ef
+run_name: colorful-roo-570
+run_uuid: e0c61b9de6d1408d9bb180343ab488ef
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728056606750
+status: 3
+tags: []
+user_id: user

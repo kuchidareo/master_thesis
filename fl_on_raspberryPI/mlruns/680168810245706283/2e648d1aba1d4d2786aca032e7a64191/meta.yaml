@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/2e648d1aba1d4d2786aca032e7a64191/artifacts
+end_time: 1729121405661
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 2e648d1aba1d4d2786aca032e7a64191
+run_name: classy-zebra-602
+run_uuid: 2e648d1aba1d4d2786aca032e7a64191
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729096890403
+status: 3
+tags: []
+user_id: user

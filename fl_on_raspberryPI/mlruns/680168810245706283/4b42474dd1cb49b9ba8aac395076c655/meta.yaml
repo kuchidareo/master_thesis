@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/4b42474dd1cb49b9ba8aac395076c655/artifacts
+end_time: 1728079654150
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 4b42474dd1cb49b9ba8aac395076c655
+run_name: bustling-mule-241
+run_uuid: 4b42474dd1cb49b9ba8aac395076c655
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728073571087
+status: 3
+tags: []
+user_id: user

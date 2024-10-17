@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/d2eb4fdfcfaa4478a903c27273c29916/artifacts
+end_time: 1727873813870
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: d2eb4fdfcfaa4478a903c27273c29916
+run_name: capable-shoat-724
+run_uuid: d2eb4fdfcfaa4478a903c27273c29916
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727873518301
+status: 4
+tags: []
+user_id: user

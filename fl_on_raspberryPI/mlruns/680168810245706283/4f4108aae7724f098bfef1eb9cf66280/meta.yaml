@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/4f4108aae7724f098bfef1eb9cf66280/artifacts
+end_time: 1727944342623
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 4f4108aae7724f098bfef1eb9cf66280
+run_name: merciful-goat-607
+run_uuid: 4f4108aae7724f098bfef1eb9cf66280
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1727926166862
+status: 3
+tags: []
+user_id: user

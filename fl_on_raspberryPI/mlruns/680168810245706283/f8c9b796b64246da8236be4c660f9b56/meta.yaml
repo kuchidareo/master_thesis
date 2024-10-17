@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/f8c9b796b64246da8236be4c660f9b56/artifacts
+end_time: 1729039885038
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: f8c9b796b64246da8236be4c660f9b56
+run_name: nebulous-skunk-608
+run_uuid: f8c9b796b64246da8236be4c660f9b56
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729034541378
+status: 3
+tags: []
+user_id: user

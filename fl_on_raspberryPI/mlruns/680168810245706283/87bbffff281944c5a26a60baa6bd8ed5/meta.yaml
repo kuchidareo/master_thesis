@@ -1,0 +1,15 @@
+artifact_uri: file:///home/user/kuchida/master_thesis/fl_on_raspberryPI/mlruns/680168810245706283/87bbffff281944c5a26a60baa6bd8ed5/artifacts
+end_time: 1728204046285
+entry_point_name: ''
+experiment_id: '680168810245706283'
+lifecycle_stage: active
+run_id: 87bbffff281944c5a26a60baa6bd8ed5
+run_name: dapper-steed-456
+run_uuid: 87bbffff281944c5a26a60baa6bd8ed5
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1728197475652
+status: 3
+tags: []
+user_id: user
